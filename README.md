@@ -1,4 +1,15 @@
-# metropolis
-Highly specialized Software Architecture Design and Documentation Tool.
+# Metropolis
+Highly specialized Architecture Design and Documentation Tool.
 
-The application consists of 3 main parts: client, persistence layer and core logic. These parts are named accordingly: Theater, Gymnasium, Temple.
+## Docs
+
+### Install
+```
+cargo install mdbook
+cargo install mdbook-mermaid
+```
+
+### Serve
+```
+mdbook serve ./docs -p 8000 -n 127.0.0.1
+```
