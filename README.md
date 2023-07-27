@@ -1,6 +1,31 @@
 # Metropolis
 Highly specialized Architecture Design and Documentation Tool.
 
+## Theater
+Client application based on the Ruby on Rails framework.
+
+Command that was used to generate the initial application:
+```
+rails new . --skip-active-record --skip-jbuilder --skip-test
+```
+
+### Install
+```
+cargo install rtx-cli
+sudo apt install zlib1g-dev libyaml-dev libssl-dev
+rtx install ruby@3.2.2
+```
+
+### Serve
+```
+./theater/bin/rails s
+```
+
+### Run tests
+```
+./theater/bin/rake -C ./theater spec
+```
+
 ## Docs
 
 ### Install
