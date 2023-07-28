@@ -4,6 +4,6 @@ class ListShowcasedProjects
   end
 
   def execute
-    @projects_client.list_projects
+    @projects_client.live_list_projects
   end
 end

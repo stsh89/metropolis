@@ -26,6 +26,11 @@ rtx install ruby@3.2.2
 ./theater/bin/rake -C ./theater spec
 ```
 
+### Build gRPC libs
+```
+./theater/bin/rake -C ./theater grpc:build
+```
+
 ## Docs
 
 ### Install
@@ -37,4 +42,16 @@ cargo install mdbook-mermaid
 ### Serve
 ```
 mdbook serve ./docs -p 8000 -n 127.0.0.1
+```
+
+## Temple
+
+### Install
+```
+sudo apt install protobuf-compiler libprotobuf-dev
+```
+
+### Serve
+```
+cargo run --manifest-path ./temple/Cargo.toml
 ```
