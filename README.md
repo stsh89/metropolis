@@ -55,3 +55,10 @@ sudo apt install protobuf-compiler libprotobuf-dev
 ```
 cargo run --manifest-path ./temple/Cargo.toml
 ```
+
+## Config
+
+### Generate
+```
+ruby ./config/local_config.rb
+```
