@@ -31,6 +31,43 @@ rtx install ruby@3.2.2
 ./theater/bin/rake -C ./theater grpc:build
 ```
 
+## Gymnasium
+Datastore based on the Phoenix framework.
+
+Command that was used to generate the initial application:
+```
+rails new . --skip-active-record --skip-jbuilder --skip-test
+```
+
+### Install
+```
+cargo install rtx-cli
+sudo apt install unzip libncurses5-dev inotify-tools
+rtx install erlang@26.0.2
+rtx install elixir@1.15.4
+```
+
+### Database setup
+```
+export PG_PASS=your_database_password
+mix ecto.create
+```
+
+### Serve
+```
+mix phx.server
+```
+
+### Run tests
+```
+./theater/bin/rake -C ./theater spec
+```
+
+### Build gRPC libs
+```
+./theater/bin/rake -C ./theater grpc:build
+```
+
 ## Docs
 
 ### Install
