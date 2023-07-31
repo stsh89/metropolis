@@ -1,12 +1,11 @@
 use tonic::{Request, Response, Status};
 
-use projects::projects_service_server::{ProjectsService};
-use projects::{ListProjectsResponse, ListProjectsRequest, Project};
+use projects::projects_service_server::ProjectsService;
+use projects::{ListProjectsRequest, ListProjectsResponse, Project};
 
 pub mod projects {
     tonic::include_proto!("projects"); // The string specified here must match the proto package name
 }
-
 
 #[derive(Debug, Default)]
 pub struct Projects {}
@@ -16,7 +15,8 @@ impl ProjectsService for Projects {
     async fn list_projects(
         &self,
         request: Request<ListProjectsRequest>, // Accept request of type HelloRequest
-    ) -> Result<Response<ListProjectsResponse>, Status> { // Return an instance of type HelloReply
+    ) -> Result<Response<ListProjectsResponse>, Status> {
+        // Return an instance of type HelloReply
         println!("Got a request: {:?}", request);
 
         let response = projects::ListProjectsResponse {

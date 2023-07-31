@@ -1,15 +1,17 @@
 [package]
+edition = "2021"
 name = "temple"
 version = "0.1.0"
-edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tonic = "0.9"
 prost = "0.11"
 prost-types = "0.11"
+serde = { version = "1.0.179", default-features = false, features = ['derive'] }
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+tonic = "0.9"
+serde_json = { version = "1.0.104" }
 
 [build-dependencies]
 tonic-build = "0.9"
