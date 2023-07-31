@@ -1,4 +1,4 @@
-module EnvConfig
+module Config
   Config = Struct.new(
     :projects_client,
     keyword_init: true
@@ -8,15 +8,19 @@ module EnvConfig
     :address,
     :port,
     keyword_init: true
-  )
+  ) do
+    def socket_address
+      "#{address}:#{port}"
+    end
+  end
 
   class Loader
     class << self
-      def load
-        file_content = File.read("#{Rails.root}/../local_config.json")
+      def read_from_file(file_path)
+        file_content = File.read(file_path)
         json = JSON.parse(file_content)
 
-        temple_config_json = json['temple_config']
+        temple_config_json = json['temple']
         temple_server_config_json = temple_config_json['server']
         projects_client = ProjectsClient.new(
           address: temple_server_config_json['address'],
@@ -31,4 +35,4 @@ module EnvConfig
   end
 end
 
-TheaterConfig = EnvConfig::Loader.load
+TheaterConfig = Config::Loader.read_from_file("#{Rails.root}/../config.json")

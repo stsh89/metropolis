@@ -1,25 +1,14 @@
-class TempleConfig
-  Attributes = Struct.new(
-    :server,
-    keyword_init: true
-  )
-
-  Server = Struct.new(
-    :address,
-    :port,
-    keyword_init: true
-  )
-
-  def initialize(attributes)
-    @attributes = attributes
-  end
-
+TempleConfig = Struct.new(
+  :server,
+  keyword_init: true
+) do
   def to_h
-    {
-      server: {
-        address: @attributes.server.address,
-        port: @attributes.server.port
-      }
-    }
+    { server: server.to_h }
   end
 end
+
+TempleServerConfig = Struct.new(
+  :address,
+  :port,
+  keyword_init: true
+)

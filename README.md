@@ -58,7 +58,7 @@ cargo run --manifest-path ./temple/Cargo.toml
 
 ## Config
 
-### Generate
+### Generate Local Config
 ```
-ruby ./config/local_config.rb
+./config/bin/generate local
 ```

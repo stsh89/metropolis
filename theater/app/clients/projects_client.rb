@@ -24,8 +24,7 @@ class ProjectsClient
   end
 
   def live_list_projects
-    socket_address = "#{TheaterConfig.projects_client.address}:#{TheaterConfig.projects_client.port}"
-    stub = Projects::ProjectsService::Stub.new(socket_address, :this_channel_is_insecure)
+    stub = Projects::ProjectsService::Stub.new(TheaterConfig.projects_client.socket_address, :this_channel_is_insecure)
 
     # [
     #   Project.new(
