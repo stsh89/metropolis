@@ -1,56 +1,72 @@
 use tonic::{Request, Response, Status};
 
-use projects::projects_service_server::ProjectsService;
-use projects::{ListProjectsRequest, ListProjectsResponse, Project};
+pub mod proto {
+    pub mod temple {
+        tonic::include_proto!("proto.temple.v1"); // The string specified here must match the proto package name
+    }
 
-pub mod projects {
-    tonic::include_proto!("projects"); // The string specified here must match the proto package name
+    pub mod gymnasium {
+        tonic::include_proto!("proto.gymnasium.v1");
+
+        pub mod dimensions {
+            tonic::include_proto!("proto.gymnasium.v1.dimensions");
+        }
+    }
 }
 
 #[derive(Debug, Default)]
 pub struct Projects {}
 
 #[tonic::async_trait]
-impl ProjectsService for Projects {
+impl proto::temple::projects_server::Projects for Projects {
     async fn list_projects(
         &self,
-        request: Request<ListProjectsRequest>, // Accept request of type HelloRequest
-    ) -> Result<Response<ListProjectsResponse>, Status> {
+        request: Request<proto::temple::ListProjectsRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::temple::ListProjectsResponse>, Status> {
         // Return an instance of type HelloReply
         println!("Got a request: {:?}", request);
 
-        let response = projects::ListProjectsResponse {
-            projects: vec![
-                Project {
-                    id: "bdabace9-d878-44c0-a846-19a729b41a67".to_string(),
-                    name: "Metropolis".to_string(),
-                    description: "Highly specialized Architecture Design and Documentation Tool.".to_string(),
-                    create_timestamp: Some(prost_types::Timestamp {
-                        seconds: 1690539573,
-                        nanos: 0
-                    })
-                },
-                Project {
-                    id: "8d7618ef-2c6b-45b5-9e7e-3d0ef12c661a".to_string(),
-                    name: "Diesel".to_string(),
-                    description: "Safe, Extensible ORM and Query Builder for Rust.".to_string(),
-                    create_timestamp: Some(prost_types::Timestamp {
-                        seconds: 1690539373,
-                        nanos: 0
-                    })
-                },
-                Project {
-                    id: "6d28578a-1ba0-43d1-a953-0bb1d855a0e1".to_string(),
-                    name: "Livebook".to_string(),
-                    description: "Livebook is a web application for writing interactive and collaborative code notebooks.".to_string(),
-                    create_timestamp: Some(prost_types::Timestamp {
-                        seconds: 1690539173,
-                        nanos: 0
-                    })
-                }
-            ],
+        let mut client =
+            proto::gymnasium::dimensions_client::DimensionsClient::connect("http://localhost:50052")
+                .await
+                .map_err(|err| {
+                    dbg!(err);
+
+                    Status::internal("can't connect to datastore")
+                })?;
+
+        let response = client.select_dimension_records(proto::gymnasium::SelectDimensionRecordsRequest{
+            parameters: Some(
+                proto::gymnasium::select_dimension_records_request::Parameters::ProjectParameters(
+                    proto::gymnasium::ProjectParameters {}
+                )
+            ),
+        }).await.map_err(|_err| {
+            Status::internal("can't connect to datastore 2")
+        })?
+        .into_inner();
+
+        if response.records.is_none() {
+            return Err(Status::internal("something went wrong"));
+        }
+
+        let projects = match response.records.unwrap() {
+            proto::gymnasium::select_dimension_records_response::Records::ProjectRecords(
+                catalogue,
+            ) => catalogue
+                .records
+                .into_iter()
+                .map(|record| proto::temple::Project {
+                    id: record.id,
+                    name: record.name,
+                    description: record.description,
+                    create_time: record.create_time,
+                })
+                .collect::<Vec<proto::temple::Project>>(),
         };
 
-        Ok(Response::new(response)) // Send back our formatted greeting
+        Ok(Response::new(proto::temple::ListProjectsResponse {
+            projects,
+        }))
     }
 }
