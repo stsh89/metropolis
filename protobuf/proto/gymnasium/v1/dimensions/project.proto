@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package proto.gymnasium.v1.dimensions;
+
+// Representation of the Project dimension.
+message Project {
+    // Unique identifier for the Project. Text representation of the UUID.
+    string id = 1;
+
+    // The name of the Project.
+    string name = 2;
+
+    // The description of the Project.
+    string description = 3;
+
+    // The creation time of the Project.
+    google.protobuf.Timestamp create_time = 4;
+}

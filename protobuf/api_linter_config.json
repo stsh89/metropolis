@@ -1,0 +1,12 @@
+[
+  {
+    "disabled_rules": [
+      "core::0191::java-multiple-files",
+      "core::0191::java-outer-classname",
+      "core::0191::java-package",
+      "core::0127::http-annotation",
+      "core::0123::resource-annotation",
+      "core::0132::request-parent-required"
+    ]
+  }
+]

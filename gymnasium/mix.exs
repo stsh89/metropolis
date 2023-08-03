@@ -49,7 +49,14 @@ defmodule Gymnasium.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:plug_cowboy, "~> 2.5"},
+
+      # Because "the lock" specifies mint 1.5.1 and grpc >= 0.6.0 depends on mint ~> 1.4.2, the lock is incompatible with grpc >= 0.6.0.
+      # Looks like will be resolved in 0.6.1: https://github.com/elixir-grpc/grpc/issues/327
+      # {:grpc, "~> 0.6.0"},
+      {:grpc, git: "https://github.com/elixir-grpc/grpc", branch: "master"},
+
+      {:google_protos, "~> 0.3.0"}
     ]
   end
 

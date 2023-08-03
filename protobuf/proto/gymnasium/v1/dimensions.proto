@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "proto/gymnasium/v1/dimensions/project.proto";
+
+package proto.gymnasium.v1;
+
+// An RPC service that defines operations on dimensions.
+service Dimensions {
+    // Returns a list of dimension records filtered by the  requested parameters.
+    rpc SelectDimensionRecords(SelectDimensionRecordsRequest) returns (SelectDimensionRecordsResponse);
+}
+
+// The definition of the request for the filtering of dimension records.
+message SelectDimensionRecordsRequest {
+    oneof parameters {
+        // Filter parameters for the Project dimension.
+        ProjectParameters project_parameters = 1;
+    }
+}
+
+// The definition of the response for the filtering of dimension records.
+message SelectDimensionRecordsResponse {
+    oneof records {
+        // Project records filtered by parameters.
+        ProjectRecords project_records = 1;
+    }
+}
+
+// The list of available filters for the Project dimension.
+message ProjectParameters {}
+
+// Wrapper around a filtered list of Projects.
+message ProjectRecords {
+    // List of filtered projects.
+    repeated dimensions.Project records = 1;
+}

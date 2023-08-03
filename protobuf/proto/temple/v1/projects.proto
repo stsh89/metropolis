@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package proto.temple.v1;
+
+// List of available actions around Project resource.
+service Projects {
+    // List showcased Projects.
+    rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+}
+
+// (-- api-linter: core::0158::request-page-token-field=disabled
+//     aip.dev/not-precedent: We need to do this because pagination is not currently supported. --)
+// (-- api-linter: core::0158::request-page-size-field=disabled
+//     aip.dev/not-precedent: We need to do this because reasons. --)
+//
+// Client's request definition for Project listing.
+message ListProjectsRequest {}
+
+// (-- api-linter: core::0158::response-next-page-token-field=disabled
+//     aip.dev/not-precedent: We need to do this because pagination is not currently supported. --)
+//
+// Server's response to Client's Project listing request.
+message ListProjectsResponse {
+    // List of Projects.
+    repeated Project projects = 1;
+}
+
+// Project representation.
+message Project {
+    // Project's unique identifier. UUID in a string form.
+    string id = 1;
+
+    // Project's name.
+    string name = 2;
+
+    // Project's description.
+    string description = 3;
+
+    // The time when the Project was created.
+    google.protobuf.Timestamp create_time = 4;
+}

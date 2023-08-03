@@ -10,6 +10,15 @@ import Config
 config :gymnasium,
   ecto_repos: [Gymnasium.Repo]
 
+config :gymnasium, Gymnasium.Repo,
+  migration_timestamps: [type: :utc_datetime_usec],
+  migration_primary_key: [
+    name: :id,
+    type: :binary_id,
+    autogenerate: false,
+    read_after_writes: false
+  ]
+
 # Configures the endpoint
 config :gymnasium, GymnasiumWeb.Endpoint,
   url: [host: "localhost"],

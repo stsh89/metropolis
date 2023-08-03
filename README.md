@@ -42,6 +42,7 @@ rails new . --skip-active-record --skip-jbuilder --skip-test
 ### Install
 ```
 cargo install rtx-cli
+mix escript.install hex protobuf
 sudo apt install unzip libncurses5-dev inotify-tools
 rtx install erlang@26.0.2
 rtx install elixir@1.15.4
@@ -65,7 +66,12 @@ mix phx.server
 
 ### Build gRPC libs
 ```
-./theater/bin/rake -C ./theater grpc:build
+protoc --elixir_out=plugins=grpc:./lib --proto_path=../proto/gymnasium/ ../proto/gymnasium/projects.proto
+```
+
+### Seed database
+```
+mix run priv/repo/seeds.exs
 ```
 
 ## Docs

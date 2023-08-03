@@ -9,3 +9,14 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+projects_data = [
+  %{
+    name: "Metropolis",
+    description: "Highly specialized Architecture Design and Documentation Tool."
+  }
+]
+
+Enum.each(projects_data, fn data ->
+  Gymnasium.Projects.create_project(data)
+end)

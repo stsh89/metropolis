@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+import "./proto/temple/v1/projects.proto";
+
+package proto.temple.v1;
