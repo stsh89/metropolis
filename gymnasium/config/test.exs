@@ -7,7 +7,7 @@ import Config
 # Run `mix help test` for more information.
 config :gymnasium, Gymnasium.Repo,
   username: "postgres",
-  password: "postgres",
+  password: System.get_env("PG_PASS"),
   hostname: "localhost",
   database: "gymnasium_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,

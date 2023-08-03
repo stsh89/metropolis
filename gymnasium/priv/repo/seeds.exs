@@ -18,5 +18,5 @@ projects_data = [
 ]
 
 Enum.each(projects_data, fn data ->
-  Gymnasium.Projects.create_project(data)
+  Gymnasium.Dimensions.create_project(data)
 end)

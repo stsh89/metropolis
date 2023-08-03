@@ -1,4 +1,4 @@
-defmodule Gymnasium.Projects do
+defmodule Gymnasium.Dimensions do
   @moduledoc """
   The Projects context.
   """
@@ -6,7 +6,7 @@ defmodule Gymnasium.Projects do
   import Ecto.Query, warn: false
   alias Gymnasium.Repo
 
-  alias Gymnasium.Projects.Project
+  alias Gymnasium.Dimensions.Project
 
   @doc """
   Returns the list of projects.

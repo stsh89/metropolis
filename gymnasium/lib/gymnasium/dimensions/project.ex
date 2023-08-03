@@ -1,4 +1,4 @@
-defmodule Gymnasium.Projects.Project do
+defmodule Gymnasium.Dimensions.Project do
   use Gymnasium.Schema
   import Ecto.Changeset
 
