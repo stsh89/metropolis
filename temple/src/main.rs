@@ -1,4 +1,7 @@
+mod client;
 mod config;
+mod datastore;
+mod model;
 mod server;
 
 use server::proto;
@@ -13,9 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Server starting at {server_socket_address}");
 
     Server::builder()
-        .add_service(proto::temple::projects_server::ProjectsServer::new(
-            projects,
-        ))
+        .add_service(proto::projects_server::ProjectsServer::new(projects))
         .serve(server_socket_address)
         .await?;
 
