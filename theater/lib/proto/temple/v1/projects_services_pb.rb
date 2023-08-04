@@ -19,6 +19,8 @@ module Proto
 
           # List showcased Projects.
           rpc :ListProjects, ::Proto::Temple::V1::ListProjectsRequest, ::Proto::Temple::V1::ListProjectsResponse
+          # Create a Project
+          rpc :SetupProjectEnvironment, ::Proto::Temple::V1::SetupProjectEnvironmentRequest, ::Proto::Temple::V1::SetupProjectEnvironmentResponse
         end
 
         Stub = Service.rpc_stub_class

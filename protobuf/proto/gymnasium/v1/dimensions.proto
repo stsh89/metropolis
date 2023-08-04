@@ -7,14 +7,18 @@ package proto.gymnasium.v1;
 // An RPC service that defines operations on dimensions.
 service Dimensions {
     // Returns a list of dimension records filtered by the  requested parameters.
-    rpc SelectDimensionRecords(SelectDimensionRecordsRequest) returns (SelectDimensionRecordsResponse);
+    rpc SelectDimensionRecords(SelectDimensionRecordsRequest) returns(SelectDimensionRecordsResponse);
+
+    // Saves Dimension record to the database.
+    // It creates a new record when identifier is missing, or updates in case of present identifier.
+    rpc StoreDimensionRecord(StoreDimensionRecordRequest) returns(StoreDimensionRecordResponse);
 }
 
 // The definition of the request for the filtering of dimension records.
 message SelectDimensionRecordsRequest {
-    oneof parameters {
+    oneof record_parameters {
         // Filter parameters for the Project dimension.
-        ProjectParameters project_parameters = 1;
+        ProjectRecordParameters project_record_parameters = 1;
     }
 }
 
@@ -27,10 +31,26 @@ message SelectDimensionRecordsResponse {
 }
 
 // The list of available filters for the Project dimension.
-message ProjectParameters {}
+message ProjectRecordParameters {}
 
 // Wrapper around a filtered list of Projects.
 message ProjectRecords {
     // List of filtered projects.
     repeated dimensions.Project records = 1;
+}
+
+// The definition of request for storing dimension record.
+message StoreDimensionRecordRequest {
+    oneof record {
+        // The Project to store.
+        dimensions.Project project_record = 1;
+    }
+}
+
+// The definition of the response for storing dimension record.
+message StoreDimensionRecordResponse {
+    oneof record {
+        // Stored Project.
+        dimensions.Project project_record = 1;
+    }
 }

@@ -7,7 +7,7 @@ require 'google/protobuf'
 require 'google/protobuf/timestamp_pb'
 
 
-descriptor_data = "\n\x1eproto/temple/v1/projects.proto\x12\x0fproto.temple.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x15\n\x13ListProjectsRequest\"B\n\x14ListProjectsResponse\x12*\n\x08projects\x18\x01 \x03(\x0b\x32\x18.proto.temple.v1.Project\"i\n\x07Project\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12/\n\x0b\x63reate_time\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp2g\n\x08Projects\x12[\n\x0cListProjects\x12$.proto.temple.v1.ListProjectsRequest\x1a%.proto.temple.v1.ListProjectsResponseb\x06proto3"
+descriptor_data = "\n\x1eproto/temple/v1/projects.proto\x12\x0fproto.temple.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x15\n\x13ListProjectsRequest\"B\n\x14ListProjectsResponse\x12*\n\x08projects\x18\x01 \x03(\x0b\x32\x18.proto.temple.v1.Project\"C\n\x1eSetupProjectEnvironmentRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\"L\n\x1fSetupProjectEnvironmentResponse\x12)\n\x07project\x18\x01 \x01(\x0b\x32\x18.proto.temple.v1.Project\"i\n\x07Project\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12/\n\x0b\x63reate_time\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp2\xe5\x01\n\x08Projects\x12[\n\x0cListProjects\x12$.proto.temple.v1.ListProjectsRequest\x1a%.proto.temple.v1.ListProjectsResponse\x12|\n\x17SetupProjectEnvironment\x12/.proto.temple.v1.SetupProjectEnvironmentRequest\x1a\x30.proto.temple.v1.SetupProjectEnvironmentResponseb\x06proto3"
 
 pool = Google::Protobuf::DescriptorPool.generated_pool
 
@@ -39,6 +39,8 @@ module Proto
     module V1
       ListProjectsRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("proto.temple.v1.ListProjectsRequest").msgclass
       ListProjectsResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("proto.temple.v1.ListProjectsResponse").msgclass
+      SetupProjectEnvironmentRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("proto.temple.v1.SetupProjectEnvironmentRequest").msgclass
+      SetupProjectEnvironmentResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("proto.temple.v1.SetupProjectEnvironmentResponse").msgclass
       Project = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("proto.temple.v1.Project").msgclass
     end
   end

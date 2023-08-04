@@ -3,7 +3,7 @@ class ProjectsController < ApplicationController
 
   # GET /projects
   def index
-    @projects = ListShowcasedProjects.new(projects_client: ProjectsClient.new).execute
+    @page = IndexProjectPage.new
   end
 
   # GET /projects/1
@@ -12,7 +12,7 @@ class ProjectsController < ApplicationController
 
   # GET /projects/new
   def new
-    # @project = Project.new
+    @page = NewProjectPage.new
   end
 
   # GET /projects/1/edit
@@ -21,13 +21,13 @@ class ProjectsController < ApplicationController
 
   # POST /projects
   def create
-    # @project = Project.new(project_params)
+    @page = CreateProjectPage.new(project_params)
 
-    # if @project.save
-    #   redirect_to @project, notice: "Project was successfully created."
-    # else
-    #   render :new, status: :unprocessable_entity
-    # end
+    if @page.create_project
+      redirect_to projects_path, notice: "Project was successfully created."
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
 
   # PATCH/PUT /projects/1
@@ -52,7 +52,7 @@ class ProjectsController < ApplicationController
     # end
 
     # Only allow a list of trusted parameters through.
-    # def project_params
-    #   params.fetch(:project, {})
-    # end
+    def project_params
+      params.fetch(:project, {}).permit(:name, :description)
+    end
 end

@@ -26,6 +26,26 @@ impl proto::projects_server::Projects for Projects {
 
         Ok(Response::new(proto::ListProjectsResponse { projects }))
     }
+
+    async fn setup_project_environment(
+        &self,
+        request: Request<proto::SetupProjectEnvironmentRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::SetupProjectEnvironmentResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::SetupProjectEnvironmentRequest { name, description } = request.into_inner();
+
+        let project = datastore::project::create(datastore::project::CreateProjectAttributes {
+            name,
+            description,
+        })
+        .await
+        .map_err(|err| Status::internal(err.description))?;
+
+        Ok(Response::new(proto::SetupProjectEnvironmentResponse {
+            project: Some(to_proto_project(project)),
+        }))
+    }
 }
 
 fn to_proto_project(project: Project) -> proto::Project {

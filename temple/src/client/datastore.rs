@@ -1,5 +1,6 @@
 use crate::model::{Project, UtcDateTime};
 use chrono::TimeZone;
+use tonic::transport::Channel;
 use uuid::Uuid;
 
 pub mod proto {
@@ -30,19 +31,26 @@ impl ClientError {
 }
 
 impl Client {
+    async fn client(
+        &self,
+    ) -> Result<proto::dimensions_client::DimensionsClient<Channel>, ClientError> {
+        use ClientError::*;
+
+        proto::dimensions_client::DimensionsClient::connect("http://localhost:50052")
+            .await
+            .map_err(|err| ConnectionError(err.to_string()))
+    }
+
     pub async fn select_projects(&self) -> Result<Vec<Project>, ClientError> {
         use ClientError::*;
 
-        let mut client =
-            proto::dimensions_client::DimensionsClient::connect("http://localhost:50052")
-                .await
-                .map_err(|err| ConnectionError(err.to_string()))?;
+        let mut client = self.client().await?;
 
         let response = client
             .select_dimension_records(proto::SelectDimensionRecordsRequest {
-                parameters: Some(
-                    proto::select_dimension_records_request::Parameters::ProjectParameters(
-                        proto::ProjectParameters {},
+                record_parameters: Some(
+                    proto::select_dimension_records_request::RecordParameters::ProjectRecordParameters(
+                        proto::ProjectRecordParameters {},
                     ),
                 ),
             })
@@ -75,6 +83,47 @@ impl Client {
         };
 
         Ok(projects)
+    }
+
+    pub async fn create_project(&self, project: Project) -> Result<Project, ClientError> {
+        use ClientError::*;
+
+        let mut client = self.client().await?;
+
+        let response = client
+            .store_dimension_record(proto::StoreDimensionRecordRequest {
+                record: Some(
+                    proto::store_dimension_record_request::Record::ProjectRecord(
+                        proto::dimensions::Project {
+                            id: Default::default(),
+                            name: project.name,
+                            description: project.description,
+                            create_time: Default::default(),
+                        },
+                    ),
+                ),
+            })
+            .await
+            .map_err(|err| EndpointRequestError(err.to_string()))?
+            .into_inner();
+
+        if response.record.is_none() {
+            return Err(EndpointRequestError(
+                "missing required field: #record".to_string(),
+            ));
+        }
+
+        let project = match response.record.unwrap() {
+            proto::store_dimension_record_response::Record::ProjectRecord(record) => Project {
+                id: Uuid::parse_str(&record.id)
+                    .map_err(|err| DataConversionError(err.to_string()))?,
+                name: record.name,
+                description: record.description,
+                create_time: from_proto_timestamp(record.create_time.unwrap())?,
+            },
+        };
+
+        Ok(project)
     }
 }
 

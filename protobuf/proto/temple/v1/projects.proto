@@ -8,12 +8,15 @@ package proto.temple.v1;
 service Projects {
     // List showcased Projects.
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+
+    // Create a Project
+    rpc SetupProjectEnvironment(SetupProjectEnvironmentRequest) returns (SetupProjectEnvironmentResponse);
 }
 
 // (-- api-linter: core::0158::request-page-token-field=disabled
 //     aip.dev/not-precedent: We need to do this because pagination is not currently supported. --)
 // (-- api-linter: core::0158::request-page-size-field=disabled
-//     aip.dev/not-precedent: We need to do this because reasons. --)
+//     aip.dev/not-precedent: We need to do this because pagination is not currently supported.. --)
 //
 // Client's request definition for Project listing.
 message ListProjectsRequest {}
@@ -25,6 +28,20 @@ message ListProjectsRequest {}
 message ListProjectsResponse {
     // List of Projects.
     repeated Project projects = 1;
+}
+
+// The definition of the request for the Project setup.
+message SetupProjectEnvironmentRequest {
+    // Project's name.
+    string name = 1;
+
+    // Project's description.
+    string description = 2;
+}
+
+// The definition of the response for the Project setup.
+message SetupProjectEnvironmentResponse {
+    Project project = 1;
 }
 
 // Project representation.

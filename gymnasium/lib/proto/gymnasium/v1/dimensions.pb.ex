@@ -3,11 +3,11 @@ defmodule Proto.Gymnasium.V1.SelectDimensionRecordsRequest do
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
-  oneof :parameters, 0
+  oneof(:record_parameters, 0)
 
-  field :project_parameters, 1,
-    type: Proto.Gymnasium.V1.ProjectParameters,
-    json_name: "projectParameters",
+  field :project_record_parameters, 1,
+    type: Proto.Gymnasium.V1.ProjectRecordParameters,
+    json_name: "projectRecordParameters",
     oneof: 0
 end
 
@@ -16,7 +16,7 @@ defmodule Proto.Gymnasium.V1.SelectDimensionRecordsResponse do
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
-  oneof :records, 0
+  oneof(:records, 0)
 
   field :project_records, 1,
     type: Proto.Gymnasium.V1.ProjectRecords,
@@ -24,7 +24,7 @@ defmodule Proto.Gymnasium.V1.SelectDimensionRecordsResponse do
     oneof: 0
 end
 
-defmodule Proto.Gymnasium.V1.ProjectParameters do
+defmodule Proto.Gymnasium.V1.ProjectRecordParameters do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
@@ -38,14 +38,48 @@ defmodule Proto.Gymnasium.V1.ProjectRecords do
   field :records, 1, repeated: true, type: Proto.Gymnasium.V1.Dimensions.Project
 end
 
+defmodule Proto.Gymnasium.V1.StoreDimensionRecordRequest do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  oneof(:record, 0)
+
+  field :project_record, 1,
+    type: Proto.Gymnasium.V1.Dimensions.Project,
+    json_name: "projectRecord",
+    oneof: 0
+end
+
+defmodule Proto.Gymnasium.V1.StoreDimensionRecordResponse do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  oneof(:record, 0)
+
+  field :project_record, 1,
+    type: Proto.Gymnasium.V1.Dimensions.Project,
+    json_name: "projectRecord",
+    oneof: 0
+end
+
 defmodule Proto.Gymnasium.V1.Dimensions.Service do
   @moduledoc false
 
   use GRPC.Service, name: "proto.gymnasium.v1.Dimensions", protoc_gen_elixir_version: "0.12.0"
 
-  rpc :SelectDimensionRecords,
-      Proto.Gymnasium.V1.SelectDimensionRecordsRequest,
-      Proto.Gymnasium.V1.SelectDimensionRecordsResponse
+  rpc(
+    :SelectDimensionRecords,
+    Proto.Gymnasium.V1.SelectDimensionRecordsRequest,
+    Proto.Gymnasium.V1.SelectDimensionRecordsResponse
+  )
+
+  rpc(
+    :StoreDimensionRecord,
+    Proto.Gymnasium.V1.StoreDimensionRecordRequest,
+    Proto.Gymnasium.V1.StoreDimensionRecordResponse
+  )
 end
 
 defmodule Proto.Gymnasium.V1.Dimensions.Stub do

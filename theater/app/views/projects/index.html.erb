@@ -2,12 +2,18 @@
 
 <h1 class="title">Projects</h1>
 
+<div class="columns">
+  <div class="column">
+    <%= link_to "New", new_project_path %>
+  </div>
+</div>
+
 <div id="projects" class="columns">
   <div class="column is-one-fifth">Name</div>
   <div class="column">Description</div>
   <div class="column">Create timestamp</div>
 </div>
 
-<%= render partial: 'project', collection: @projects %>
+<%= render partial: 'project', collection: @page.projects %>
 
 <%#= link_to "New project", new_project_path %>
