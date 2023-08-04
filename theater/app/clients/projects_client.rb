@@ -1,5 +1,5 @@
-require "#{Rails.root}/lib/projects_pb"
-require "#{Rails.root}/lib/projects_services_pb.rb"
+require "#{Rails.root}/lib/proto/temple/v1/projects_pb"
+require "#{Rails.root}/lib/proto/temple/v1/projects_services_pb.rb"
 require 'google/protobuf/well_known_types'
 
 class ProjectsClient
@@ -24,7 +24,7 @@ class ProjectsClient
   end
 
   def live_list_projects
-    stub = Projects::ProjectsService::Stub.new(TheaterConfig.projects_client.socket_address, :this_channel_is_insecure)
+    stub = Proto::Temple::V1::Projects::Stub.new(TheaterConfig.projects_client.socket_address, :this_channel_is_insecure)
 
     # [
     #   Project.new(
@@ -44,12 +44,13 @@ class ProjectsClient
     #   ),
     # ]
     # stub = Proto::ProjectsService::Service.new('[::1]:50051', :this_channel_is_insecure)
-    message = stub.list_projects(Projects::ListProjectsRequest.new())
+    message = stub.list_projects(Proto::Temple::V1::ListProjectsRequest.new())
     message.projects.map do |project|
       Project.new(
+        id: project.id,
         name: project.name,
         description: project.description,
-        create_timestamp: project.create_timestamp.to_time
+        create_time: project.create_time.to_time
       )
     end
   end
