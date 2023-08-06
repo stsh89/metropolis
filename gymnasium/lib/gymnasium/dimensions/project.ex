@@ -3,8 +3,9 @@ defmodule Gymnasium.Dimensions.Project do
   import Ecto.Changeset
 
   schema "projects" do
-    field :name, :string
     field :description, :string
+    field :name, :string
+    field :slug, :string
 
     timestamps()
   end
@@ -12,7 +13,9 @@ defmodule Gymnasium.Dimensions.Project do
   @doc false
   def changeset(project, attrs) do
     project
-    |> cast(attrs, [:name, :description])
-    |> validate_required([:name])
+    |> cast(attrs, [:description, :name, :slug])
+    |> validate_required([:name, :slug])
+    |> unique_constraint(:name, name: :projects_name_index)
+    |> unique_constraint(:slug, name: :projects_slug_index)
   end
 end

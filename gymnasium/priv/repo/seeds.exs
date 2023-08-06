@@ -12,8 +12,9 @@
 
 projects_data = [
   %{
-    name: "Metropolis",
-    description: "Highly specialized Architecture Design and Documentation Tool."
+    description: "An online platform for buying and selling books.",
+    name: "Bookstore",
+    slug: "bookstore"
   }
 ]
 

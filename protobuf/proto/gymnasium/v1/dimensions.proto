@@ -12,6 +12,9 @@ service Dimensions {
     // Saves Dimension record to the database.
     // It creates a new record when identifier is missing, or updates in case of present identifier.
     rpc StoreDimensionRecord(StoreDimensionRecordRequest) returns(StoreDimensionRecordResponse);
+
+    // Returns found Dimension record.
+    rpc FindDimensionRecord(FindDimensionRecordRequest) returns(FindDimensionRecordResponse);
 }
 
 // The definition of the request for the filtering of dimension records.
@@ -51,6 +54,22 @@ message StoreDimensionRecordRequest {
 message StoreDimensionRecordResponse {
     oneof record {
         // Stored Project.
+        dimensions.Project project_record = 1;
+    }
+}
+
+// The definition of response for searching dimension record by some unique identifier.
+message FindDimensionRecordRequest {
+    oneof id {
+        // Search a Project by it's slug.
+        string project_record_slug = 1;
+    }
+}
+
+// The definition of request for searching dimension record by some unique identifier.
+message FindDimensionRecordResponse {
+    oneof record {
+        // Found Project.
         dimensions.Project project_record = 1;
     }
 }

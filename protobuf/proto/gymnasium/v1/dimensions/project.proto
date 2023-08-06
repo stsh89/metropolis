@@ -17,4 +17,7 @@ message Project {
 
     // The creation time of the Project.
     google.protobuf.Timestamp create_time = 4;
+
+    // The slug of the Project. Unique identifier for the Project's web address.
+    string slug = 5;
 }

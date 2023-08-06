@@ -27,4 +27,13 @@ defmodule Proto.Gymnasium.V1.Dimensions.Server do
         raise GRPC.RPCError, status: :invalid_argument
     end
   end
+
+  def find_dimension_record(request, _stream) do
+    case request.id do
+      {:project_record_slug, slug} ->
+        GymnasiumGrpc.Dimensions.Project.find(slug)
+      _ ->
+        raise GRPC.RPCError, status: :invalid_argument
+    end
+  end
 end

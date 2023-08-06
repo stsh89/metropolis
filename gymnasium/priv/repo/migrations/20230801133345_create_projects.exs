@@ -3,10 +3,14 @@ defmodule Gymnasium.Repo.Migrations.CreateProjects do
 
   def change do
     create table(:projects) do
-      add :name, :string
       add :description, :string
+      add :name, :string
+      add :slug, :string
 
       timestamps()
     end
+
+    create unique_index(:projects, :name)
+    create unique_index(:projects, :slug)
   end
 end

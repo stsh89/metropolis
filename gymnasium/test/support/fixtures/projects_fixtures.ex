@@ -11,8 +11,9 @@ defmodule Gymnasium.DimensionsFixtures do
     {:ok, project} =
       attrs
       |> Enum.into(%{
-        name: "some name",
-        description: "some description"
+        description: "An online platform for buying and selling books.",
+        name: "Bookstore",
+        slug: "bookstore"
       })
       |> Gymnasium.Dimensions.create_project()
 

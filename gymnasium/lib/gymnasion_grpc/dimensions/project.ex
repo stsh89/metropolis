@@ -4,9 +4,10 @@ defmodule GymnasiumGrpc.Dimensions.Project do
   alias Proto.Gymnasium.V1.Dimensions.Project, as: ProtoProject
 
   alias Proto.Gymnasium.V1.{
+    FindDimensionRecordResponse,
+    ProjectRecordParameters,
     SelectDimensionRecordsResponse,
-    StoreDimensionRecordResponse,
-    ProjectRecordParameters
+    StoreDimensionRecordResponse
   }
 
   def select(_parameters = %ProjectRecordParameters{}) do
@@ -26,17 +27,39 @@ defmodule GymnasiumGrpc.Dimensions.Project do
         _ -> raise "update is not implemented"
       end
 
-    {:ok, project = %Project{}} = result
+    store_response(result)
+  end
 
+  def find(slug) do
+    project = Dimensions.get_project!(slug)
+
+    %FindDimensionRecordResponse{
+      record: {:project_record, to_proto_project(project)}
+    }
+  end
+
+  defp store_response({:ok, project = %Project{}}) do
     %StoreDimensionRecordResponse{
       record: {:project_record, to_proto_project(project)}
     }
   end
 
+  defp store_response({:error, changeset = %Ecto.Changeset{}}) do
+    error = List.first(changeset.errors)
+
+    case error do
+      { field, {message, _validation}} ->
+        raise GRPC.RPCError, status: :invalid_argument, message: "#{field}: #{message}"
+      _ ->
+        raise GRPC.RPCError, status: :invalid_argument
+    end
+  end
+
   defp create(project = %ProtoProject{}) do
     attributes = %{
+      description: project.description,
       name: project.name,
-      description: project.description
+      slug: project.slug
     }
 
     Dimensions.create_project(attributes)
@@ -44,10 +67,11 @@ defmodule GymnasiumGrpc.Dimensions.Project do
 
   defp to_proto_project(project = %Project{}) do
     %ProtoProject{
+      create_time: Helpers.to_proto_timestamp(project.inserted_at),
+      description: project.description,
       id: project.id,
       name: project.name,
-      description: project.description,
-      create_time: Helpers.to_proto_timestamp(project.inserted_at)
+      slug: project.slug
     }
   end
 end

@@ -8,7 +8,7 @@ defmodule Gymnasium.DimensionsTest do
 
     import Gymnasium.DimensionsFixtures
 
-    @invalid_attrs %{name: nil, description: nil}
+    @invalid_project_attrs %{name: nil, slug: nil}
 
     test "list_projects/0 returns all projects" do
       project = project_fixture()
@@ -22,35 +22,38 @@ defmodule Gymnasium.DimensionsTest do
 
     test "create_project/1 with valid data creates a project" do
       valid_attrs = %{
-        name: "some name",
-        description: "some description"
+        description: "An online platform for buying and selling books.",
+        name: "Bookstore",
+        slug: "bookstore"
       }
 
       assert {:ok, %Project{} = project} = Dimensions.create_project(valid_attrs)
-      assert project.name == "some name"
-      assert project.description == "some description"
+      assert project.description == "An online platform for buying and selling books."
+      assert project.name == "Bookstore"
+      assert project.slug == "bookstore"
     end
 
     test "create_project/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Dimensions.create_project(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Dimensions.create_project(@invalid_project_attrs)
     end
 
     test "update_project/2 with valid data updates the project" do
       project = project_fixture()
 
       update_attrs = %{
-        name: "some updated name",
-        description: "some updated description"
+        description: "A wild sell and buy book platform",
+        name: "Wild Bookstore",
+        slug: "wild-bookstore"
       }
 
       assert {:ok, %Project{} = project} = Dimensions.update_project(project, update_attrs)
-      assert project.name == "some updated name"
-      assert project.description == "some updated description"
+      assert project.name == "Wild Bookstore"
+      assert project.description == "A wild sell and buy book platform"
     end
 
     test "update_project/2 with invalid data returns error changeset" do
       project = project_fixture()
-      assert {:error, %Ecto.Changeset{}} = Dimensions.update_project(project, @invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Dimensions.update_project(project, @invalid_project_attrs)
       assert project == Dimensions.get_project!(project.id)
     end
 

@@ -18,7 +18,9 @@ defmodule Gymnasium.Dimensions do
 
   """
   def list_projects do
-    Repo.all(Project)
+    Repo.all(
+      from(p in Project, order_by: [desc: p.inserted_at])
+    )
   end
 
   @doc """
@@ -28,14 +30,14 @@ defmodule Gymnasium.Dimensions do
 
   ## Examples
 
-      iex> get_project!(123)
+      iex> get_project!("bookstore")
       %Project{}
 
-      iex> get_project!(456)
+      iex> get_project!("filestore")
       ** (Ecto.NoResultsError)
 
   """
-  def get_project!(id), do: Repo.get!(Project, id)
+  def get_project!(slug), do: Repo.get_by!(Project, slug: slug)
 
   @doc """
   Creates a project.
