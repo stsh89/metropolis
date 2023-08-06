@@ -103,5 +103,5 @@ cargo run --manifest-path ./temple/Cargo.toml
 
 ### Generate Local Config
 ```
-./config/bin/generate local
+./config/bin/write_to_file local
 ```
