@@ -87,6 +87,22 @@ defmodule Proto.Gymnasium.V1.FindDimensionRecordResponse do
     oneof: 0
 end
 
+defmodule Proto.Gymnasium.V1.RemoveDimensionRecordRequest do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  oneof :id, 0
+
+  field :project_record_id, 1, type: :string, json_name: "projectRecordId", oneof: 0
+end
+
+defmodule Proto.Gymnasium.V1.RemoveDimensionRecordResponse do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+end
+
 defmodule Proto.Gymnasium.V1.Dimensions.Service do
   @moduledoc false
 
@@ -103,6 +119,10 @@ defmodule Proto.Gymnasium.V1.Dimensions.Service do
   rpc :FindDimensionRecord,
       Proto.Gymnasium.V1.FindDimensionRecordRequest,
       Proto.Gymnasium.V1.FindDimensionRecordResponse
+
+  rpc :RemoveDimensionRecord,
+      Proto.Gymnasium.V1.RemoveDimensionRecordRequest,
+      Proto.Gymnasium.V1.RemoveDimensionRecordResponse
 end
 
 defmodule Proto.Gymnasium.V1.Dimensions.Stub do

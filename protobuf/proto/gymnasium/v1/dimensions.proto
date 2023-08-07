@@ -15,6 +15,9 @@ service Dimensions {
 
     // Returns found Dimension record.
     rpc FindDimensionRecord(FindDimensionRecordRequest) returns(FindDimensionRecordResponse);
+
+    // Removes requests Dimension record.
+    rpc RemoveDimensionRecord(RemoveDimensionRecordRequest) returns(RemoveDimensionRecordResponse);
 }
 
 // The definition of the request for the filtering of dimension records.
@@ -58,7 +61,7 @@ message StoreDimensionRecordResponse {
     }
 }
 
-// The definition of response for searching dimension record by some unique identifier.
+// The definition of request for searching dimension record by some unique identifier.
 message FindDimensionRecordRequest {
     oneof id {
         // Search a Project by it's slug.
@@ -66,10 +69,21 @@ message FindDimensionRecordRequest {
     }
 }
 
-// The definition of request for searching dimension record by some unique identifier.
+// The definition of response for searching dimension record by some unique identifier.
 message FindDimensionRecordResponse {
     oneof record {
         // Found Project.
         dimensions.Project project_record = 1;
     }
 }
+
+// The definition of request for removing dimension record by some unique identifier.
+message RemoveDimensionRecordRequest {
+    oneof id {
+        // Search a Project by it's id.
+        string project_record_id = 1;
+    }
+}
+
+// The definition of response for removing dimension record.
+message RemoveDimensionRecordResponse {}

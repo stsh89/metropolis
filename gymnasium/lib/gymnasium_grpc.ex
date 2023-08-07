@@ -36,4 +36,13 @@ defmodule Proto.Gymnasium.V1.Dimensions.Server do
         raise GRPC.RPCError, status: :invalid_argument
     end
   end
+
+  def remove_dimension_record(request, _stream) do
+    case request.id do
+      {:project_record_id, id} ->
+        GymnasiumGrpc.Dimensions.Project.remove(id)
+      _ ->
+        raise GRPC.RPCError, status: :invalid_argument
+    end
+  end
 end

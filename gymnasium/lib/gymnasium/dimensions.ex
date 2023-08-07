@@ -24,20 +24,36 @@ defmodule Gymnasium.Dimensions do
   end
 
   @doc """
+  Find a single project by it's slug.
+
+  Raises `Ecto.NoResultsError` if the Project does not exist.
+
+  ## Examples
+
+      iex> find_project!("bookstore")
+      %Project{}
+
+      iex> find_project!("filestore")
+      ** (Ecto.NoResultsError)
+
+  """
+  def find_project!(slug), do: Repo.get_by!(Project, slug: slug)
+
+  @doc """
   Gets a single project.
 
   Raises `Ecto.NoResultsError` if the Project does not exist.
 
   ## Examples
 
-      iex> get_project!("bookstore")
+      iex> get_project!("8e3b5275-bc1b-4490-a2d8-23c68d9b0fd5")
       %Project{}
 
-      iex> get_project!("filestore")
+      iex> get_project!("8844f7c8-1f83-4fdf-817f-41780c9e5d05")
       ** (Ecto.NoResultsError)
 
   """
-  def get_project!(slug), do: Repo.get_by!(Project, slug: slug)
+  def get_project!(id), do: Repo.get!(Project, id)
 
   @doc """
   Creates a project.
