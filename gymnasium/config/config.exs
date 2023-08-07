@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :gymnasium, external_config: File.read!("../config.json")
+
 config :gymnasium,
   ecto_repos: [Gymnasium.Repo]
 

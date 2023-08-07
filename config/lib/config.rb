@@ -1,11 +1,13 @@
 require 'json'
 
 require_relative './config/file'
-require_relative './config/temple_config'
+require_relative './config/temple'
+require_relative './config/gymnasium'
 
 class Config
   Config = Struct.new(
     :temple,
+    :gymnasium,
     keyword_init: true
   )
 
@@ -24,10 +26,16 @@ class Config
 
     def local
       Config.new(
-        temple: TempleConfig.new(
-          server: TempleServerConfig.new(
+        temple: Temple::Config.new(
+          server: Temple::Server.new(
             address: '[::1]',
             port: '50051'
+          )
+        ),
+        gymnasium: Gymnasium::Config.new(
+          server: Gymnasium::Server.new(
+            address: '127.0.0.1',
+            port: '50052'
           )
         )
       )
