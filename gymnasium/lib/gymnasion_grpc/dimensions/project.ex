@@ -38,7 +38,7 @@ defmodule GymnasiumGrpc.Dimensions.Project do
       |> to_proto_project
 
     %FindDimensionRecordResponse{
-        record: {:project_record, to_proto_project(proto_project)}
+      record: {:project_record, to_proto_project(proto_project)}
     }
   end
 
@@ -52,8 +52,9 @@ defmodule GymnasiumGrpc.Dimensions.Project do
     error = List.first(changeset.errors)
 
     case error do
-      { field, {message, _validation}} ->
+      {field, {message, _validation}} ->
         raise GRPC.RPCError, status: :invalid_argument, message: "#{field}: #{message}"
+
       _ ->
         raise GRPC.RPCError, status: :invalid_argument
     end
@@ -85,11 +86,12 @@ defmodule GymnasiumGrpc.Dimensions.Project do
     result =
       id
       |> do_get
-      |> Dimensions.delete_project
+      |> Dimensions.delete_project()
 
     case result do
       {:ok, %Project{}} ->
         %RemoveDimensionRecordResponse{}
+
       {:error, %Ecto.Changeset{}} ->
         raise GRPC.RPCError, status: :invalid_argument
     end

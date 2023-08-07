@@ -20,6 +20,11 @@ defmodule Gymnasium.DimensionsTest do
       assert Dimensions.get_project!(project.id) == project
     end
 
+    test "find_project!/1 returns the project with given slug" do
+      project = project_fixture()
+      assert Dimensions.find_project!(project.slug) == project
+    end
+
     test "create_project/1 with valid data creates a project" do
       valid_attrs = %{
         description: "An online platform for buying and selling books.",
@@ -53,7 +58,10 @@ defmodule Gymnasium.DimensionsTest do
 
     test "update_project/2 with invalid data returns error changeset" do
       project = project_fixture()
-      assert {:error, %Ecto.Changeset{}} = Dimensions.update_project(project, @invalid_project_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Dimensions.update_project(project, @invalid_project_attrs)
+
       assert project == Dimensions.get_project!(project.id)
     end
 

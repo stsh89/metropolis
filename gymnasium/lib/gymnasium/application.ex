@@ -22,7 +22,7 @@ defmodule Gymnasium.Application do
       # {Gymnasium.Worker, arg}
       {GRPC.Server.Supervisor,
        endpoint: Proto.Gymnasium.Endpoint,
-       port: Gymnasium.Config.grpc_server_port,
+       port: Gymnasium.Config.grpc_server_port(),
        start_server: true}
     ]
 

@@ -18,9 +18,7 @@ defmodule Gymnasium.Dimensions do
 
   """
   def list_projects do
-    Repo.all(
-      from(p in Project, order_by: [desc: p.inserted_at])
-    )
+    Repo.all(from(p in Project, order_by: [desc: p.inserted_at]))
   end
 
   @doc """
