@@ -7,6 +7,6 @@ grpcurl -d @ \
     localhost:50052 \
     proto.gymnasium.v1.Dimensions/FindDimensionRecord <<EOM
 {
-    "project_record_slug": "free-food-service"
+    "project_record_id": "5f528fc2-5370-4646-9d97-93d4dbc5ec41"
 }
 EOM

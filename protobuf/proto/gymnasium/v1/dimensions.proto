@@ -66,6 +66,9 @@ message FindDimensionRecordRequest {
     oneof id {
         // Search a Project by it's slug.
         string project_record_slug = 1;
+
+        // Search a Project by it's id. UUID in a string form.
+        string project_record_id = 2;
     }
 }
 

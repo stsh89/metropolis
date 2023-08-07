@@ -11,6 +11,12 @@ service Projects {
 
     // Create a Project
     rpc SetupProjectEnvironment(SetupProjectEnvironmentRequest) returns (SetupProjectEnvironmentResponse);
+
+    // Rename a Project
+    rpc RenameProject(RenameProjectRequest) returns (RenameProjectResponse);
+
+    // Get all Project details.
+    rpc CheckProjectDetails(CheckProjectDetailsRequest) returns (CheckProjectDetailsResponse);
 }
 
 // (-- api-linter: core::0158::request-page-token-field=disabled
@@ -44,6 +50,31 @@ message SetupProjectEnvironmentResponse {
     Project project = 1;
 }
 
+// The definition of the request for the Project setup.
+message RenameProjectRequest {
+    // Project's unique identifier. UUID in a string form.
+    string id = 1;
+
+    // Project's new name.
+    string new_name = 2;
+}
+
+// The definition of the response for the Project rename.
+message RenameProjectResponse {
+    Project project = 1;
+}
+
+// The definition of the request for the Project details.
+message CheckProjectDetailsRequest {
+    // Project's unique web identifier.
+    string slug = 1;
+}
+
+// The definition of the response for the Project details.
+message CheckProjectDetailsResponse {
+    Project project = 1;
+}
+
 // Project representation.
 message Project {
     // Project's unique identifier. UUID in a string form.
@@ -52,9 +83,12 @@ message Project {
     // Project's name.
     string name = 2;
 
+    // Project's slug.
+    string slug = 3;
+
     // Project's description.
-    string description = 3;
+    string description = 4;
 
     // The time when the Project was created.
-    google.protobuf.Timestamp create_time = 4;
+    google.protobuf.Timestamp create_time = 5;
 }

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+grpcurl -d @ \
+    -import-path ./protobuf \
+    -proto ./protobuf/proto/temple/v1/projects.proto \
+    -plaintext \
+    '[::1]:50051' \
+    proto.temple.v1.Projects/CheckProjectDetails <<EOM
+{
+    "slug": "free-dog-service"
+}
+EOM

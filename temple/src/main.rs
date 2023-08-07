@@ -1,8 +1,8 @@
-mod client;
 mod config;
 mod datastore;
 mod model;
 mod server;
+mod service;
 
 use server::proto;
 use tonic::transport::Server;

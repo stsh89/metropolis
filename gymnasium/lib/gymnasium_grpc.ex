@@ -33,6 +33,9 @@ defmodule Proto.Gymnasium.V1.Dimensions.Server do
       {:project_record_slug, slug} ->
         GymnasiumGrpc.Dimensions.Project.find(slug)
 
+      {:project_record_id, id} ->
+        GymnasiumGrpc.Dimensions.Project.get(id)
+
       _ ->
         raise GRPC.RPCError, status: :invalid_argument
     end

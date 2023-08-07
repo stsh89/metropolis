@@ -32,13 +32,24 @@ defmodule GymnasiumGrpc.Dimensions.Project do
   end
 
   def find(slug) do
-    proto_project =
+    project_record =
       slug
       |> do_find
       |> to_proto_project
 
     %FindDimensionRecordResponse{
-      record: {:project_record, to_proto_project(proto_project)}
+      record: {:project_record, project_record}
+    }
+  end
+
+  def get(id) do
+    project_record =
+      id
+      |> do_get
+      |> to_proto_project
+
+    %FindDimensionRecordResponse{
+      record: {:project_record, project_record}
     }
   end
 
@@ -120,6 +131,7 @@ defmodule GymnasiumGrpc.Dimensions.Project do
       Dimensions.get_project!(id)
     rescue
       Ecto.NoResultsError -> raise GRPC.RPCError, status: :not_found
+      Ecto.Query.CastError -> raise GRPC.RPCError, status: :invalid_argument, message: "malformed UUID"
     end
   end
 end

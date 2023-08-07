@@ -23,9 +23,9 @@ pub struct ServerConfig {
 
 #[derive(Debug)]
 pub enum ConfigError {
-    DeserializationError(String),
-    FileReadError(String),
-    ValidationError(String),
+    Deserialization(String),
+    FileRead(String),
+    InvalidParameter(String),
 }
 
 impl ConfigError {
@@ -33,9 +33,9 @@ impl ConfigError {
         use ConfigError::*;
 
         match self {
-            DeserializationError(description) => description,
-            ValidationError(description) => description,
-            FileReadError(description) => description,
+            Deserialization(description) => description,
+            InvalidParameter(description) => description,
+            FileRead(description) => description,
         }
     }
 }
@@ -50,12 +50,14 @@ impl Error for ConfigError {}
 
 impl Config {
     pub fn server_socket_address(&self) -> Result<SocketAddr, ConfigError> {
+        use ConfigError::*;
+
         let Some(temple_config) = self.temple.clone() else {
-            return Err(ConfigError::ValidationError("missing or empty field 'temple'".to_string()))
+            return Err(InvalidParameter("missing or empty field 'temple'".to_string()))
         };
 
         let Some(server_config) = temple_config.server.clone() else {
-            return Err(ConfigError::ValidationError("missing or empty field 'temple#server'".to_string()))
+            return Err(InvalidParameter("missing or empty field 'temple#server'".to_string()))
         };
 
         server_config.socket_address()
@@ -64,9 +66,11 @@ impl Config {
 
 impl ServerConfig {
     fn address(&self) -> Result<String, ConfigError> {
+        use ConfigError::*;
+
         match &self.address {
             Some(address) => Ok(address.to_owned()),
-            None => Err(ConfigError::ValidationError(Self::validation_error_text(
+            None => Err(InvalidParameter(Self::validation_error_text(
                 "address",
                 "missing or empty",
             ))),
@@ -74,9 +78,11 @@ impl ServerConfig {
     }
 
     fn port(&self) -> Result<String, ConfigError> {
+        use ConfigError::*;
+
         match &self.port {
             Some(port) => Ok(port.to_owned()),
-            None => Err(ConfigError::ValidationError(Self::validation_error_text(
+            None => Err(InvalidParameter(Self::validation_error_text(
                 "port",
                 "missing or empty",
             ))),
@@ -84,12 +90,14 @@ impl ServerConfig {
     }
 
     fn socket_address(&self) -> Result<SocketAddr, ConfigError> {
+        use ConfigError::*;
+
         let socket_address_string = format!("{}:{}", self.address()?, self.port()?);
         let result: Result<SocketAddr, AddrParseError> = socket_address_string.parse();
 
         match result {
             Ok(socket_address) => Ok(socket_address),
-            Err(error) => Err(ConfigError::ValidationError(error.to_string())),
+            Err(error) => Err(InvalidParameter(error.to_string())),
         }
     }
 
@@ -102,8 +110,8 @@ pub fn read_from_file(file_path: &str) -> Result<Config, ConfigError> {
     let serialized_config = match std::fs::read_to_string(file_path) {
         Ok(serialized_config) => serialized_config,
         Err(error) => {
-            let error_text = format!("{}: {}", file_path, error.to_string());
-            return Err(ConfigError::FileReadError(error_text));
+            let error_text = format!("{}: {}", file_path, error);
+            return Err(ConfigError::FileRead(error_text));
         }
     };
 
@@ -111,6 +119,6 @@ pub fn read_from_file(file_path: &str) -> Result<Config, ConfigError> {
 }
 
 fn deserialize_from_json(serialized_config: &str) -> Result<Config, ConfigError> {
-    serde_json::from_str(&serialized_config)
-        .map_err(|error| ConfigError::DeserializationError(error.to_string()))
+    serde_json::from_str(serialized_config)
+        .map_err(|error| ConfigError::Deserialization(error.to_string()))
 }

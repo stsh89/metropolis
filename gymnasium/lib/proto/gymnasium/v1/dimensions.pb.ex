@@ -72,6 +72,7 @@ defmodule Proto.Gymnasium.V1.FindDimensionRecordRequest do
   oneof :id, 0
 
   field :project_record_slug, 1, type: :string, json_name: "projectRecordSlug", oneof: 0
+  field :project_record_id, 2, type: :string, json_name: "projectRecordId", oneof: 0
 end
 
 defmodule Proto.Gymnasium.V1.FindDimensionRecordResponse do
