@@ -1,5 +1,6 @@
 mod config;
 mod datastore;
+mod helpers;
 mod model;
 mod server;
 mod service;

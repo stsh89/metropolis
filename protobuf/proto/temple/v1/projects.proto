@@ -7,15 +7,15 @@ package proto.temple.v1;
 // List of available actions around Project resource.
 service Projects {
     // List showcased Projects.
-    rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+    rpc ShowcaseProjects(ShowcaseProjectsRequest) returns (ShowcaseProjectsResponse);
 
-    // Create a Project
-    rpc SetupProjectEnvironment(SetupProjectEnvironmentRequest) returns (SetupProjectEnvironmentResponse);
+    // Create a Project.
+    rpc InitializeProject(InitializeProjectRequest) returns (InitializeProjectResponse);
 
-    // Rename a Project
+    // Change Project's name.
     rpc RenameProject(RenameProjectRequest) returns (RenameProjectResponse);
 
-    // Get all Project details.
+    // Show Project details.
     rpc CheckProjectDetails(CheckProjectDetailsRequest) returns (CheckProjectDetailsResponse);
 }
 
@@ -25,19 +25,19 @@ service Projects {
 //     aip.dev/not-precedent: We need to do this because pagination is not currently supported.. --)
 //
 // Client's request definition for Project listing.
-message ListProjectsRequest {}
+message ShowcaseProjectsRequest {}
 
 // (-- api-linter: core::0158::response-next-page-token-field=disabled
 //     aip.dev/not-precedent: We need to do this because pagination is not currently supported. --)
 //
 // Server's response to Client's Project listing request.
-message ListProjectsResponse {
+message ShowcaseProjectsResponse {
     // List of Projects.
     repeated Project projects = 1;
 }
 
 // The definition of the request for the Project setup.
-message SetupProjectEnvironmentRequest {
+message InitializeProjectRequest {
     // Project's name.
     string name = 1;
 
@@ -46,7 +46,8 @@ message SetupProjectEnvironmentRequest {
 }
 
 // The definition of the response for the Project setup.
-message SetupProjectEnvironmentResponse {
+message InitializeProjectResponse {
+    // Created Project.
     Project project = 1;
 }
 
@@ -56,11 +57,12 @@ message RenameProjectRequest {
     string id = 1;
 
     // Project's new name.
-    string new_name = 2;
+    string name = 2;
 }
 
 // The definition of the response for the Project rename.
 message RenameProjectResponse {
+    // Renamed Project.
     Project project = 1;
 }
 
@@ -72,6 +74,7 @@ message CheckProjectDetailsRequest {
 
 // The definition of the response for the Project details.
 message CheckProjectDetailsResponse {
+    // Found Project.
     Project project = 1;
 }
 

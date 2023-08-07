@@ -6,7 +6,9 @@ pub struct CheckProjectDetailsAttributes {
     pub slug: String,
 }
 
-pub async fn execute(attributes: CheckProjectDetailsAttributes) -> Result<Project, CheckProjectDetailsError> {
+pub async fn execute(
+    attributes: CheckProjectDetailsAttributes,
+) -> Result<Project, CheckProjectDetailsError> {
     let CheckProjectDetailsAttributes { slug } = attributes;
 
     let project = datastore::project::find(&slug)

@@ -1,5 +1,4 @@
-use crate::model::{Project, UtcDateTime};
-use chrono::TimeZone;
+use crate::{helpers, model::Project};
 use tonic::transport::Channel;
 use uuid::Uuid;
 
@@ -125,7 +124,7 @@ impl Client {
                             name: project.name,
                             slug: project.slug,
                             description: project.description,
-                            create_time: Some(to_proto_timestamp(project.create_time)),
+                            create_time: Some(helpers::to_proto_timestamp(project.create_time)),
                         },
                     ),
                 ),
@@ -204,40 +203,19 @@ impl Client {
     }
 }
 
-fn from_proto_timestamp(timestamp: prost_types::Timestamp) -> Result<UtcDateTime, ClientError> {
-    use ClientError::DataConversion;
-
-    let nanos = timestamp
-        .nanos
-        .try_into()
-        .map_err(|_err| DataConversion("negative nanoseconds".to_string()))?;
-
-    match chrono::Utc.timestamp_opt(timestamp.seconds, nanos) {
-        chrono::LocalResult::None => Err(DataConversion(
-            "out-of-range number of seconds and/or invalid nanosecond".to_string(),
-        )),
-        chrono::LocalResult::Single(datetime) => Ok(datetime),
-        chrono::LocalResult::Ambiguous(_, _) => Err(DataConversion(
-            "Given local time representation has multiple results and thus ambiguous.".to_string(),
-        )),
-    }
-}
-
 fn from_proto_project(proto_project: proto::dimensions::Project) -> Result<Project, ClientError> {
     use ClientError::*;
+
+    let Some(create_time) = proto_project.create_time else {
+        return Err(DataConversion("missing create time".to_string()))
+    };
 
     Ok(Project {
         id: Uuid::parse_str(&proto_project.id).map_err(|err| DataConversion(err.to_string()))?,
         name: proto_project.name,
         description: proto_project.description,
         slug: proto_project.slug,
-        create_time: from_proto_timestamp(proto_project.create_time.unwrap())?,
+        create_time: helpers::from_proto_timestamp(create_time, "create_time")
+            .map_err(|err| DataConversion(err.to_string()))?,
     })
-}
-
-pub fn to_proto_timestamp(datetime: UtcDateTime) -> prost_types::Timestamp {
-    prost_types::Timestamp {
-        seconds: datetime.timestamp(),
-        nanos: datetime.timestamp_subsec_nanos() as i32,
-    }
 }

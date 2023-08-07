@@ -1,9 +1,5 @@
-use crate::{
-    model::{Project, UtcDateTime},
-    service,
-};
+use crate::{helpers, model::Project, service};
 use tonic::{Request, Response, Status};
-use uuid::Uuid;
 
 pub mod proto {
     tonic::include_proto!("proto.temple.v1"); // The string specified here must match the proto package name
@@ -14,10 +10,10 @@ pub struct Projects {}
 
 #[tonic::async_trait]
 impl proto::projects_server::Projects for Projects {
-    async fn list_projects(
+    async fn showcase_projects(
         &self,
-        request: Request<proto::ListProjectsRequest>, // Accept request of type HelloRequest
-    ) -> Result<Response<proto::ListProjectsResponse>, Status> {
+        request: Request<proto::ShowcaseProjectsRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::ShowcaseProjectsResponse>, Status> {
         println!("Got a request: {:?}", request);
 
         let projects = service::showcase_projects()
@@ -27,26 +23,23 @@ impl proto::projects_server::Projects for Projects {
             .map(to_proto_project)
             .collect();
 
-        Ok(Response::new(proto::ListProjectsResponse { projects }))
+        Ok(Response::new(proto::ShowcaseProjectsResponse { projects }))
     }
 
-    async fn setup_project_environment(
+    async fn initialize_project(
         &self,
-        request: Request<proto::SetupProjectEnvironmentRequest>, // Accept request of type HelloRequest
-    ) -> Result<Response<proto::SetupProjectEnvironmentResponse>, Status> {
+        request: Request<proto::InitializeProjectRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::InitializeProjectResponse>, Status> {
         println!("Got a request: {:?}", request);
 
-        let proto::SetupProjectEnvironmentRequest { name, description } = request.into_inner();
+        let proto::InitializeProjectRequest { name, description } = request.into_inner();
 
         let project =
-            service::setup_project_environment(service::SetupProjectEnvironmentAttributes {
-                name,
-                description,
-            })
-            .await
-            .map_err(|_err| Status::internal(""))?;
+            service::initialize_project(service::InitializeProjectAttributes { name, description })
+                .await
+                .map_err(|_err| Status::internal(""))?;
 
-        Ok(Response::new(proto::SetupProjectEnvironmentResponse {
+        Ok(Response::new(proto::InitializeProjectResponse {
             project: Some(to_proto_project(project)),
         }))
     }
@@ -57,11 +50,11 @@ impl proto::projects_server::Projects for Projects {
     ) -> Result<Response<proto::RenameProjectResponse>, Status> {
         println!("Got a request: {:?}", request);
 
-        let proto::RenameProjectRequest { id, new_name } = request.into_inner();
+        let proto::RenameProjectRequest { id, name } = request.into_inner();
 
         let project = service::rename_project(service::RenameProjectAttributes {
-            id: from_proto_id(&id)?,
-            new_name,
+            id: helpers::uuid_from_proto_string(&id, "id")?,
+            name,
         })
         .await
         .map_err(|_err| Status::internal(""))?;
@@ -79,11 +72,10 @@ impl proto::projects_server::Projects for Projects {
 
         let proto::CheckProjectDetailsRequest { slug } = request.into_inner();
 
-        let project = service::check_project_details(service::CheckProjectDetailsAttributes {
-            slug
-        })
-        .await
-        .map_err(|_err| Status::internal(""))?;
+        let project =
+            service::check_project_details(service::CheckProjectDetailsAttributes { slug })
+                .await
+                .map_err(|_err| Status::internal(""))?;
 
         Ok(Response::new(proto::CheckProjectDetailsResponse {
             project: Some(to_proto_project(project)),
@@ -93,21 +85,10 @@ impl proto::projects_server::Projects for Projects {
 
 fn to_proto_project(project: Project) -> proto::Project {
     proto::Project {
-        create_time: Some(to_proto_timestamp(project.create_time)),
+        create_time: Some(helpers::to_proto_timestamp(project.create_time)),
         description: project.description,
         id: project.id.to_string(),
         name: project.name,
         slug: project.slug,
     }
-}
-
-pub fn to_proto_timestamp(datetime: UtcDateTime) -> prost_types::Timestamp {
-    prost_types::Timestamp {
-        seconds: datetime.timestamp(),
-        nanos: datetime.timestamp_subsec_nanos() as i32,
-    }
-}
-
-fn from_proto_id(id: &str) -> Result<Uuid, Status> {
-    Uuid::parse_str(id).map_err(|_err| Status::invalid_argument("id"))
 }

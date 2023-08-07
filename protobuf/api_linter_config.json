@@ -6,7 +6,8 @@
       "core::0191::java-package",
       "core::0127::http-annotation",
       "core::0123::resource-annotation",
-      "core::0132::request-parent-required"
+      "core::0132::request-parent-required",
+      "core::0203::field-behavior-required"
     ]
   }
 ]
