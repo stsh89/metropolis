@@ -133,10 +133,16 @@ impl From<tonic::Status> for AppError {
 
 impl From<AppError> for tonic::Status {
     fn from(value: AppError) -> tonic::Status {
-        match value.code {
+        let mut error = match value.code {
             Code::InvalidArgument => tonic::Status::invalid_argument(value.message),
             Code::FailedPrecondition => tonic::Status::failed_precondition(value.message),
             Code::Internal => tonic::Status::internal(value.message),
+        };
+
+        if let Some(source) = value.source {
+            error.set_source(source);
         }
+
+        error
     }
 }
