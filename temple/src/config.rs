@@ -2,22 +2,52 @@ use crate::{AppError, AppResult};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-pub struct Config {
-    pub temple: Option<TempleConfig>,
+pub struct Configuration {
+    pub temple: Option<TempleConfiguration>,
+    pub gymnasium: Option<GymnasiumConfiguration>,
 }
 
 #[derive(Clone, Deserialize)]
-pub struct TempleConfig {
-    pub server: Option<ServerConfig>,
+pub struct TempleConfiguration {
+    pub server: Option<TempleServerConfiguration>,
 }
 
 #[derive(Clone, Deserialize)]
-pub struct ServerConfig {
+pub struct TempleServerConfiguration {
     pub address: Option<String>,
     pub port: Option<String>,
 }
 
-impl Config {
+#[derive(Clone, Deserialize)]
+pub struct GymnasiumConfiguration {
+    pub server: Option<GymnasiumServerConfiguration>,
+}
+
+#[derive(Clone, Deserialize)]
+pub struct GymnasiumServerConfiguration {
+    pub address: Option<String>,
+    pub port: Option<String>,
+}
+
+impl GymnasiumServerConfiguration {
+    fn connection_string(&self) -> AppResult<String> {
+        Ok(format!("http://{}:{}", self.address()?, self.port()?))
+    }
+
+    fn address(&self) -> AppResult<&str> {
+        self.address
+            .as_deref()
+            .ok_or(AppError::failed_precondition("server#address is missing"))
+    }
+
+    fn port(&self) -> AppResult<&str> {
+        self.port
+            .as_deref()
+            .ok_or(AppError::failed_precondition("server#port is missing"))
+    }
+}
+
+impl Configuration {
     pub fn server_socket_address(&self) -> AppResult<std::net::SocketAddr> {
         let Some(temple_config) = self.temple.clone() else {
             return Err(AppError::failed_precondition("missing or empty field 'temple'".to_string()))
@@ -29,9 +59,21 @@ impl Config {
 
         server_config.socket_address()
     }
+
+    pub fn repository_connection_string(&self) -> AppResult<String> {
+        let Some(gymnasium_config) = self.gymnasium.clone() else {
+            return Err(AppError::failed_precondition("missing or empty field 'gymnasium'".to_string()))
+        };
+
+        let Some(server_config) = gymnasium_config.server.clone() else {
+            return Err(AppError::failed_precondition("missing or empty field 'gymnasium#server'".to_string()))
+        };
+
+        server_config.connection_string()
+    }
 }
 
-impl ServerConfig {
+impl TempleServerConfiguration {
     fn address(&self) -> AppResult<&str> {
         self.address
             .as_deref()
@@ -57,7 +99,7 @@ impl ServerConfig {
     }
 }
 
-pub fn read_from_file(file_path: &str) -> AppResult<Config> {
+pub fn read_from_file(file_path: &str) -> AppResult<Configuration> {
     let serialized_config = match std::fs::read_to_string(file_path) {
         Ok(serialized_config) => serialized_config,
         Err(err) => {
@@ -72,7 +114,7 @@ pub fn read_from_file(file_path: &str) -> AppResult<Config> {
     deserialize_from_json(&serialized_config)
 }
 
-fn deserialize_from_json(serialized_config: &str) -> AppResult<Config> {
+fn deserialize_from_json(serialized_config: &str) -> AppResult<Configuration> {
     serde_json::from_str(serialized_config).map_err(|err| {
         let mut error = AppError::failed_precondition("can't deserialize a Config");
         error.set_source(std::sync::Arc::new(err));

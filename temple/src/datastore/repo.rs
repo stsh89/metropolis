@@ -12,11 +12,14 @@ pub mod proto {
     }
 }
 
-pub struct Client {}
+#[derive(Default, Debug)]
+pub struct Repo {
+    pub connection_string: String,
+}
 
-impl Client {
+impl Repo {
     async fn connect(&self) -> AppResult<proto::dimensions_client::DimensionsClient<Channel>> {
-        proto::dimensions_client::DimensionsClient::connect("http://localhost:50052")
+        proto::dimensions_client::DimensionsClient::connect(self.connection_string.clone())
             .await
             .map_err(|err| AppError::internal(err.to_string()))
     }

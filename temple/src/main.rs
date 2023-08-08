@@ -12,7 +12,11 @@ pub use result::{AppError, AppResult};
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = config::read_from_file("./config.json")?;
     let server_socket_address = config.server_socket_address()?;
-    let projects = server::Projects::default();
+    let projects = server::Projects {
+        repo: std::sync::Arc::new(datastore::Repo {
+            connection_string: config.repository_connection_string()?,
+        }),
+    };
 
     println!("Running server::proto::projects_server::ProjectsServer with tonic::transport::Server using http://{server_socket_address}");
 

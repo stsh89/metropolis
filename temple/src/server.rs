@@ -1,4 +1,4 @@
-use crate::{model::Project, service, util};
+use crate::{datastore::Repo, model::Project, service, util};
 use tonic::{Request, Response, Status};
 
 pub mod proto {
@@ -6,7 +6,9 @@ pub mod proto {
 }
 
 #[derive(Debug, Default)]
-pub struct Projects {}
+pub struct Projects {
+    pub repo: std::sync::Arc<Repo>,
+}
 
 #[tonic::async_trait]
 impl proto::projects_server::Projects for Projects {
@@ -16,11 +18,12 @@ impl proto::projects_server::Projects for Projects {
     ) -> Result<Response<proto::ShowcaseProjectsResponse>, Status> {
         println!("Got a request: {:?}", request);
 
-        let projects = service::showcase_projects()
-            .await?
-            .into_iter()
-            .map(to_proto_project)
-            .collect();
+        let projects =
+            service::showcase_projects(service::ShowcaseProjectsAttributes { repo: &self.repo })
+                .await?
+                .into_iter()
+                .map(to_proto_project)
+                .collect();
 
         Ok(Response::new(proto::ShowcaseProjectsResponse { projects }))
     }
@@ -33,9 +36,12 @@ impl proto::projects_server::Projects for Projects {
 
         let proto::InitializeProjectRequest { name, description } = request.into_inner();
 
-        let project =
-            service::initialize_project(service::InitializeProjectAttributes { name, description })
-                .await?;
+        let project = service::initialize_project(service::InitializeProjectAttributes {
+            repo: &self.repo,
+            name,
+            description,
+        })
+        .await?;
 
         Ok(Response::new(proto::InitializeProjectResponse {
             project: Some(to_proto_project(project)),
@@ -53,6 +59,7 @@ impl proto::projects_server::Projects for Projects {
         let project = service::rename_project(service::RenameProjectAttributes {
             id: util::proto::uuid_from_proto_string(&id, "id")?,
             name,
+            repo: &self.repo,
         })
         .await?;
 
@@ -69,8 +76,11 @@ impl proto::projects_server::Projects for Projects {
 
         let proto::CheckProjectDetailsRequest { slug } = request.into_inner();
 
-        let project =
-            service::check_project_details(service::CheckProjectDetailsAttributes { slug }).await?;
+        let project = service::check_project_details(service::CheckProjectDetailsAttributes {
+            slug,
+            repo: &self.repo,
+        })
+        .await?;
 
         Ok(Response::new(proto::CheckProjectDetailsResponse {
             project: Some(to_proto_project(project)),
