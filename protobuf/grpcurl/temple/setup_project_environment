@@ -5,9 +5,9 @@ grpcurl -d @ \
     -proto ./protobuf/proto/temple/v1/projects.proto \
     -plaintext \
     '[::1]:50051' \
-    proto.temple.v1.Projects/SetupProjectEnvironment <<EOM
+    proto.temple.v1.Projects/InitializeProject <<EOM
 {
-    "name": "Stan Inc.",
-    "description": "Uber coorparate service for chess grandmasters."
+    "name": "Marvel",
+    "description": "Fantastic universe."
 }
 EOM

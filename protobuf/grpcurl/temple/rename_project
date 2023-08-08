@@ -7,7 +7,7 @@ grpcurl -d @ \
     '[::1]:50051' \
     proto.temple.v1.Projects/RenameProject <<EOM
 {
-    "id": "5f528fc2-5370-4646-9d97-93d4dbc5ec41",
-    "new_name": "Free dog service"
+    "id": "7e2b8f9c-a064-49c2-b992-36e0ba317376",
+    "name": "SUper Marvel"
 }
 EOM

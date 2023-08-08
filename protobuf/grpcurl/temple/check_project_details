@@ -7,6 +7,6 @@ grpcurl -d @ \
     '[::1]:50051' \
     proto.temple.v1.Projects/CheckProjectDetails <<EOM
 {
-    "slug": "free-dog-service"
+    "slug": "super-marvel"
 }
 EOM
