@@ -1,19 +1,13 @@
-use crate::{datastore, model::Project};
-
-pub struct CheckProjectDetailsError {}
+use crate::{datastore, model::Project, AppResult};
 
 pub struct CheckProjectDetailsAttributes {
     pub slug: String,
 }
 
-pub async fn execute(
-    attributes: CheckProjectDetailsAttributes,
-) -> Result<Project, CheckProjectDetailsError> {
+pub async fn execute(attributes: CheckProjectDetailsAttributes) -> AppResult<Project> {
     let CheckProjectDetailsAttributes { slug } = attributes;
 
-    let project = datastore::project::find(&slug)
-        .await
-        .map_err(|_err| CheckProjectDetailsError {})?;
+    let project = datastore::project::find(&slug).await?;
 
     Ok(project)
 }

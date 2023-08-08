@@ -1,4 +1,4 @@
-use crate::{helpers, model::Project, service};
+use crate::{model::Project, service, util};
 use tonic::{Request, Response, Status};
 
 pub mod proto {
@@ -17,8 +17,7 @@ impl proto::projects_server::Projects for Projects {
         println!("Got a request: {:?}", request);
 
         let projects = service::showcase_projects()
-            .await
-            .map_err(|_err| Status::internal(""))?
+            .await?
             .into_iter()
             .map(to_proto_project)
             .collect();
@@ -36,8 +35,7 @@ impl proto::projects_server::Projects for Projects {
 
         let project =
             service::initialize_project(service::InitializeProjectAttributes { name, description })
-                .await
-                .map_err(|_err| Status::internal(""))?;
+                .await?;
 
         Ok(Response::new(proto::InitializeProjectResponse {
             project: Some(to_proto_project(project)),
@@ -53,11 +51,10 @@ impl proto::projects_server::Projects for Projects {
         let proto::RenameProjectRequest { id, name } = request.into_inner();
 
         let project = service::rename_project(service::RenameProjectAttributes {
-            id: helpers::uuid_from_proto_string(&id, "id")?,
+            id: util::proto::uuid_from_proto_string(&id, "id")?,
             name,
         })
-        .await
-        .map_err(|_err| Status::internal(""))?;
+        .await?;
 
         Ok(Response::new(proto::RenameProjectResponse {
             project: Some(to_proto_project(project)),
@@ -73,9 +70,7 @@ impl proto::projects_server::Projects for Projects {
         let proto::CheckProjectDetailsRequest { slug } = request.into_inner();
 
         let project =
-            service::check_project_details(service::CheckProjectDetailsAttributes { slug })
-                .await
-                .map_err(|_err| Status::internal(""))?;
+            service::check_project_details(service::CheckProjectDetailsAttributes { slug }).await?;
 
         Ok(Response::new(proto::CheckProjectDetailsResponse {
             project: Some(to_proto_project(project)),
@@ -85,7 +80,7 @@ impl proto::projects_server::Projects for Projects {
 
 fn to_proto_project(project: Project) -> proto::Project {
     proto::Project {
-        create_time: Some(helpers::to_proto_timestamp(project.create_time)),
+        create_time: Some(util::proto::to_proto_timestamp(project.create_time)),
         description: project.description,
         id: project.id.to_string(),
         name: project.name,

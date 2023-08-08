@@ -1,6 +1,8 @@
-use crate::{helpers, model::Project};
+use crate::{
+    model::{Project, Uuid},
+    util, AppError, AppResult,
+};
 use tonic::transport::Channel;
-use uuid::Uuid;
 
 pub mod proto {
     tonic::include_proto!("proto.gymnasium.v1");
@@ -12,37 +14,14 @@ pub mod proto {
 
 pub struct Client {}
 
-#[derive(Debug)]
-pub enum ClientError {
-    Connection(String),
-    EndpointRequest(String),
-    DataConversion(String),
-}
-
-impl ClientError {
-    pub fn description(&self) -> &str {
-        match self {
-            ClientError::Connection(description) => description,
-            ClientError::EndpointRequest(description) => description,
-            ClientError::DataConversion(description) => description,
-        }
-    }
-}
-
 impl Client {
-    async fn connect(
-        &self,
-    ) -> Result<proto::dimensions_client::DimensionsClient<Channel>, ClientError> {
-        use ClientError::*;
-
+    async fn connect(&self) -> AppResult<proto::dimensions_client::DimensionsClient<Channel>> {
         proto::dimensions_client::DimensionsClient::connect("http://localhost:50052")
             .await
-            .map_err(|err| Connection(err.to_string()))
+            .map_err(|err| AppError::internal(err.to_string()))
     }
 
-    pub async fn select_projects(&self) -> Result<Vec<Project>, ClientError> {
-        use ClientError::*;
-
+    pub async fn select_projects(&self) -> AppResult<Vec<Project>> {
         let mut client = self.connect().await?;
 
         let response = client
@@ -53,14 +32,11 @@ impl Client {
                     ),
                 ),
             })
-            .await
-            .map_err(|err| EndpointRequest(err.to_string()))?
+            .await?
             .into_inner();
 
         let Some(records) = response.records else {
-            return Err(EndpointRequest(
-                "missing required field: #records".to_string(),
-            ));
+            return Err(AppError::internal("missing #records for select_dimension_records response"));
         };
 
         match records {
@@ -69,14 +45,12 @@ impl Client {
                     .records
                     .into_iter()
                     .map(from_proto_project)
-                    .collect::<Result<Vec<Project>, ClientError>>()
+                    .collect::<AppResult<Vec<Project>>>()
             }
         }
     }
 
-    pub async fn create_project(&self, project: Project) -> Result<Project, ClientError> {
-        use ClientError::*;
-
+    pub async fn create_project(&self, project: Project) -> AppResult<Project> {
         let mut client = self.connect().await?;
 
         let response = client
@@ -93,14 +67,11 @@ impl Client {
                     ),
                 ),
             })
-            .await
-            .map_err(|err| EndpointRequest(err.to_string()))?
+            .await?
             .into_inner();
 
         let Some(record) = response.record else {
-            return Err(EndpointRequest(
-                "missing required field: #record".to_string(),
-            ));
+            return Err(AppError::internal("missing #record for store_dimension_record response"));
         };
 
         match record {
@@ -110,9 +81,7 @@ impl Client {
         }
     }
 
-    pub async fn update_project(&self, project: Project) -> Result<Project, ClientError> {
-        use ClientError::*;
-
+    pub async fn update_project(&self, project: Project) -> AppResult<Project> {
         let mut client = self.connect().await?;
 
         let response = client
@@ -124,19 +93,16 @@ impl Client {
                             name: project.name,
                             slug: project.slug,
                             description: project.description,
-                            create_time: Some(helpers::to_proto_timestamp(project.create_time)),
+                            create_time: Some(util::proto::to_proto_timestamp(project.create_time)),
                         },
                     ),
                 ),
             })
-            .await
-            .map_err(|err| EndpointRequest(err.to_string()))?
+            .await?
             .into_inner();
 
         let Some(record) = response.record else {
-            return Err(EndpointRequest(
-                "missing required field: #record".to_string(),
-            ));
+            return Err(AppError::internal("missing #record for store_dimension_record response"));
         };
 
         match record {
@@ -146,9 +112,7 @@ impl Client {
         }
     }
 
-    pub async fn find_project(&self, slug: &str) -> Result<Project, ClientError> {
-        use ClientError::*;
-
+    pub async fn find_project(&self, slug: &str) -> AppResult<Project> {
         let mut client = self.connect().await?;
 
         let response = client
@@ -157,14 +121,11 @@ impl Client {
                     slug.to_owned(),
                 )),
             })
-            .await
-            .map_err(|err| EndpointRequest(err.to_string()))?
+            .await?
             .into_inner();
 
         let Some(record) = response.record else {
-            return Err(EndpointRequest(
-                "missing required field: #record".to_string(),
-            ));
+            return Err(AppError::internal("missing #record for find_dimension_record response"));
         };
 
         match record {
@@ -174,9 +135,7 @@ impl Client {
         }
     }
 
-    pub async fn get_project(&self, id: Uuid) -> Result<Project, ClientError> {
-        use ClientError::*;
-
+    pub async fn get_project(&self, id: Uuid) -> AppResult<Project> {
         let mut client = self.connect().await?;
 
         let response = client
@@ -185,14 +144,11 @@ impl Client {
                     id.to_string(),
                 )),
             })
-            .await
-            .map_err(|err| EndpointRequest(err.to_string()))?
+            .await?
             .into_inner();
 
         let Some(record) = response.record else {
-            return Err(EndpointRequest(
-                "missing required field: #record".to_string(),
-            ));
+            return Err(AppError::internal("missing #record for find_dimension_record response"));
         };
 
         match record {
@@ -203,19 +159,16 @@ impl Client {
     }
 }
 
-fn from_proto_project(proto_project: proto::dimensions::Project) -> Result<Project, ClientError> {
-    use ClientError::*;
-
+fn from_proto_project(proto_project: proto::dimensions::Project) -> AppResult<Project> {
     let Some(create_time) = proto_project.create_time else {
-        return Err(DataConversion("missing create time".to_string()))
+        return Err(AppError::internal("missing #create_time for Project"))
     };
 
     Ok(Project {
-        id: Uuid::parse_str(&proto_project.id).map_err(|err| DataConversion(err.to_string()))?,
+        id: util::proto::uuid_from_proto_string(&proto_project.id, "id")?,
         name: proto_project.name,
         description: proto_project.description,
         slug: proto_project.slug,
-        create_time: helpers::from_proto_timestamp(create_time, "create_time")
-            .map_err(|err| DataConversion(err.to_string()))?,
+        create_time: util::proto::from_proto_timestamp(create_time, "create_time")?,
     })
 }

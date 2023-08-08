@@ -1,21 +1,11 @@
-use uuid::Uuid;
-
 use super::client::Client;
-use crate::model::Project;
+use crate::{
+    model::{Project, Uuid},
+    util, AppResult,
+};
 
-pub struct ProjectListError {
-    pub description: String,
-}
-
-pub async fn list() -> Result<Vec<Project>, ProjectListError> {
-    let datastore_client = Client {};
-
-    let projects = datastore_client
-        .select_projects()
-        .await
-        .map_err(|err| ProjectListError {
-            description: err.description().to_owned(),
-        })?;
+pub async fn list() -> AppResult<Vec<Project>> {
+    let projects = Client {}.select_projects().await?;
 
     Ok(projects)
 }
@@ -25,11 +15,7 @@ pub struct CreateProjectAttributes {
     pub description: String,
 }
 
-pub struct ProjectCreateError {
-    pub description: String,
-}
-
-pub async fn create(attributes: CreateProjectAttributes) -> Result<Project, ProjectCreateError> {
+pub async fn create(attributes: CreateProjectAttributes) -> AppResult<Project> {
     let client = Client {};
 
     let CreateProjectAttributes { name, description } = attributes;
@@ -38,71 +24,35 @@ pub async fn create(attributes: CreateProjectAttributes) -> Result<Project, Proj
         .create_project(Project {
             id: Default::default(),
             create_time: Default::default(),
-            slug: sluggify::sluggify::sluggify(&name, None),
+            slug: util::slug::sluggify(&name),
             name,
             description,
         })
-        .await
-        .map_err(|err| ProjectCreateError {
-            description: err.description().to_owned(),
-        })?;
+        .await?;
 
     Ok(project)
 }
 
-pub struct GetProjectAttributes {
-    pub id: Uuid,
-}
-
-pub struct GetProjectError {
-    pub description: String,
-}
-
-pub async fn get(attributes: GetProjectAttributes) -> Result<Project, GetProjectError> {
+pub async fn get(id: Uuid) -> AppResult<Project> {
     let client = Client {};
 
-    let GetProjectAttributes { id } = attributes;
-
-    let project = client
-        .get_project(id)
-        .await
-        .map_err(|err| GetProjectError {
-            description: err.description().to_owned(),
-        })?;
+    let project = client.get_project(id).await?;
 
     Ok(project)
 }
 
-pub struct FindProjectError {
-    pub description: String,
-}
-
-pub async fn find(slug: &str) -> Result<Project, FindProjectError> {
+pub async fn find(slug: &str) -> AppResult<Project> {
     let client = Client {};
 
-    let project = client
-        .find_project(slug)
-        .await
-        .map_err(|err| FindProjectError {
-            description: err.description().to_owned(),
-        })?;
+    let project = client.find_project(slug).await?;
 
     Ok(project)
 }
 
-pub struct UpdateProjectError {
-    pub description: String,
-}
-
-pub async fn update(project: Project) -> Result<Project, UpdateProjectError> {
+pub async fn update(project: Project) -> AppResult<Project> {
     let client = Client {};
 
-    let project = client
-        .update_project(project)
-        .await
-        .map_err(|err| UpdateProjectError {
-            description: err.description().to_owned(),
-        })?;
+    let project = client.update_project(project).await?;
 
     Ok(project)
 }

@@ -1,9 +1,12 @@
 mod config;
 mod datastore;
-mod helpers;
 mod model;
+mod result;
 mod server;
 mod service;
+mod util;
+
+pub use result::{AppError, AppResult};
 
 use server::proto;
 use tonic::transport::Server;
