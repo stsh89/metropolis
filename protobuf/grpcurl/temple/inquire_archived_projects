@@ -4,9 +4,9 @@ grpcurl -d @ \
     -import-path ./protobuf \
     -proto ./protobuf/proto/temple/v1/projects.proto \
     -plaintext \
-    '[::1]:50051' \
-    proto.temple.v1.Projects/CheckProjectDetails <<EOM
+    [::1]:50051 \
+    proto.temple.v1.Projects/InquireArchivedProjects <<EOM
 {
-    "slug": "marvel"
+
 }
 EOM

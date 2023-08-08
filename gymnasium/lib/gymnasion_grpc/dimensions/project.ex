@@ -11,9 +11,15 @@ defmodule GymnasiumGrpc.Dimensions.Project do
     StoreDimensionRecordResponse
   }
 
-  def select(_parameters = %ProjectRecordParameters{}) do
+  def select(parameters = %ProjectRecordParameters{}) do
+    query_attributes = if parameters.archived do
+        [archive_indicator: "archived"]
+    else
+        [archive_indicator: "not_archived"]
+    end
+
     project_records =
-      Dimensions.list_projects()
+      Dimensions.list_projects(query_attributes)
       |> Enum.map(fn project -> to_proto_project(project) end)
 
     %SelectDimensionRecordsResponse{
@@ -71,21 +77,31 @@ defmodule GymnasiumGrpc.Dimensions.Project do
     end
   end
 
-  defp create(project = %ProtoProject{}) do
+  defp create(proto_project = %ProtoProject{}) do
+    archived_at = if proto_project.archivation_time do
+      Helpers.from_proto_timestamp(proto_project.archivation_time)
+    end
+
     attributes = %{
-      description: project.description,
-      name: project.name,
-      slug: project.slug
+      archived_at: archived_at,
+      description: proto_project.description,
+      name: proto_project.name,
+      slug: proto_project.slug
     }
 
     Dimensions.create_project(attributes)
   end
 
-  defp update(project = %ProtoProject{id: id}) do
+  defp update(proto_project = %ProtoProject{id: id}) do
+    archived_at = if proto_project.archivation_time do
+      Helpers.from_proto_timestamp(proto_project.archivation_time)
+    end
+
     attributes = %{
-      description: project.description,
-      name: project.name,
-      slug: project.slug
+      archived_at: archived_at,
+      description: proto_project.description,
+      name: proto_project.name,
+      slug: proto_project.slug
     }
 
     project = do_get(id)
@@ -109,7 +125,10 @@ defmodule GymnasiumGrpc.Dimensions.Project do
   end
 
   defp to_proto_project(project = %Project{}) do
+    archivation_time = if project.archived_at, do: Helpers.to_proto_timestamp(project.archived_at)
+
     %ProtoProject{
+      archivation_time: archivation_time,
       create_time: Helpers.to_proto_timestamp(project.inserted_at),
       description: project.description,
       id: project.id,

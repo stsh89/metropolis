@@ -5,8 +5,8 @@ grpcurl -d @ \
     -proto ./protobuf/proto/temple/v1/projects.proto \
     -plaintext \
     '[::1]:50051' \
-    proto.temple.v1.Projects/CheckProjectDetails <<EOM
+    proto.temple.v1.Projects/DeleteProject <<EOM
 {
-    "slug": "marvel"
+    "id": "c2bdadeb-d4bf-45b6-8d70-9bc1f8a4dc3a"
 }
 EOM

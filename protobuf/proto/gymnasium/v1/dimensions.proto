@@ -37,7 +37,9 @@ message SelectDimensionRecordsResponse {
 }
 
 // The list of available filters for the Project dimension.
-message ProjectRecordParameters {}
+message ProjectRecordParameters {
+    bool archived = 1;
+}
 
 // Wrapper around a filtered list of Projects.
 message ProjectRecords {

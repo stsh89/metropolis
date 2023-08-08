@@ -17,6 +17,10 @@ pub struct Repo {
     pub connection_string: String,
 }
 
+pub struct SelectProjectsAttributes {
+    pub archived: bool,
+}
+
 impl Repo {
     async fn connect(&self) -> AppResult<proto::dimensions_client::DimensionsClient<Channel>> {
         proto::dimensions_client::DimensionsClient::connect(self.connection_string.clone())
@@ -24,14 +28,21 @@ impl Repo {
             .map_err(|err| AppError::internal(err.to_string()))
     }
 
-    pub async fn select_projects(&self) -> AppResult<Vec<Project>> {
+    pub async fn select_projects(
+        &self,
+        attributes: SelectProjectsAttributes,
+    ) -> AppResult<Vec<Project>> {
+        let SelectProjectsAttributes { archived } = attributes;
+
         let mut client = self.connect().await?;
 
         let response = client
             .select_dimension_records(proto::SelectDimensionRecordsRequest {
                 record_parameters: Some(
                     proto::select_dimension_records_request::RecordParameters::ProjectRecordParameters(
-                        proto::ProjectRecordParameters {},
+                        proto::ProjectRecordParameters {
+                            archived,
+                        },
                     ),
                 ),
             })
@@ -66,6 +77,7 @@ impl Repo {
                             slug: project.slug,
                             description: project.description,
                             create_time: Default::default(),
+                            archivation_time: Default::default(),
                         },
                     ),
                 ),
@@ -96,6 +108,9 @@ impl Repo {
                             name: project.name,
                             slug: project.slug,
                             description: project.description,
+                            archivation_time: project
+                                .archivation_time
+                                .map(util::proto::to_proto_timestamp),
                             create_time: Some(util::proto::to_proto_timestamp(project.create_time)),
                         },
                     ),
@@ -160,6 +175,20 @@ impl Repo {
             }
         }
     }
+
+    pub async fn delete_project(&self, project: Project) -> AppResult<()> {
+        let mut client = self.connect().await?;
+
+        client
+            .remove_dimension_record(proto::RemoveDimensionRecordRequest {
+                id: Some(proto::remove_dimension_record_request::Id::ProjectRecordId(
+                    project.id.to_string(),
+                )),
+            })
+            .await?;
+
+        Ok(())
+    }
 }
 
 fn from_proto_project(proto_project: proto::dimensions::Project) -> AppResult<Project> {
@@ -168,10 +197,14 @@ fn from_proto_project(proto_project: proto::dimensions::Project) -> AppResult<Pr
     };
 
     Ok(Project {
+        archivation_time: proto_project
+            .archivation_time
+            .map(|timestamp| util::proto::from_proto_timestamp(timestamp, "archivation_time"))
+            .transpose()?,
+        create_time: util::proto::from_proto_timestamp(create_time, "create_time")?,
+        description: proto_project.description,
         id: util::proto::uuid_from_proto_string(&proto_project.id, "id")?,
         name: proto_project.name,
-        description: proto_project.description,
         slug: proto_project.slug,
-        create_time: util::proto::from_proto_timestamp(create_time, "create_time")?,
     })
 }

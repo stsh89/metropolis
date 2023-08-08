@@ -17,6 +17,18 @@ service Projects {
 
     // Show Project details.
     rpc CheckProjectDetails(CheckProjectDetailsRequest) returns (CheckProjectDetailsResponse);
+
+    // Move a Project from the Showcase to the Museum.
+    rpc ArchiveProject(ArchiveProjectRequest) returns (ArchiveProjectResponse);
+
+    // Move a Project from the Museum to the Showcase.
+    rpc RecoverProject(RecoverProjectRequest) returns (RecoverProjectResponse);
+
+    // Get a list of archived Projects.
+    rpc InquireArchivedProjects(InquireArchivedProjectsRequest) returns (InquireArchivedProjectsResponse);
+
+    // Purge a Project from the Museum history.
+    rpc DeleteProject(DeleteProjectRequest) returns (DeleteProjectResponse);
 }
 
 // (-- api-linter: core::0158::request-page-token-field=disabled
@@ -77,6 +89,48 @@ message CheckProjectDetailsResponse {
     // Found Project.
     Project project = 1;
 }
+
+// The definition of the request for the Project archiving request.
+message ArchiveProjectRequest {
+    // Project's unique web identifier.
+    string id = 1;
+}
+
+// The definition of the response for the Project archiving response.
+message ArchiveProjectResponse {
+    // Archived Project.
+    Project project = 1;
+}
+
+// The definition of the request for the Project recoverying request.
+message RecoverProjectRequest {
+    // Project's unique identifier.
+    string id = 1;
+}
+
+// The definition of the response for the Project recoverying response.
+message RecoverProjectResponse {
+    // Recovered Project.
+    Project project = 1;
+}
+
+// Client's request definition for archived Projects inquiring.
+message InquireArchivedProjectsRequest {}
+
+// Server's response to Client's Project inquiring request.
+message InquireArchivedProjectsResponse {
+    // List of archived Projects.
+    repeated Project projects = 1;
+}
+
+// The definition of the request for the Project deleting request.
+message DeleteProjectRequest {
+    // Project's unique identifier.
+    string id = 1;
+}
+
+// The definition of the response for the Project deleting response.
+message DeleteProjectResponse {}
 
 // Project representation.
 message Project {

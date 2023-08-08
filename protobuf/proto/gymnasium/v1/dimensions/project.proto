@@ -20,4 +20,7 @@ message Project {
 
     // The slug of the Project. Unique identifier for the Project's web address.
     string slug = 5;
+
+    // The archivation time of the Project.
+    google.protobuf.Timestamp archivation_time = 6;
 }

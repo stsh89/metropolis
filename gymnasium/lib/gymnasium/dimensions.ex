@@ -17,8 +17,20 @@ defmodule Gymnasium.Dimensions do
       [%Project{}, ...]
 
   """
-  def list_projects do
-    Repo.all(from(p in Project, order_by: [desc: p.inserted_at]))
+  def list_projects(query_attributes \\ []) do
+    query = from p in Project, order_by: [desc: p.inserted_at]
+
+    query = case query_attributes[:archive_indicator] do
+        "archived" ->
+            from p in query, where: not(is_nil(p.archived_at))
+
+        "not_archived" ->
+            from p in query, where: is_nil(p.archived_at)
+
+        _ -> query
+    end
+
+    Repo.all(query)
   end
 
   @doc """

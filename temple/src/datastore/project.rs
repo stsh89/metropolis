@@ -1,11 +1,19 @@
 use crate::{
-    datastore::Repo,
+    datastore::{self, Repo},
     model::{Project, Uuid},
     util, AppResult,
 };
 
-pub async fn list(repo: &Repo) -> AppResult<Vec<Project>> {
-    let projects = repo.select_projects().await?;
+pub struct ListProjectsAttributes {
+    pub archived: bool,
+}
+
+pub async fn list(repo: &Repo, attributes: ListProjectsAttributes) -> AppResult<Vec<Project>> {
+    let ListProjectsAttributes { archived } = attributes;
+
+    let projects = repo
+        .select_projects(datastore::repo::SelectProjectsAttributes { archived })
+        .await?;
 
     Ok(projects)
 }
@@ -20,11 +28,12 @@ pub async fn create(repo: &Repo, attributes: CreateProjectAttributes) -> AppResu
 
     let project = repo
         .create_project(Project {
-            id: Default::default(),
+            archivation_time: Default::default(),
             create_time: Default::default(),
+            description,
+            id: Default::default(),
             slug: util::slug::sluggify(&name),
             name,
-            description,
         })
         .await?;
 
@@ -47,4 +56,8 @@ pub async fn update(repo: &Repo, project: Project) -> AppResult<Project> {
     let project = repo.update_project(project).await?;
 
     Ok(project)
+}
+
+pub async fn delete(repo: &Repo, project: Project) -> AppResult<()> {
+    repo.delete_project(project).await
 }

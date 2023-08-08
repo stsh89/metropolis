@@ -28,6 +28,8 @@ defmodule Proto.Gymnasium.V1.ProjectRecordParameters do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :archived, 1, type: :bool
 end
 
 defmodule Proto.Gymnasium.V1.ProjectRecords do

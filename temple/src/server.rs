@@ -86,6 +86,81 @@ impl proto::projects_server::Projects for Projects {
             project: Some(to_proto_project(project)),
         }))
     }
+
+    async fn archive_project(
+        &self,
+        request: Request<proto::ArchiveProjectRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::ArchiveProjectResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::ArchiveProjectRequest { id } = request.into_inner();
+
+        let project = service::archive_project(service::ArchiveProjectAttributes {
+            id: util::proto::uuid_from_proto_string(&id, "id")?,
+            repo: &self.repo,
+        })
+        .await?;
+
+        Ok(Response::new(proto::ArchiveProjectResponse {
+            project: Some(to_proto_project(project)),
+        }))
+    }
+
+    async fn recover_project(
+        &self,
+        request: Request<proto::RecoverProjectRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::RecoverProjectResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::RecoverProjectRequest { id } = request.into_inner();
+
+        let project = service::recover_project(service::RecoverProjectAttributes {
+            id: util::proto::uuid_from_proto_string(&id, "id")?,
+            repo: &self.repo,
+        })
+        .await?;
+
+        Ok(Response::new(proto::RecoverProjectResponse {
+            project: Some(to_proto_project(project)),
+        }))
+    }
+
+    async fn inquire_archived_projects(
+        &self,
+        request: Request<proto::InquireArchivedProjectsRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::InquireArchivedProjectsResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let projects =
+            service::inquire_archived_projects(service::InquireArchivedProjectsAttributes {
+                repo: &self.repo,
+            })
+            .await?
+            .into_iter()
+            .map(to_proto_project)
+            .collect();
+
+        Ok(Response::new(proto::InquireArchivedProjectsResponse {
+            projects,
+        }))
+    }
+
+    async fn delete_project(
+        &self,
+        request: Request<proto::DeleteProjectRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::DeleteProjectResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::DeleteProjectRequest { id } = request.into_inner();
+
+        service::delete_project(service::DeleteProjectAttributes {
+            id: util::proto::uuid_from_proto_string(&id, "id")?,
+            repo: &self.repo,
+        })
+        .await?;
+
+        Ok(Response::new(proto::DeleteProjectResponse {}))
+    }
 }
 
 fn to_proto_project(project: Project) -> proto::Project {
