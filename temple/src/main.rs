@@ -10,7 +10,10 @@ pub use result::{AppError, AppResult};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let config = config::read_from_file("./config.json")?;
+    let args = std::env::args().collect::<Vec<String>>();
+    let config_file_path = &args[1];
+    let config = config::read_from_file(config_file_path)?;
+
     let server_socket_address = config.app()?.server_socket_address()?;
     let projects = server::Projects {
         repo: std::sync::Arc::new(datastore::Repo {

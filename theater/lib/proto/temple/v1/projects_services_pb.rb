@@ -18,9 +18,21 @@ module Proto
           self.service_name = 'proto.temple.v1.Projects'
 
           # List showcased Projects.
-          rpc :ListProjects, ::Proto::Temple::V1::ListProjectsRequest, ::Proto::Temple::V1::ListProjectsResponse
-          # Create a Project
-          rpc :SetupProjectEnvironment, ::Proto::Temple::V1::SetupProjectEnvironmentRequest, ::Proto::Temple::V1::SetupProjectEnvironmentResponse
+          rpc :ShowcaseProjects, ::Proto::Temple::V1::ShowcaseProjectsRequest, ::Proto::Temple::V1::ShowcaseProjectsResponse
+          # Create a Project.
+          rpc :InitializeProject, ::Proto::Temple::V1::InitializeProjectRequest, ::Proto::Temple::V1::InitializeProjectResponse
+          # Change Project's name.
+          rpc :RenameProject, ::Proto::Temple::V1::RenameProjectRequest, ::Proto::Temple::V1::RenameProjectResponse
+          # Show Project details.
+          rpc :CheckProjectDetails, ::Proto::Temple::V1::CheckProjectDetailsRequest, ::Proto::Temple::V1::CheckProjectDetailsResponse
+          # Move a Project from the Showcase to the Museum.
+          rpc :ArchiveProject, ::Proto::Temple::V1::ArchiveProjectRequest, ::Proto::Temple::V1::ArchiveProjectResponse
+          # Move a Project from the Museum to the Showcase.
+          rpc :RecoverProject, ::Proto::Temple::V1::RecoverProjectRequest, ::Proto::Temple::V1::RecoverProjectResponse
+          # Get a list of archived Projects.
+          rpc :InquireArchivedProjects, ::Proto::Temple::V1::InquireArchivedProjectsRequest, ::Proto::Temple::V1::InquireArchivedProjectsResponse
+          # Purge a Project from the Museum history.
+          rpc :DeleteProject, ::Proto::Temple::V1::DeleteProjectRequest, ::Proto::Temple::V1::DeleteProjectResponse
         end
 
         Stub = Service.rpc_stub_class

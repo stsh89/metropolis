@@ -1,9 +1,26 @@
-<h1>New project</h1>
+<div class="columns">
+  <div class="column">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="<%= root_path %>">Projects</a></li>
+        <li class="is-active"><a href="#" aria-current="page">Project initialization</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
 
-<%= render "form", project: @page.project %>
-
-<br>
+<div class="table-container">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td class="pl-0 pr-4">
+          <%= link_to "Cancel", root_path %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 <div>
-  <%= link_to "Back to projects", projects_path %>
+  <%= render "form", project: @page.project %>
 </div>

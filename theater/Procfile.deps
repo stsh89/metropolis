@@ -1,0 +1,2 @@
+temple: cargo run --manifest-path ../temple/Cargo.toml -- ../config.json
+gymnasium: cd ../gymnasium && mix phx.server

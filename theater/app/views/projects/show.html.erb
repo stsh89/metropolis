@@ -1,10 +1,36 @@
-<p style="color: green"><%= notice %></p>
+<div class="columns">
+  <div class="column">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="<%= root_path %>">Projects</a></li>
+        <li class="is-active"><a href="#" aria-current="page"><%= @page.project.name %></a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
 
-<%= render @project %>
+<div class="table-container">
+  <table class="table">
+    <tbody>
+      <tr>
+        <td class="pl-0 pr-4">
+          <%= link_to "Archive", project_path(@page.project.id, project: {archive: true}), data: { "turbo-method": :put } %>
+        </td>
+        <td class="pl-0 pr-4">
+          <%= link_to "Add Model", root_path %>
+        </td>
+        <td class="pl-0 pr-4">
+          <%= link_to "Models Diagram", root_path %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-<div>
-  <%= link_to "Edit this project", edit_project_path(@project) %> |
-  <%= link_to "Back to projects", projects_path %>
+<h1 class="title"><%= @page.project.name %></h1>
 
-  <%= button_to "Destroy this project", @project, method: :delete %>
+<div class="block">
+  <p>
+    <%= @page.project.description %>
+  </p>
 </div>

@@ -4,6 +4,6 @@ class CreateProjectPage
   end
 
   def create_project
-    ProjectsDataProvider.new.setup_project_environment(@params)
+    ProjectsDataProvider.new.initialize_project(@params)
   end
 end

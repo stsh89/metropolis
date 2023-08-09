@@ -9,12 +9,17 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://bulma.io/vendor/fontawesome-free-5.15.2-web/css/all.min.css">
   </head>
 
   <body>
     <section class="section">
       <div class="container">
-        <%= yield %>
+        <div class="columns">
+            <div class="column"></div>
+            <div class="column is-three-fifths"><%= yield %></div>
+            <div class="column"></div>
+        </div>
       </div>
     </section>
   </body>

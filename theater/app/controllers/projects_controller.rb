@@ -6,8 +6,9 @@ class ProjectsController < ApplicationController
     @page = IndexProjectPage.new
   end
 
-  # GET /projects/1
+  # GET /projects/food-service
   def show
+    @page = ShowProjectPage.new(params[:id])
   end
 
   # GET /projects/new
@@ -32,11 +33,13 @@ class ProjectsController < ApplicationController
 
   # PATCH/PUT /projects/1
   def update
-    # if @project.update(project_params)
-    #   redirect_to @project, notice: "Project was successfully updated."
-    # else
-    #   render :edit, status: :unprocessable_entity
-    # end
+    @page = UpdateProjectPage.new(params[:id], params[:project])
+
+    if @page.update_project
+      redirect_to root_path
+    else
+      redirect_to root_path
+    end
   end
 
   # DELETE /projects/1
