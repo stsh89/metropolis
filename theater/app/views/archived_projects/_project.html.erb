@@ -1,23 +1,8 @@
-<div class="card mt-5 is-horizontal">
-  <header class="card-header">
-    <p class="card-header-title">
-      <%= project.name %>
-    </p>
-    <%= link_to archived_project_path(project.id, project: {recover: true}), class: "card-header-icon", "aria-label" =>"restore project", data: { "turbo-method": :put } do %>
-      <span class="icon">
-        <i class="fas fa-solid fa-backward" aria-hidden="true"></i>
-      </span>
-    <% end %>
-  </header>
-
-  <div class="card-content">
-    <div class="content">
-      <%= project.description %>
-    </div>
-  </div>
-
-  <footer class="card-footer">
-    <time class="card-footer-item is-justify-content-right" datetime="<%= project_create_time(project.create_time) %>"><%= project_create_time(project.create_time) %></time>
-  </footer>
-</div>
-
+<tr>
+  <td><%= project.name %></td>
+  <td><%= project.description %></td>
+  <td><%= project_create_time(project.create_time) %></td>
+  <td>
+    <%= link_to 'Recover', archived_project_path(project.id, project: {recover: true}), data: {"turbo-method": :put} %> | <%= link_to 'Delete', project_path(project.id), data: {"turbo-method": :delete} %>
+  </td>
+</tr>

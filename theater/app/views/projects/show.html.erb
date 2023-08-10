@@ -1,36 +1,41 @@
 <div class="columns">
-  <div class="column">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li><a href="<%= root_path %>">Projects</a></li>
-        <li class="is-active"><a href="#" aria-current="page"><%= @page.project.name %></a></li>
-      </ul>
-    </nav>
+  <div class="column"></div>
+  <div class="column is-three-fifths">
+    <div class="box">
+      <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+          <li>
+            <%= link_to "Dashboard", root_path %>
+          </li>
+          <li>
+            <%= link_to "Projects", projects_path %>
+          </li>
+          <li class="is-active"><a href="#" aria-current="page"><%= @page.project.name %></a></li>
+        </ul>
+      </nav>
+
+      <div class="block">
+        <h1 class="title"><%= @page.project.name %></h1>
+
+        <div class="block">
+          <p>
+            <%= @page.project.description %>
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-
-<div class="table-container">
-  <table class="table">
-    <tbody>
-      <tr>
-        <td class="pl-0 pr-4">
-          <%= link_to "Archive", project_path(@page.project.id, project: {archive: true}), data: { "turbo-method": :put } %>
-        </td>
-        <td class="pl-0 pr-4">
-          <%= link_to "Add Model", root_path %>
-        </td>
-        <td class="pl-0 pr-4">
-          <%= link_to "Models Diagram", root_path %>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<h1 class="title"><%= @page.project.name %></h1>
-
-<div class="block">
-  <p>
-    <%= @page.project.description %>
-  </p>
+  <div class="column">
+    <div class="box">
+      <div class="block">
+        <%= link_to "Add Model", root_path %>
+      </div>
+      <div class="block">
+        <%= link_to "Models Diagram", root_path %>
+      </div>
+      <div class="block">
+        <%= link_to "Archive", project_path(@page.project.id, project: {archive: true}), data: { "turbo-method": :put } %>
+      </div>
+    </div>
+  </div>
 </div>

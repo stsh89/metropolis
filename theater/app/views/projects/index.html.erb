@@ -1,42 +1,29 @@
-<p style="color: green"><%= notice %></p>
-
 <div class="columns">
-  <div class="column">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li class="is-active"><a href="#" aria-current="page">Projects</a></li>
-      </ul>
-    </nav>
-  </div>
-</div>
+  <div class="column"></div>
+  <div class="column is-three-fifths">
+    <div class="box">
+      <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+          <li>
+            <%= link_to "Dashboard", root_path %>
+          </li>
+          <li class="is-active"><a href="#" aria-current="page">Projects</a></li>
+        </ul>
+      </nav>
 
-<div class="table-container">
-  <table class="table">
-    <tbody>
-      <tr>
-        <td class="pl-0 pr-4">
-          <%= link_to "New", new_project_path %>
-        </td>
-        <td class="pl-0 pr-4">
-          <%= link_to "Visit archive", archived_projects_path %>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<% if @page.projects.blank? %>
-  <div class="columns">
-    <div class="column">
-      <p>The first step is to create a new Project.</p>
+      <div class="block">
+        <%= render "projects", projects: @page.projects %>
+      </div>
     </div>
   </div>
-<% else %>
-  <div class="block">
-    <input class="input" type="text" placeholder="Search">
+  <div class="column">
+    <div class="box">
+      <div class="block">
+        <%= link_to "New", new_project_path %>
+      </div>
+      <div class="block">
+        <%= link_to "Archived Projects", archived_projects_path %>
+      </div>
+    </div>
   </div>
-
-  <div id="projects">
-    <%= render partial: 'project', collection: @page.projects %>
-  </div>
-<% end %>
+</div>

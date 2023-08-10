@@ -1,38 +1,25 @@
 <div class="columns">
-  <div class="column">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li><a href="<%= root_path %>">Projects</a></li>
-        <li class="is-active"><a href="#" aria-current="page">Archive</a></li>
-      </ul>
-    </nav>
-  </div>
-</div>
+  <div class="column"></div>
+  <div class="column is-three-fifths">
+    <div class="box">
+      <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+          <li>
+            <%= link_to "Dashboard", root_path %>
+          </li>
+          <li>
+            <%= link_to "Projects", projects_path %>
+          </li>
+          <li class="is-active"><a href="#" aria-current="page">Archive</a></li>
+        </ul>
+      </nav>
 
-<div class="table-container">
-  <table class="table">
-    <tbody>
-      <tr>
-        <td class="pl-0 pr-4">
-          <%= link_to "Leave archive", root_path %>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<% if @page.projects.blank? %>
-  <div class="columns">
-    <div class="column">
-      <p>Projects archive is empty</p>
+      <div class="block">
+        <% if @page.projects.present? %>
+          <%= render "projects", projects: @page.projects %>
+        <% end %>
+      </div>
     </div>
   </div>
-<% else %>
-  <div class="block">
-    <input class="input" type="text" placeholder="Search">
-  </div>
-
-  <div id="projects">
-    <%= render partial: 'project', collection: @page.projects %>
-  </div>
-<% end %>
+  <div class="column"></div>
+</div>

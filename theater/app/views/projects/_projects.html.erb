@@ -1,0 +1,28 @@
+<% if projects.present? %>
+  <div class="block" data-controller="search">
+    <div class="block">
+      <div class="control has-icons-left">
+        <input class="input" type="text" placeholder="Search" data-action="keyup->search#find" data-search-target="input">
+        <span class="icon is-left">
+          <i class="fas fa-search" aria-hidden="true"></i>
+        </span>
+      </div>
+    </div>
+    <div class="block">
+      <table class="table is-striped">
+        <thead>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </thead>
+        <tbody>
+          <%= render partial: 'project', collection: projects %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="block">
+    <p>The first step is to create a new Project.</p>
+  </div>
+<% end %>

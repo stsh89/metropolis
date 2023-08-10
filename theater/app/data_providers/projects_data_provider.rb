@@ -57,6 +57,12 @@ class ProjectsDataProvider
     ProjectsDataProvider.from_proto(message.project)
   end
 
+  def delete_project(id)
+    @stub.delete_project(Proto::Temple::V1::DeleteProjectRequest.new(
+      id: id
+    ))
+  end
+
   class << self
     def from_proto(proto_project)
       Project.new(

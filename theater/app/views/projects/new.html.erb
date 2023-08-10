@@ -1,26 +1,23 @@
 <div class="columns">
-  <div class="column">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li><a href="<%= root_path %>">Projects</a></li>
-        <li class="is-active"><a href="#" aria-current="page">Project initialization</a></li>
-      </ul>
-    </nav>
+  <div class="column"></div>
+  <div class="column is-three-fifths">
+    <div class="box">
+      <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+          <li>
+            <%= link_to "Dashboard", root_path %>
+          </li>
+          <li>
+            <%= link_to "Projects", projects_path %>
+          </li>
+          <li class="is-active"><a href="#" aria-current="page">New</a></li>
+        </ul>
+      </nav>
+
+      <div class="block">
+        <%= render "form", project: @page.project %>
+      </div>
+    </div>
   </div>
-</div>
-
-<div class="table-container">
-  <table class="table">
-    <tbody>
-      <tr>
-        <td class="pl-0 pr-4">
-          <%= link_to "Cancel", root_path %>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div>
-  <%= render "form", project: @page.project %>
+  <div class="column"></div>
 </div>

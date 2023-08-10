@@ -36,9 +36,9 @@ class ProjectsController < ApplicationController
     @page = UpdateProjectPage.new(params[:id], params[:project])
 
     if @page.update_project
-      redirect_to root_path
+      redirect_to projects_path
     else
-      redirect_to root_path
+      redirect_to projects_path
     end
   end
 

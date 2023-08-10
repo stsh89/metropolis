@@ -1,4 +1,6 @@
 class UpdateArchivedProjectPage
+  attr_reader :project
+
   def initialize(project_id, params)
     @project_id = project_id
     @params = params

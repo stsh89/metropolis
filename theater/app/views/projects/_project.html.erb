@@ -1,28 +1,5 @@
-<div class="card mt-5 is-horizontal">
-  <header class="card-header">
-    <p class="card-header-title">
-      <%= project.name %>
-    </p>
-    <button class="card-header-icon" aria-label="rename project">
-      <span class="icon">
-        <i class="fas fa-solid fa-pen" aria-hidden="true"></i>
-      </span>
-    </button>
-    <%= link_to project_path(project.slug), class: "card-header-icon" do %>
-      <span class="icon">
-        <i class="fas fa-solid fa-eye" aria-hidden="true"></i>
-      </span>
-    <% end %>
-  </header>
-
-  <div class="card-content">
-    <div class="content">
-      <%= project.description %>
-    </div>
-  </div>
-
-  <footer class="card-footer">
-    <time class="card-footer-item is-justify-content-right" datetime="<%= project_create_time(project.create_time) %>"><%= project_create_time(project.create_time) %></time>
-  </footer>
-</div>
-
+<tr data-search-target="value" data-value="<%= project.name %>">
+  <td><%= project.name %></td>
+  <td><%= project.description %></td>
+  <td><%= link_to 'Show', project_path(project.slug) %></td>
+</tr>
