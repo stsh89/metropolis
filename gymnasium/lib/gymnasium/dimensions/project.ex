@@ -1,4 +1,6 @@
 defmodule Gymnasium.Dimensions.Project do
+  alias Gymnasium.Dimensions.Model
+
   use Gymnasium.Schema
   import Ecto.Changeset
 
@@ -7,6 +9,8 @@ defmodule Gymnasium.Dimensions.Project do
     field :name, :string
     field :slug, :string
     field :archived_at, :utc_datetime_usec
+
+    has_many :models, Model
 
     timestamps()
   end

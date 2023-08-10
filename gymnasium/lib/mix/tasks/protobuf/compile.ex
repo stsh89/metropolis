@@ -15,7 +15,8 @@ defmodule Mix.Tasks.Protobuf.Compile do
 
     files = [
       "dimensions.proto",
-      "dimensions/project.proto"
+      "dimensions/project.proto",
+      "dimensions/model.proto"
     ]
 
     for file <- files do

@@ -6,7 +6,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn compile_proto_gymnasium() -> Result<(), Box<dyn std::error::Error>> {
-    let files = vec!["dimensions.proto", "dimensions/project.proto"];
+    let files = vec!["dimensions.proto", "dimensions/project.proto", "dimensions/model.proto"];
 
     let protos: Vec<String> = files
         .iter()

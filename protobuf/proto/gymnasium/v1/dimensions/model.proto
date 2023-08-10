@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package proto.gymnasium.v1.dimensions;
+
+// Representation of the Model dimension.
+message Model {
+    // Unique identifier for the Project. Text representation of the UUID.
+    string project_id = 1;
+
+    // Unique identifier for the Model. Text representation of the UUID.
+    string id = 2;
+
+    // The name of the Model.
+    string name = 3;
+
+    // The description of the Model.
+    string description = 4;
+
+    // The creation time of the Model.
+    google.protobuf.Timestamp create_time = 5;
+
+    // The slug of the Model. Unique identifier for the Model's web address.
+    string slug = 6;
+
+    // The list of the Model's attributes.
+    repeated ModelAttribute attributes = 7;
+}
+
+message ModelAttribute {
+    // Unique identifier for the Model. Text representation of the UUID.
+    string model_id = 1;
+
+    string name = 2;
+
+    string description = 3;
+
+    oneof kind {
+        ModelScalarAttributeKind scalar = 4;
+
+        // Unique identifier for the referenced Model. Text representation of the UUID.
+        string reference = 5;
+    }
+
+    bool list = 6;
+}
+
+enum ModelScalarAttributeKind {
+    MODEL_SCALAR_ATTRIBUTE_KIND_UNSPECIFIED = 0;
+    MODEL_SCALAR_ATTRIBUTE_KIND_STRING = 1;
+    MODEL_SCALAR_ATTRIBUTE_KIND_INT64 = 2;
+    MODEL_SCALAR_ATTRIBUTE_KIND_BOOL = 3;
+}

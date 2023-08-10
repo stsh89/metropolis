@@ -13,10 +13,28 @@ defmodule Gymnasium.DimensionsFixtures do
       |> Enum.into(%{
         description: "An online platform for buying and selling books.",
         name: "Bookstore",
-        slug: "bookstore"
+        slug: "bookstore",
+        archived_at: nil
       })
       |> Gymnasium.Dimensions.create_project()
 
     project
+  end
+
+  @doc """
+  Generate a model.
+  """
+  def model_fixture(attrs \\ %{}) do
+    {:ok, model} =
+      attrs
+      |> Enum.into(%{
+        description: "Book model",
+        name: "Book",
+        slug: "book",
+        project_id: attrs[:project_id]
+      })
+      |> Gymnasium.Dimensions.create_model()
+
+    model
   end
 end

@@ -9,6 +9,11 @@ defmodule Proto.Gymnasium.V1.SelectDimensionRecordsRequest do
     type: Proto.Gymnasium.V1.ProjectRecordParameters,
     json_name: "projectRecordParameters",
     oneof: 0
+
+  field :model_record_parameters, 2,
+    type: Proto.Gymnasium.V1.ModelRecordParameters,
+    json_name: "modelRecordParameters",
+    oneof: 0
 end
 
 defmodule Proto.Gymnasium.V1.SelectDimensionRecordsResponse do
@@ -22,6 +27,11 @@ defmodule Proto.Gymnasium.V1.SelectDimensionRecordsResponse do
     type: Proto.Gymnasium.V1.ProjectRecords,
     json_name: "projectRecords",
     oneof: 0
+
+  field :model_records, 2,
+    type: Proto.Gymnasium.V1.ModelRecords,
+    json_name: "modelRecords",
+    oneof: 0
 end
 
 defmodule Proto.Gymnasium.V1.ProjectRecordParameters do
@@ -32,12 +42,28 @@ defmodule Proto.Gymnasium.V1.ProjectRecordParameters do
   field :archived, 1, type: :bool
 end
 
+defmodule Proto.Gymnasium.V1.ModelRecordParameters do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :project_id, 1, type: :string, json_name: "projectId"
+end
+
 defmodule Proto.Gymnasium.V1.ProjectRecords do
   @moduledoc false
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   field :records, 1, repeated: true, type: Proto.Gymnasium.V1.Dimensions.Project
+end
+
+defmodule Proto.Gymnasium.V1.ModelRecords do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :records, 1, repeated: true, type: Proto.Gymnasium.V1.Dimensions.Model
 end
 
 defmodule Proto.Gymnasium.V1.StoreDimensionRecordRequest do
@@ -50,6 +76,11 @@ defmodule Proto.Gymnasium.V1.StoreDimensionRecordRequest do
   field :project_record, 1,
     type: Proto.Gymnasium.V1.Dimensions.Project,
     json_name: "projectRecord",
+    oneof: 0
+
+  field :model_record, 2,
+    type: Proto.Gymnasium.V1.Dimensions.Model,
+    json_name: "modelRecord",
     oneof: 0
 end
 
@@ -64,6 +95,11 @@ defmodule Proto.Gymnasium.V1.StoreDimensionRecordResponse do
     type: Proto.Gymnasium.V1.Dimensions.Project,
     json_name: "projectRecord",
     oneof: 0
+
+  field :model_record, 2,
+    type: Proto.Gymnasium.V1.Dimensions.Model,
+    json_name: "modelRecord",
+    oneof: 0
 end
 
 defmodule Proto.Gymnasium.V1.FindDimensionRecordRequest do
@@ -75,6 +111,8 @@ defmodule Proto.Gymnasium.V1.FindDimensionRecordRequest do
 
   field :project_record_slug, 1, type: :string, json_name: "projectRecordSlug", oneof: 0
   field :project_record_id, 2, type: :string, json_name: "projectRecordId", oneof: 0
+  field :model_record_slug, 3, type: :string, json_name: "modelRecordSlug", oneof: 0
+  field :model_record_id, 4, type: :string, json_name: "modelRecordId", oneof: 0
 end
 
 defmodule Proto.Gymnasium.V1.FindDimensionRecordResponse do
@@ -88,6 +126,11 @@ defmodule Proto.Gymnasium.V1.FindDimensionRecordResponse do
     type: Proto.Gymnasium.V1.Dimensions.Project,
     json_name: "projectRecord",
     oneof: 0
+
+  field :model_record, 2,
+    type: Proto.Gymnasium.V1.Dimensions.Model,
+    json_name: "modelRecord",
+    oneof: 0
 end
 
 defmodule Proto.Gymnasium.V1.RemoveDimensionRecordRequest do
@@ -98,6 +141,7 @@ defmodule Proto.Gymnasium.V1.RemoveDimensionRecordRequest do
   oneof :id, 0
 
   field :project_record_id, 1, type: :string, json_name: "projectRecordId", oneof: 0
+  field :model_record_id, 2, type: :string, json_name: "modelRecordId", oneof: 0
 end
 
 defmodule Proto.Gymnasium.V1.RemoveDimensionRecordResponse do

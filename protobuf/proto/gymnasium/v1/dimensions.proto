@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "proto/gymnasium/v1/dimensions/project.proto";
+import "proto/gymnasium/v1/dimensions/model.proto";
 
 package proto.gymnasium.v1;
 
@@ -25,6 +26,9 @@ message SelectDimensionRecordsRequest {
     oneof record_parameters {
         // Filter parameters for the Project dimension.
         ProjectRecordParameters project_record_parameters = 1;
+
+        // Filter parameters for the Model dimension.
+        ModelRecordParameters model_record_parameters = 2;
     }
 }
 
@@ -33,6 +37,9 @@ message SelectDimensionRecordsResponse {
     oneof records {
         // Project records filtered by parameters.
         ProjectRecords project_records = 1;
+
+        // Model records filtered by parameters.
+        ModelRecords model_records = 2;
     }
 }
 
@@ -41,10 +48,22 @@ message ProjectRecordParameters {
     bool archived = 1;
 }
 
+// The list of available filters for the Model dimension.
+message ModelRecordParameters {
+    // Project's unique identifier. Text representation of the UUID.
+    string project_id = 1;
+}
+
 // Wrapper around a filtered list of Projects.
 message ProjectRecords {
     // List of filtered projects.
     repeated dimensions.Project records = 1;
+}
+
+// Wrapper around a filtered list of Models.
+message ModelRecords {
+    // List of filtered models.
+    repeated dimensions.Model records = 1;
 }
 
 // The definition of request for storing dimension record.
@@ -52,6 +71,9 @@ message StoreDimensionRecordRequest {
     oneof record {
         // The Project to store.
         dimensions.Project project_record = 1;
+
+        // The Model to store.
+        dimensions.Model model_record = 2;
     }
 }
 
@@ -60,6 +82,9 @@ message StoreDimensionRecordResponse {
     oneof record {
         // Stored Project.
         dimensions.Project project_record = 1;
+
+        // Stored Model.
+        dimensions.Model model_record = 2;
     }
 }
 
@@ -71,6 +96,12 @@ message FindDimensionRecordRequest {
 
         // Search a Project by it's id. UUID in a string form.
         string project_record_id = 2;
+
+        // Search a Model by it's slug.
+        string model_record_slug = 3;
+
+        // Search a Model by it's id. UUID in a string form.
+        string model_record_id = 4;
     }
 }
 
@@ -79,6 +110,9 @@ message FindDimensionRecordResponse {
     oneof record {
         // Found Project.
         dimensions.Project project_record = 1;
+
+        // Found Model.
+        dimensions.Model model_record = 2;
     }
 }
 
@@ -87,6 +121,9 @@ message RemoveDimensionRecordRequest {
     oneof id {
         // Search a Project by it's id.
         string project_record_id = 1;
+
+        // Search a Model by it's id.
+        string model_record_id = 2;
     }
 }
 

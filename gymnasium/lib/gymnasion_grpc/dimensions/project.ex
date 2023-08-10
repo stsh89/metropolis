@@ -12,11 +12,12 @@ defmodule GymnasiumGrpc.Dimensions.Project do
   }
 
   def select(parameters = %ProjectRecordParameters{}) do
-    query_attributes = if parameters.archived do
+    query_attributes =
+      if parameters.archived do
         [archive_indicator: "archived"]
-    else
+      else
         [archive_indicator: "not_archived"]
-    end
+      end
 
     project_records =
       Dimensions.list_projects(query_attributes)
@@ -78,9 +79,10 @@ defmodule GymnasiumGrpc.Dimensions.Project do
   end
 
   defp create(proto_project = %ProtoProject{}) do
-    archived_at = if proto_project.archivation_time do
-      Helpers.from_proto_timestamp(proto_project.archivation_time)
-    end
+    archived_at =
+      if proto_project.archivation_time do
+        Helpers.from_proto_timestamp(proto_project.archivation_time)
+      end
 
     attributes = %{
       archived_at: archived_at,
@@ -93,9 +95,10 @@ defmodule GymnasiumGrpc.Dimensions.Project do
   end
 
   defp update(proto_project = %ProtoProject{id: id}) do
-    archived_at = if proto_project.archivation_time do
-      Helpers.from_proto_timestamp(proto_project.archivation_time)
-    end
+    archived_at =
+      if proto_project.archivation_time do
+        Helpers.from_proto_timestamp(proto_project.archivation_time)
+      end
 
     attributes = %{
       archived_at: archived_at,
@@ -149,8 +152,11 @@ defmodule GymnasiumGrpc.Dimensions.Project do
     try do
       Dimensions.get_project!(id)
     rescue
-      Ecto.NoResultsError -> raise GRPC.RPCError, status: :not_found
-      Ecto.Query.CastError -> raise GRPC.RPCError, status: :invalid_argument, message: "malformed UUID"
+      Ecto.NoResultsError ->
+        raise GRPC.RPCError, status: :not_found
+
+      Ecto.Query.CastError ->
+        raise GRPC.RPCError, status: :invalid_argument, message: "malformed UUID"
     end
   end
 end
