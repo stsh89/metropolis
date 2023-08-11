@@ -60,6 +60,9 @@ impl Repo {
                     .into_iter()
                     .map(from_proto_project)
                     .collect::<AppResult<Vec<Project>>>()
+            },
+            _ => {
+                return Err(AppError::internal("missing #record for store_dimension_record response"));
             }
         }
     }
@@ -92,6 +95,9 @@ impl Repo {
         match record {
             proto::store_dimension_record_response::Record::ProjectRecord(proto_project) => {
                 from_proto_project(proto_project)
+            },
+            _ => {
+                return Err(AppError::internal("missing #record for store_dimension_record response"));
             }
         }
     }
@@ -126,6 +132,9 @@ impl Repo {
         match record {
             proto::store_dimension_record_response::Record::ProjectRecord(proto_project) => {
                 from_proto_project(proto_project)
+            },
+            _ => {
+                return Err(AppError::internal("missing #record for store_dimension_record response"));
             }
         }
     }
@@ -149,6 +158,9 @@ impl Repo {
         match record {
             proto::find_dimension_record_response::Record::ProjectRecord(proto_project) => {
                 from_proto_project(proto_project)
+            },
+            _ => {
+                return Err(AppError::internal("missing #record for store_dimension_record response"));
             }
         }
     }
@@ -172,6 +184,9 @@ impl Repo {
         match record {
             proto::find_dimension_record_response::Record::ProjectRecord(proto_project) => {
                 from_proto_project(proto_project)
+            },
+            _ => {
+                return Err(AppError::internal("missing #record for store_dimension_record response"));
             }
         }
     }
