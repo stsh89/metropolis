@@ -67,7 +67,7 @@ mod tests {
             }
         }
 
-        pub async fn get_project(
+        pub async fn find_project_by_slug(
             &self,
             slug: &str,
         ) -> FoundationResult<datastore::project::Project> {
@@ -78,7 +78,18 @@ mod tests {
                 .find(|project| project.slug == slug)
                 .cloned()
                 .ok_or(FoundationError::not_found(format!(
-                    "can't find project with the slug: `{slug}`"
+                    "no Project with slug: `{slug}`"
+                )))
+        }
+
+        pub async fn get(&self, id: Uuid) -> FoundationResult<datastore::project::Project> {
+            let project_records = self.projects.read().await;
+
+            project_records
+                .get(&id)
+                .cloned()
+                .ok_or(FoundationError::not_found(format!(
+                    "no Project with id: `{id}`",
                 )))
         }
 

@@ -32,7 +32,7 @@ mod tests {
     #[async_trait::async_trait]
     impl DeleteProject for ProjectRepo {
         async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project> {
-            self.get_project(slug).await
+            self.find_project_by_slug(slug).await
         }
 
         async fn delete_project(

@@ -27,26 +27,21 @@ pub async fn execute(repo: &impl ArchiveProject, request: Request) -> Foundation
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{project::tests::ProjectRepo, FoundationError, Utc};
+    use crate::{project::tests::ProjectRepo, Utc};
 
     #[async_trait::async_trait]
     impl ArchiveProject for ProjectRepo {
         async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project> {
-            self.get_project(slug).await
+            self.find_project_by_slug(slug).await
         }
 
         async fn archive_project(
             &self,
             project_record: datastore::project::Project,
         ) -> FoundationResult<()> {
-            let mut project_records = self.projects.write().await;
+            let mut found_project_record = self.get(project_record.id).await?;
 
-            let mut found_project_record = project_records.get(&project_record.id).cloned().ok_or(
-                FoundationError::not_found(format!(
-                    "can't find project with the id: `{}`",
-                    project_record.id
-                )),
-            )?;
+            let mut project_records = self.projects.write().await;
 
             found_project_record.archived_at = Some(Utc::now());
 

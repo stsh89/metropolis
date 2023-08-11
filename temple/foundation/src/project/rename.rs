@@ -42,26 +42,21 @@ pub async fn execute(repo: &impl RenameProject, request: Request) -> FoundationR
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{project::tests::ProjectRepo, FoundationError};
+    use crate::project::tests::ProjectRepo;
 
     #[async_trait::async_trait]
     impl RenameProject for ProjectRepo {
         async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project> {
-            self.get_project(slug).await
+            self.find_project_by_slug(slug).await
         }
 
         async fn rename_project(
             &self,
             project_record: datastore::project::Project,
         ) -> FoundationResult<datastore::project::Project> {
-            let mut project_records = self.projects.write().await;
+            let mut found_project_record = self.get(project_record.id).await?;
 
-            let mut found_project_record = project_records.get(&project_record.id).cloned().ok_or(
-                FoundationError::not_found(format!(
-                    "can't find project with the id: `{}`",
-                    project_record.id
-                )),
-            )?;
+            let mut project_records = self.projects.write().await;
 
             found_project_record.name = project_record.name;
             found_project_record.slug = project_record.slug;
