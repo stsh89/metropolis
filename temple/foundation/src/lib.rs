@@ -1,8 +1,11 @@
 pub mod datastore;
+pub mod model;
 pub mod project;
 
 mod result;
 mod util;
+
+mod tests;
 
 pub use result::{FoundationError, FoundationResult};
 

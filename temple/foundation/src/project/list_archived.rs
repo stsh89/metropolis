@@ -22,13 +22,16 @@ pub async fn execute(repo: &impl ListProjects) -> FoundationResult<Response> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{project::tests::ProjectRepo, Utc};
+    use crate::{
+        tests::{project_record_fixture, ProjectRecordFixture, ProjectRepo},
+        Utc,
+    };
 
     #[async_trait::async_trait]
     impl ListProjects for ProjectRepo {
         async fn list_projects(&self) -> FoundationResult<Vec<datastore::project::Project>> {
             let project_records = self
-                .projects
+                .records
                 .read()
                 .await
                 .values()
@@ -40,35 +43,23 @@ mod tests {
         }
     }
 
-    fn projec_records() -> Vec<datastore::project::Project> {
-        vec![
-            datastore::project::Project {
-                name: "Food service".to_string(),
-                slug: "food-service".to_string(),
-                archived_at: Some(Utc::now()),
-                ..Default::default()
-            },
-            datastore::project::Project {
-                name: "Book store".to_string(),
-                slug: "book-store".to_string(),
-                ..Default::default()
-            },
-        ]
-    }
-
     #[tokio::test]
     async fn it_returns_not_archived_projects() -> FoundationResult<()> {
-        let repo = ProjectRepo::initialize(projec_records());
+        let project_record = project_record_fixture(ProjectRecordFixture {
+            name: Some("Food service".to_string()),
+            slug: Some("food-service".to_string()),
+            archived_at: Some(Utc::now()),
+            ..Default::default()
+        });
+
+        let repo = ProjectRepo::seed(vec![
+            project_record.clone(),
+            project_record_fixture(Default::default()),
+        ]);
+
         let response = execute(&repo).await?;
 
-        assert_eq!(
-            response.projects,
-            vec![Project {
-                description: None,
-                name: "Food service".to_string(),
-                slug: "food-service".to_string()
-            }]
-        );
+        assert_eq!(response.projects, vec![project_record.into()]);
 
         Ok(())
     }

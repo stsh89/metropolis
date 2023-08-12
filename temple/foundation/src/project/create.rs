@@ -38,7 +38,7 @@ pub async fn execute(repo: &impl CreateProject, request: Request) -> FoundationR
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::project::tests::ProjectRepo;
+    use crate::tests::ProjectRepo;
 
     #[async_trait::async_trait]
     impl CreateProject for ProjectRepo {
@@ -52,7 +52,7 @@ mod tests {
                 slug,
             } = project;
 
-            let mut project_records = self.projects.write().await;
+            let mut project_records = self.records.write().await;
 
             let project_record = datastore::project::Project {
                 description: description.unwrap_or_default(),
@@ -67,20 +67,21 @@ mod tests {
         }
     }
 
-    fn valid_request() -> Request {
-        Request {
-            name: "Book store".to_string(),
-            description: "Buy and sell books platform".to_string(),
-        }
-    }
-
     #[tokio::test]
     async fn it_creates_a_project() -> FoundationResult<()> {
-        let repo = ProjectRepo::initialize(vec![]);
-        let response = execute(&repo, valid_request()).await?;
+        let repo = ProjectRepo::seed(vec![]);
+
+        let response = execute(
+            &repo,
+            Request {
+                name: "Book store".to_string(),
+                description: "Buy and sell books platform".to_string(),
+            },
+        )
+        .await?;
 
         assert_eq!(
-            repo.projects()
+            repo.records()
                 .await
                 .into_iter()
                 .map(Into::<Project>::into)

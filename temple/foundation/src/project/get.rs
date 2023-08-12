@@ -28,66 +28,45 @@ pub async fn execute(repo: &impl GetProject, request: Request) -> FoundationResu
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{project::tests::ProjectRepo, result::FoundationErrorCode, FoundationError};
+    use crate::{
+        result::FoundationErrorCode,
+        tests::{project_record_fixture, ProjectRepo},
+        FoundationError,
+    };
 
     #[async_trait::async_trait]
     impl GetProject for ProjectRepo {
         async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project> {
-            self.find_project_by_slug(slug).await
-        }
-    }
-
-    fn project_records() -> Vec<datastore::project::Project> {
-        vec![datastore::project::Project {
-            name: "Book store".to_string(),
-            slug: "book-store".to_string(),
-            ..Default::default()
-        }]
-    }
-
-    fn valid_request() -> Request {
-        Request {
-            slug: "book-store".to_string(),
-        }
-    }
-
-    fn invalid_request() -> Request {
-        Request {
-            slug: "food-service".to_string(),
+            self.find_by_slug(slug).await
         }
     }
 
     #[tokio::test]
     async fn it_returns_found_project() -> FoundationResult<()> {
-        let repo = ProjectRepo::initialize(project_records());
-        let response = execute(&repo, valid_request()).await?;
+        let project_record = project_record_fixture(Default::default());
 
-        assert_eq!(
-            repo.projects()
-                .await
-                .into_iter()
-                .map(Into::<Project>::into)
-                .collect::<Vec<Project>>(),
-            vec![response.project.clone()]
-        );
+        let repo = ProjectRepo::seed(vec![project_record.clone()]);
 
-        assert_eq!(
-            response.project,
-            Project {
-                description: None,
-                name: "Book store".to_string(),
-                slug: "book-store".to_string()
-            }
-        );
+        let response = execute(
+            &repo,
+            Request {
+                slug: project_record.slug.to_string(),
+            },
+        )
+        .await?;
+
+        assert_eq!(response.project, project_record.into());
 
         Ok(())
     }
 
     #[tokio::test]
     async fn it_returns_not_found_error() -> FoundationResult<()> {
-        let repo = ProjectRepo::initialize(project_records());
+        let repo = ProjectRepo::seed(vec![]);
 
-        let Err(error) = execute(&repo, invalid_request()).await else {
+        let Err(error) = execute(&repo,             Request {
+            slug: "book-store".to_string(),
+        },).await else {
             return Err(FoundationError::internal("expected error, got ok"));
         };
 

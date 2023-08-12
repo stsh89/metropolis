@@ -42,12 +42,12 @@ pub async fn execute(repo: &impl RenameProject, request: Request) -> FoundationR
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::project::tests::ProjectRepo;
+    use crate::tests::{project_record_fixture, ProjectRepo};
 
     #[async_trait::async_trait]
     impl RenameProject for ProjectRepo {
         async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project> {
-            self.find_project_by_slug(slug).await
+            self.find_by_slug(slug).await
         }
 
         async fn rename_project(
@@ -56,7 +56,7 @@ mod tests {
         ) -> FoundationResult<datastore::project::Project> {
             let mut found_project_record = self.get(project_record.id).await?;
 
-            let mut project_records = self.projects.write().await;
+            let mut project_records = self.records.write().await;
 
             found_project_record.name = project_record.name;
             found_project_record.slug = project_record.slug;
@@ -67,28 +67,23 @@ mod tests {
         }
     }
 
-    fn projec_records() -> Vec<datastore::project::Project> {
-        vec![datastore::project::Project {
-            name: "Book store".to_string(),
-            slug: "book-store".to_string(),
-            ..Default::default()
-        }]
-    }
-
-    fn valid_request() -> Request {
-        Request {
-            slug: "book-store".to_string(),
-            name: "Food service".to_string(),
-        }
-    }
-
     #[tokio::test]
     async fn it_changes_project_name_and_slug() -> FoundationResult<()> {
-        let repo = ProjectRepo::initialize(projec_records());
-        let response = execute(&repo, valid_request()).await?;
+        let project_record = project_record_fixture(Default::default());
+
+        let repo = ProjectRepo::seed(vec![project_record.clone()]);
+
+        let response = execute(
+            &repo,
+            Request {
+                slug: project_record.slug,
+                name: "Food service".to_string(),
+            },
+        )
+        .await?;
 
         assert_eq!(
-            repo.projects()
+            repo.records()
                 .await
                 .into_iter()
                 .map(Into::<Project>::into)

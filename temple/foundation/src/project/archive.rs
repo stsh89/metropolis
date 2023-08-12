@@ -27,12 +27,15 @@ pub async fn execute(repo: &impl ArchiveProject, request: Request) -> Foundation
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{project::tests::ProjectRepo, Utc};
+    use crate::{
+        tests::{project_record_fixture, ProjectRecordFixture, ProjectRepo},
+        Utc,
+    };
 
     #[async_trait::async_trait]
     impl ArchiveProject for ProjectRepo {
         async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project> {
-            self.find_project_by_slug(slug).await
+            self.find_by_slug(slug).await
         }
 
         async fn archive_project(
@@ -41,7 +44,7 @@ mod tests {
         ) -> FoundationResult<()> {
             let mut found_project_record = self.get(project_record.id).await?;
 
-            let mut project_records = self.projects.write().await;
+            let mut project_records = self.records.write().await;
 
             found_project_record.archived_at = Some(Utc::now());
 
@@ -51,40 +54,38 @@ mod tests {
         }
     }
 
-    fn project_records() -> Vec<datastore::project::Project> {
-        vec![
-            datastore::project::Project {
-                name: "Book store".to_string(),
-                slug: "book-store".to_string(),
-                ..Default::default()
-            },
-            datastore::project::Project {
-                name: "Food service".to_string(),
-                slug: "food-service".to_string(),
-                ..Default::default()
-            },
-        ]
-    }
-
-    fn valid_request() -> Request {
-        Request {
-            slug: "book-store".to_string(),
-        }
-    }
-
     #[tokio::test]
     async fn it_marks_a_project_as_archived() -> FoundationResult<()> {
-        let repo = ProjectRepo::initialize(project_records());
-        execute(&repo, valid_request()).await?;
+        let project_record = project_record_fixture(Default::default());
 
-        assert_eq!(
-            repo.projects()
-                .await
-                .iter()
-                .filter(|record| record.archived_at.is_some())
-                .count(),
-            1
-        );
+        let repo = ProjectRepo::seed(vec![
+            project_record.clone(),
+            project_record_fixture(ProjectRecordFixture {
+                name: Some("Food service".to_string()),
+                slug: Some("food-service".to_string()),
+                ..Default::default()
+            }),
+        ]);
+
+        execute(
+            &repo,
+            Request {
+                slug: project_record.slug.clone(),
+            },
+        )
+        .await?;
+
+        assert!(repo
+            .find_by_slug(&project_record.slug)
+            .await?
+            .archived_at
+            .is_some(),);
+
+        assert!(repo
+            .find_by_slug("food-service")
+            .await?
+            .archived_at
+            .is_none(),);
 
         Ok(())
     }

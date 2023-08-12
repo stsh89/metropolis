@@ -27,19 +27,19 @@ pub async fn execute(repo: &impl DeleteProject, request: Request) -> FoundationR
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::project::tests::ProjectRepo;
+    use crate::tests::{project_record_fixture, ProjectRepo};
 
     #[async_trait::async_trait]
     impl DeleteProject for ProjectRepo {
         async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project> {
-            self.find_project_by_slug(slug).await
+            self.find_by_slug(slug).await
         }
 
         async fn delete_project(
             &self,
             project_record: datastore::project::Project,
         ) -> FoundationResult<()> {
-            let mut project_records = self.projects.write().await;
+            let mut project_records = self.records.write().await;
 
             project_records.remove(&project_record.id);
 
@@ -47,26 +47,20 @@ mod tests {
         }
     }
 
-    fn project_records() -> Vec<datastore::project::Project> {
-        vec![datastore::project::Project {
-            name: "Book store".to_string(),
-            slug: "book-store".to_string(),
-            ..Default::default()
-        }]
-    }
-
-    fn valid_request() -> Request {
-        Request {
-            slug: "book-store".to_string(),
-        }
-    }
-
     #[tokio::test]
     async fn it_deletes_project() -> FoundationResult<()> {
-        let repo = ProjectRepo::initialize(project_records());
-        execute(&repo, valid_request()).await?;
+        let project_record = project_record_fixture(Default::default());
+        let repo = ProjectRepo::seed(vec![project_record.clone()]);
 
-        assert!(repo.projects().await.is_empty());
+        execute(
+            &repo,
+            Request {
+                slug: project_record.slug,
+            },
+        )
+        .await?;
+
+        assert!(repo.records().await.is_empty());
 
         Ok(())
     }

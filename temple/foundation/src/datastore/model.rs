@@ -1,13 +1,14 @@
-use crate::{UtcDateTime, Uuid};
+use crate::{Utc, UtcDateTime, Uuid};
 
+#[derive(Clone)]
 pub struct Model {
     pub id: Uuid,
+
+    pub project_id: Uuid,
 
     pub description: String,
 
     pub name: String,
-
-    pub project_id: Uuid,
 
     pub slug: String,
 
@@ -19,11 +20,11 @@ pub struct Model {
 pub struct Attribute {
     pub id: Uuid,
 
+    pub model_id: Uuid,
+
     pub description: String,
 
     pub kind: AttributeKind,
-
-    pub model_id: Uuid,
 
     pub name: String,
 
@@ -32,7 +33,9 @@ pub struct Attribute {
     pub updated_at: UtcDateTime,
 }
 
+#[derive(Default)]
 pub enum AttributeKind {
+    #[default]
     String,
 
     Int64,
@@ -62,4 +65,36 @@ pub enum AssociationKind {
     HasOne,
 
     ManyToMany,
+}
+
+impl Default for Model {
+    fn default() -> Self {
+        let now = Utc::now();
+
+        Self {
+            id: Uuid::new_v4(),
+            project_id: Uuid::new_v4(),
+            description: Default::default(),
+            name: Default::default(),
+            slug: Default::default(),
+            inserted_at: now,
+            updated_at: now,
+        }
+    }
+}
+
+impl Default for Attribute {
+    fn default() -> Self {
+        let now = Utc::now();
+
+        Self {
+            id: Uuid::new_v4(),
+            model_id: Uuid::new_v4(),
+            description: Default::default(),
+            kind: Default::default(),
+            name: Default::default(),
+            inserted_at: now,
+            updated_at: now,
+        }
+    }
 }
