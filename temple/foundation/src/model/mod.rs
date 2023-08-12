@@ -1,6 +1,9 @@
 pub mod create;
+pub mod create_attribute;
 
-use crate::{datastore, util};
+use std::str::FromStr;
+
+use crate::{datastore, util, FoundationError};
 
 #[derive(Clone, Debug)]
 pub struct Model {
@@ -89,12 +92,20 @@ impl From<datastore::model::Attribute> for Attribute {
 
 impl From<datastore::model::AttributeKind> for AttributeKind {
     fn from(value: datastore::model::AttributeKind) -> Self {
-        use AttributeKind::*;
-
         match value {
-            datastore::model::AttributeKind::String => String,
-            datastore::model::AttributeKind::Int64 => Int64,
-            datastore::model::AttributeKind::Bool => Bool,
+            datastore::model::AttributeKind::String => AttributeKind::String,
+            datastore::model::AttributeKind::Int64 => AttributeKind::Int64,
+            datastore::model::AttributeKind::Bool => AttributeKind::Bool,
+        }
+    }
+}
+
+impl From<AttributeKind> for datastore::model::AttributeKind {
+    fn from(value: AttributeKind) -> Self {
+        match value {
+            AttributeKind::String => datastore::model::AttributeKind::String,
+            AttributeKind::Int64 => datastore::model::AttributeKind::Int64,
+            AttributeKind::Bool => datastore::model::AttributeKind::Bool,
         }
     }
 }
@@ -119,14 +130,42 @@ impl PartialEq for Association {
     }
 }
 
+impl FromStr for AttributeKind {
+    type Err = FoundationError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "string" => Ok(AttributeKind::String),
+            "int64" => Ok(AttributeKind::Int64),
+            "Bool" => Ok(AttributeKind::Bool),
+            other => Err(FoundationError::invalid_argument(format! {
+                "`#{other}` is not a valid AttributeKind for the Model"
+            })),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{attribute_record_fixture, model_record_fixture, ModelRepo, ProjectRepo};
+    use crate::tests::{
+        attribute_record_fixture, model_record_fixture, ModelAttributeRepo, ModelRepo, ProjectRepo,
+    };
 
     pub struct Repo {
         pub project_repo: ProjectRepo,
         pub model_repo: ModelRepo,
+        pub model_attribute_repo: ModelAttributeRepo,
+    }
+
+    impl Default for Repo {
+        fn default() -> Self {
+            Self {
+                project_repo: ProjectRepo::seed(vec![]),
+                model_repo: ModelRepo::seed(vec![]),
+                model_attribute_repo: ModelAttributeRepo::seed(vec![]),
+            }
+        }
     }
 
     #[test]

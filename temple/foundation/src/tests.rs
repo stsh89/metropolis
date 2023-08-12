@@ -97,6 +97,43 @@ impl ModelRepo {
     }
 }
 
+pub struct ModelAttributeRepo {
+    pub records: RwLock<HashMap<Uuid, datastore::model::Attribute>>,
+}
+
+impl ModelAttributeRepo {
+    pub fn seed(records: Vec<datastore::model::Attribute>) -> Self {
+        let iter: HashMap<Uuid, datastore::model::Attribute> = records
+            .into_iter()
+            .map(|record| (record.id, record))
+            .collect();
+
+        Self {
+            records: RwLock::new(HashMap::from_iter(iter)),
+        }
+    }
+
+    pub async fn find_by_name(
+        &self,
+        model_id: Uuid,
+        name: &str,
+    ) -> FoundationResult<datastore::model::Attribute> {
+        let records = self.records.read().await;
+
+        records
+            .values()
+            .find(|record| record.model_id == model_id && record.name == name)
+            .cloned()
+            .ok_or(FoundationError::not_found(format!(
+                "no ModelAttribute with the name: `{name}`, and model_id: `#{model_id}`"
+            )))
+    }
+
+    pub async fn records(&self) -> Vec<datastore::model::Attribute> {
+        self.records.read().await.values().cloned().collect()
+    }
+}
+
 #[derive(Default)]
 pub struct ProjectRecordFixture {
     pub name: Option<String>,

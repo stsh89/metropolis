@@ -98,6 +98,7 @@ mod tests {
         let repo = Repo {
             project_repo,
             model_repo,
+            ..Default::default()
         };
 
         let response = execute(

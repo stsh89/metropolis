@@ -17,6 +17,7 @@ pub struct Model {
     pub updated_at: UtcDateTime,
 }
 
+#[derive(Clone)]
 pub struct Attribute {
     pub id: Uuid,
 
@@ -33,7 +34,7 @@ pub struct Attribute {
     pub updated_at: UtcDateTime,
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub enum AttributeKind {
     #[default]
     String,
