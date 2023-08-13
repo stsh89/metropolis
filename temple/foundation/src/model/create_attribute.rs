@@ -1,7 +1,7 @@
 use crate::{datastore, model::Attribute, util, FoundationResult};
 
 #[async_trait::async_trait]
-pub trait CreateModel {
+pub trait CreateModelAttribute {
     async fn get_model(
         &self,
         project_slug: &str,
@@ -27,7 +27,10 @@ pub struct Response {
     pub model_attribute: Attribute,
 }
 
-pub async fn execute(repo: &impl CreateModel, request: Request) -> FoundationResult<Response> {
+pub async fn execute(
+    repo: &impl CreateModelAttribute,
+    request: Request,
+) -> FoundationResult<Response> {
     let Request {
         project_slug,
         model_slug,
@@ -68,7 +71,7 @@ mod tests {
     };
 
     #[async_trait::async_trait]
-    impl CreateModel for Repo {
+    impl CreateModelAttribute for Repo {
         async fn get_model(
             &self,
             project_slug: &str,

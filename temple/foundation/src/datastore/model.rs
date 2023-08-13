@@ -44,28 +44,33 @@ pub enum AttributeKind {
     Bool,
 }
 
+#[derive(Clone, Default)]
 pub struct Association {
     pub id: Uuid,
+
+    pub model_id: Uuid,
+
+    pub associated_model: Model,
 
     pub description: String,
 
     pub kind: AssociationKind,
 
-    pub model_id: Uuid,
-
-    pub sub_model_id: Uuid,
+    pub name: String,
 
     pub inserted_at: UtcDateTime,
 
     pub updated_at: UtcDateTime,
 }
 
+#[derive(Clone, Default)]
 pub enum AssociationKind {
+    #[default]
     BelongsTo,
 
     HasOne,
 
-    ManyToMany,
+    HasMany,
 }
 
 impl Default for Model {

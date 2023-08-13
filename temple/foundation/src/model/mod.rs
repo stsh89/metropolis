@@ -1,5 +1,11 @@
 pub mod create;
+pub mod create_association;
 pub mod create_attribute;
+pub mod delete;
+pub mod delete_association;
+pub mod delete_attribute;
+pub mod get;
+pub mod list;
 
 use std::str::FromStr;
 
@@ -25,11 +31,13 @@ pub struct Attribute {
 
 #[derive(Clone, Debug)]
 pub struct Association {
-    pub description: String,
+    pub description: Option<String>,
 
     pub kind: AssociationKind,
 
     pub model: Model,
+
+    pub name: String,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -47,7 +55,7 @@ pub enum AssociationKind {
 
     HasOne,
 
-    ManyToMany,
+    HasMany,
 }
 
 impl From<datastore::model::Model> for Model {
@@ -110,23 +118,89 @@ impl From<AttributeKind> for datastore::model::AttributeKind {
     }
 }
 
+impl From<datastore::model::Association> for Association {
+    fn from(value: datastore::model::Association) -> Self {
+        let datastore::model::Association {
+            id: _,
+            model_id: _,
+            associated_model,
+            description,
+            kind,
+            name,
+            inserted_at: _,
+            updated_at: _,
+        } = value;
+
+        Self {
+            description: util::string::optional(&description),
+            kind: kind.into(),
+            model: associated_model.into(),
+            name,
+        }
+    }
+}
+
+impl From<datastore::model::AssociationKind> for AssociationKind {
+    fn from(value: datastore::model::AssociationKind) -> Self {
+        use datastore::model::AssociationKind::*;
+
+        match value {
+            BelongsTo => AssociationKind::BelongsTo,
+            HasOne => AssociationKind::HasOne,
+            HasMany => AssociationKind::HasMany,
+        }
+    }
+}
+
+impl From<AssociationKind> for datastore::model::AssociationKind {
+    fn from(value: AssociationKind) -> Self {
+        use datastore::model::AssociationKind::*;
+
+        match value {
+            AssociationKind::BelongsTo => BelongsTo,
+            AssociationKind::HasOne => HasOne,
+            AssociationKind::HasMany => HasMany,
+        }
+    }
+}
+
 impl PartialEq for Model {
     fn eq(&self, other: &Self) -> bool {
-        self.description == other.description && self.name == other.name && self.slug == other.slug
+        let Model {
+            description,
+            name,
+            slug,
+        } = other;
+
+        &self.description == description && &self.name == name && &self.slug == slug
     }
 }
 
 impl PartialEq for Attribute {
     fn eq(&self, other: &Self) -> bool {
-        self.description == other.description && self.name == other.name && self.kind == other.kind
+        let Attribute {
+            description,
+            kind,
+            name,
+        } = other;
+
+        &self.description == description && &self.name == name && &self.kind == kind
     }
 }
 
 impl PartialEq for Association {
     fn eq(&self, other: &Self) -> bool {
-        self.description == other.description
-            && self.kind == other.kind
-            && self.model == other.model
+        let Association {
+            description,
+            kind,
+            model,
+            name,
+        } = other;
+
+        &self.description == description
+            && &self.kind == kind
+            && &self.model == model
+            && &self.name == name
     }
 }
 
@@ -145,17 +219,34 @@ impl FromStr for AttributeKind {
     }
 }
 
+impl FromStr for AssociationKind {
+    type Err = FoundationError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "belongs_to" => Ok(AssociationKind::BelongsTo),
+            "has_one" => Ok(AssociationKind::HasOne),
+            "has_many" => Ok(AssociationKind::HasMany),
+            other => Err(FoundationError::invalid_argument(format! {
+                "`#{other}` is not a valid AssociationKind for the Model"
+            })),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::tests::{
-        attribute_record_fixture, model_record_fixture, ModelAttributeRepo, ModelRepo, ProjectRepo,
+        model_attribute_record_fixture, model_record_fixture, ModelAssociationRepo,
+        ModelAttributeRepo, ModelRepo, ProjectRepo,
     };
 
     pub struct Repo {
         pub project_repo: ProjectRepo,
         pub model_repo: ModelRepo,
         pub model_attribute_repo: ModelAttributeRepo,
+        pub model_association_repo: ModelAssociationRepo,
     }
 
     impl Default for Repo {
@@ -164,6 +255,7 @@ mod tests {
                 project_repo: ProjectRepo::seed(vec![]),
                 model_repo: ModelRepo::seed(vec![]),
                 model_attribute_repo: ModelAttributeRepo::seed(vec![]),
+                model_association_repo: ModelAssociationRepo::seed(vec![]),
             }
         }
     }
@@ -186,7 +278,7 @@ mod tests {
 
     #[test]
     fn it_converts_attribute_from_record() {
-        let attribute_record = attribute_record_fixture(Default::default());
+        let attribute_record = model_attribute_record_fixture(Default::default());
 
         let attribute: Attribute = attribute_record.into();
 

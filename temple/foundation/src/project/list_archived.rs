@@ -10,10 +10,10 @@ pub struct Response {
 }
 
 pub async fn execute(repo: &impl ListProjects) -> FoundationResult<Response> {
-    let projec_records = repo.list_projects().await?;
+    let project_records = repo.list_projects().await?;
 
     let response = Response {
-        projects: projec_records.into_iter().map(Into::into).collect(),
+        projects: project_records.into_iter().map(Into::into).collect(),
     };
 
     Ok(response)

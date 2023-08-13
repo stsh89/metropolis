@@ -1,7 +1,10 @@
 #![cfg(test)]
 
 use super::*;
-use crate::{datastore::model::AttributeKind, FoundationError, FoundationResult, Uuid};
+use crate::{
+    datastore::model::{AssociationKind, AttributeKind},
+    FoundationError, FoundationResult, Uuid,
+};
 use std::collections::HashMap;
 use tokio::sync::RwLock;
 
@@ -81,17 +84,6 @@ impl ModelRepo {
             )))
     }
 
-    // pub async fn get(&self, id: Uuid) -> FoundationResult<datastore::model::Model> {
-    //     let records = self.records.read().await;
-
-    //     records
-    //         .get(&id)
-    //         .cloned()
-    //         .ok_or(FoundationError::not_found(format!(
-    //             "no Model with id: `{id}`",
-    //         )))
-    // }
-
     pub async fn records(&self) -> Vec<datastore::model::Model> {
         self.records.read().await.values().cloned().collect()
     }
@@ -129,7 +121,71 @@ impl ModelAttributeRepo {
             )))
     }
 
+    pub async fn list(&self, model_id: Uuid) -> FoundationResult<Vec<datastore::model::Attribute>> {
+        let records = self.records.read().await;
+
+        let list = records
+            .values()
+            .filter(|record| record.model_id == model_id)
+            .cloned()
+            .collect();
+
+        Ok(list)
+    }
+
     pub async fn records(&self) -> Vec<datastore::model::Attribute> {
+        self.records.read().await.values().cloned().collect()
+    }
+}
+
+pub struct ModelAssociationRepo {
+    pub records: RwLock<HashMap<Uuid, datastore::model::Association>>,
+}
+
+impl ModelAssociationRepo {
+    pub fn seed(records: Vec<datastore::model::Association>) -> Self {
+        let iter: HashMap<Uuid, datastore::model::Association> = records
+            .into_iter()
+            .map(|record| (record.id, record))
+            .collect();
+
+        Self {
+            records: RwLock::new(HashMap::from_iter(iter)),
+        }
+    }
+
+    pub async fn find_by_name(
+        &self,
+        model_id: Uuid,
+        name: &str,
+    ) -> FoundationResult<datastore::model::Association> {
+        let records = self.records.read().await;
+
+        records
+            .values()
+            .find(|record| record.model_id == model_id && record.name == name)
+            .cloned()
+            .ok_or(FoundationError::not_found(format!(
+                "no ModelAssociation with the name: `{name}`, and model_id: `#{model_id}`"
+            )))
+    }
+
+    pub async fn list(
+        &self,
+        model_id: Uuid,
+    ) -> FoundationResult<Vec<datastore::model::Association>> {
+        let records = self.records.read().await;
+
+        let list = records
+            .values()
+            .filter(|record| record.model_id == model_id)
+            .cloned()
+            .collect();
+
+        Ok(list)
+    }
+
+    pub async fn records(&self) -> Vec<datastore::model::Association> {
         self.records.read().await.values().cloned().collect()
     }
 }
@@ -185,15 +241,17 @@ pub fn model_record_fixture(fixture: ModelRecordFixture) -> datastore::model::Mo
 }
 
 #[derive(Default)]
-pub struct AttributeRecordFixture {
+pub struct ModelAttributeRecordFixture {
     pub model_id: Option<Uuid>,
     pub description: Option<String>,
     pub kind: Option<AttributeKind>,
     pub name: Option<String>,
 }
 
-pub fn attribute_record_fixture(fixture: AttributeRecordFixture) -> datastore::model::Attribute {
-    let AttributeRecordFixture {
+pub fn model_attribute_record_fixture(
+    fixture: ModelAttributeRecordFixture,
+) -> datastore::model::Attribute {
+    let ModelAttributeRecordFixture {
         model_id,
         description,
         kind,
@@ -205,6 +263,36 @@ pub fn attribute_record_fixture(fixture: AttributeRecordFixture) -> datastore::m
         description: description.unwrap_or_default(),
         kind: kind.unwrap_or_default(),
         name: name.unwrap_or("Title".to_string()),
+        ..Default::default()
+    }
+}
+
+#[derive(Default)]
+pub struct ModelAssociationRecordFixture {
+    pub model_id: Option<Uuid>,
+    pub associated_model: Option<datastore::model::Model>,
+    pub description: Option<String>,
+    pub kind: Option<AssociationKind>,
+    pub name: Option<String>,
+}
+
+pub fn model_association_record_fixture(
+    fixture: ModelAssociationRecordFixture,
+) -> datastore::model::Association {
+    let ModelAssociationRecordFixture {
+        model_id,
+        associated_model,
+        description,
+        kind,
+        name,
+    } = fixture;
+
+    datastore::model::Association {
+        model_id: model_id.unwrap_or(Uuid::new_v4()),
+        associated_model: associated_model.unwrap_or(model_record_fixture(Default::default())),
+        description: description.unwrap_or_default(),
+        kind: kind.unwrap_or_default(),
+        name: name.unwrap_or("Publisher".to_string()),
         ..Default::default()
     }
 }
