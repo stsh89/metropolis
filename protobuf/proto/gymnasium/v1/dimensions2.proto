@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+import "proto/gymnasium/v1/dimensions/project.proto";
+import "proto/gymnasium/v1/dimensions/model.proto";
+
+package proto.gymnasium.v1;
+
+// An RPC service that defines operations on dimensions.
+service Dimensions {
+    // Returns a list of dimension records filtered by the  requested parameters.
+    rpc SelectDimensionRecords(SelectDimensionRecordsRequest) returns(SelectDimensionRecordsResponse);
+
+    // Saves Dimension record to the database.
+    // It creates a new record when identifier is missing, or updates in case of present identifier.
+    rpc StoreDimensionRecord(StoreDimensionRecordRequest) returns(StoreDimensionRecordResponse);
+
+    // Returns found Dimension record.
+    rpc FindDimensionRecord(FindDimensionRecordRequest) returns(FindDimensionRecordResponse);
+
+    // Removes requests Dimension record.
+    rpc RemoveDimensionRecord(RemoveDimensionRecordRequest) returns(RemoveDimensionRecordResponse);
+}
+
+// The definition of the request for the filtering of dimension records.
+message SelectDimensionRecordsRequest {
+    oneof record_parameters {
+        // Filter parameters for the Project dimension.
+        ProjectRecordParameters project_record_parameters = 1;
+
+        // Filter parameters for the Model dimension.
+        ModelRecordParameters model_record_parameters = 2;
+    }
+}
+
+// The definition of the response for the filtering of dimension records.
+message SelectDimensionRecordsResponse {
+    oneof records {
+        // Project records filtered by parameters.
+        ProjectRecords project_records = 1;
+
+        // Model records filtered by parameters.
+        ModelRecords model_records = 2;
+    }
+}
+
+// The list of available filters for the Project dimension.
+message ProjectRecordParameters {
+    bool archived = 1;
+}
+
+// The list of available filters for the Model dimension.
+message ModelRecordParameters {
+    // Project's unique identifier. Text representation of the UUID.
+    string project_id = 1;
+}
+
+// Wrapper around a filtered list of Projects.
+message ProjectRecords {
+    // List of filtered projects.
+    repeated dimensions.Project records = 1;
+}
+
+// Wrapper around a filtered list of Models.
+message ModelRecords {
+    // List of filtered models.
+    repeated dimensions.Model records = 1;
+}
+
+// Wrapper around a filtered list of ModelAttributes.
+message ModelAttributeRecords {
+    // List of filtered ModelAttributes.
+    repeated dimensions.ModelAttribute records = 1;
+}
+
+// The definition of request for storing dimension record.
+message StoreDimensionRecordRequest {
+    oneof record {
+        // The Project to store.
+        dimensions.Project project_record = 1;
+
+        // The Model to store.
+        dimensions.Model model_record = 2;
+
+        // The ModelAttribute to store.
+        dimensions.Model model_attribute_record = 3;
+    }
+}
+
+// The definition of the response for storing dimension record.
+message StoreDimensionRecordResponse {
+    oneof record {
+        // Stored Project.
+        dimensions.Project project_record = 1;
+
+        // Stored Model.
+        dimensions.Model model_record = 2;
+
+        // Stored ModelAttribute
+        dimensions.Model model_attribute_record = 3;
+    }
+}
+
+// The definition of request for searching dimension record by some unique identifier.
+message FindDimensionRecordRequest {
+    oneof id {
+        // Search a Project by it's slug.
+        string project_record_slug = 1;
+
+        // Search a Project by it's id. UUID in a string form.
+        string project_record_id = 2;
+
+        // Search a Model by it's slug.
+        string model_record_slug = 3;
+
+        // Search a Model by it's id. UUID in a string form.
+        string model_record_id = 4;
+
+        // Search a ModelAttribute by it's id. UUID in a string form.
+        string model_attribute_record_id = 5;
+    }
+}
+
+// The definition of response for searching dimension record by some unique identifier.
+message FindDimensionRecordResponse {
+    oneof record {
+        // Found Project.
+        dimensions.Project project_record = 1;
+
+        // Found Model.
+        dimensions.Model model_record = 2;
+
+        // Found ModelAttribute.bool
+        dimensions.ModelAttribute model_attribute_record = 3;
+    }
+}
+
+// The definition of request for removing dimension record by some unique identifier.
+message RemoveDimensionRecordRequest {
+    oneof id {
+        // Search a Project by it's id.
+        string project_record_id = 1;
+
+        // Search a Model by it's id.
+        string model_record_id = 2;
+
+        // Search a ModelAttribute by it's id.
+        string model_attribute_id = 3;
+    }
+}
+
+// The definition of response for removing dimension record.
+message RemoveDimensionRecordResponse {}

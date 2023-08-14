@@ -4,139 +4,18 @@ import "google/protobuf/timestamp.proto";
 
 package proto.temple.v1;
 
-// List of available actions around Project resource.
 service Projects {
-    // List showcased Projects.
-    rpc ShowcaseProjects(ShowcaseProjectsRequest) returns (ShowcaseProjectsResponse);
-
-    // Create a Project.
-    rpc InitializeProject(InitializeProjectRequest) returns (InitializeProjectResponse);
-
-    // Change Project's name.
-    rpc RenameProject(RenameProjectRequest) returns (RenameProjectResponse);
-
-    // Show Project details.
-    rpc CheckProjectDetails(CheckProjectDetailsRequest) returns (CheckProjectDetailsResponse);
-
-    // Move a Project from the Showcase to the Museum.
+    rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+    rpc ListArchivedProjects(ListArchivedProjectsRequest) returns (ListArchivedProjectsResponse);
+    rpc GetProject(GetProjectRequest) returns (GetProjectResponse);
+    rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
     rpc ArchiveProject(ArchiveProjectRequest) returns (ArchiveProjectResponse);
-
-    // Move a Project from the Museum to the Showcase.
-    rpc RecoverProject(RecoverProjectRequest) returns (RecoverProjectResponse);
-
-    // Get a list of archived Projects.
-    rpc InquireArchivedProjects(InquireArchivedProjectsRequest) returns (InquireArchivedProjectsResponse);
-
-    // Purge a Project from the Museum history.
+    rpc RestoreProject(RestoreProjectRequest) returns (RestoreProjectResponse);
     rpc DeleteProject(DeleteProjectRequest) returns (DeleteProjectResponse);
+    rpc RenameProject(RenameProjectRequest) returns (RenameProjectResponse);
 }
 
-// (-- api-linter: core::0158::request-page-token-field=disabled
-//     aip.dev/not-precedent: We need to do this because pagination is not currently supported. --)
-// (-- api-linter: core::0158::request-page-size-field=disabled
-//     aip.dev/not-precedent: We need to do this because pagination is not currently supported.. --)
-//
-// Client's request definition for Project listing.
-message ShowcaseProjectsRequest {}
-
-// (-- api-linter: core::0158::response-next-page-token-field=disabled
-//     aip.dev/not-precedent: We need to do this because pagination is not currently supported. --)
-//
-// Server's response to Client's Project listing request.
-message ShowcaseProjectsResponse {
-    // List of Projects.
-    repeated Project projects = 1;
-}
-
-// The definition of the request for the Project setup.
-message InitializeProjectRequest {
-    // Project's name.
-    string name = 1;
-
-    // Project's description.
-    string description = 2;
-}
-
-// The definition of the response for the Project setup.
-message InitializeProjectResponse {
-    // Created Project.
-    Project project = 1;
-}
-
-// The definition of the request for the Project setup.
-message RenameProjectRequest {
-    // Project's unique identifier. UUID in a string form.
-    string id = 1;
-
-    // Project's new name.
-    string name = 2;
-}
-
-// The definition of the response for the Project rename.
-message RenameProjectResponse {
-    // Renamed Project.
-    Project project = 1;
-}
-
-// The definition of the request for the Project details.
-message CheckProjectDetailsRequest {
-    // Project's unique web identifier.
-    string slug = 1;
-}
-
-// The definition of the response for the Project details.
-message CheckProjectDetailsResponse {
-    // Found Project.
-    Project project = 1;
-}
-
-// The definition of the request for the Project archiving request.
-message ArchiveProjectRequest {
-    // Project's unique web identifier.
-    string id = 1;
-}
-
-// The definition of the response for the Project archiving response.
-message ArchiveProjectResponse {
-    // Archived Project.
-    Project project = 1;
-}
-
-// The definition of the request for the Project recoverying request.
-message RecoverProjectRequest {
-    // Project's unique identifier.
-    string id = 1;
-}
-
-// The definition of the response for the Project recoverying response.
-message RecoverProjectResponse {
-    // Recovered Project.
-    Project project = 1;
-}
-
-// Client's request definition for archived Projects inquiring.
-message InquireArchivedProjectsRequest {}
-
-// Server's response to Client's Project inquiring request.
-message InquireArchivedProjectsResponse {
-    // List of archived Projects.
-    repeated Project projects = 1;
-}
-
-// The definition of the request for the Project deleting request.
-message DeleteProjectRequest {
-    // Project's unique identifier.
-    string id = 1;
-}
-
-// The definition of the response for the Project deleting response.
-message DeleteProjectResponse {}
-
-// Project representation.
 message Project {
-    // Project's unique identifier. UUID in a string form.
-    string id = 1;
-
     // Project's name.
     string name = 2;
 
@@ -145,7 +24,60 @@ message Project {
 
     // Project's description.
     string description = 4;
+}
 
-    // The time when the Project was created.
-    google.protobuf.Timestamp create_time = 5;
+message ListProjectsRequest {}
+
+message ListProjectsResponse {
+    repeated Project projects = 1;
+}
+
+message ListArchivedProjectsRequest {}
+
+message ListArchivedProjectsResponse {
+    repeated Project projects = 1;
+}
+
+message GetProjectRequest {
+    string slug = 1;
+}
+
+message GetProjectResponse {
+    Project project = 1;
+}
+
+message CreateProjectRequest {
+    string description = 1;
+    string name = 2;
+}
+
+message CreateProjectResponse {
+    Project project = 1;
+}
+
+message ArchiveProjectRequest {
+    string slug = 1;
+}
+
+message ArchiveProjectResponse {}
+
+message RestoreProjectRequest {
+    string slug = 1;
+}
+
+message RestoreProjectResponse {}
+
+message DeleteProjectRequest {
+    string slug = 1;
+}
+
+message DeleteProjectResponse {}
+
+message RenameProjectRequest {
+    string name = 1;
+    string slug = 2;
+}
+
+message RenameProjectResponse {
+    Project project = 1;
 }

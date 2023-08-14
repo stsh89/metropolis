@@ -5,7 +5,7 @@ grpcurl -d @ \
     -proto ./protobuf/proto/temple/v1/projects.proto \
     -plaintext \
     [::1]:50051 \
-    proto.temple.v1.Projects/ShowcaseProjects <<EOM
+    proto.temple.v1.Projects/ListProjects <<EOM
 {
 
 }

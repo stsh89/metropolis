@@ -1,8 +1,3 @@
-[workspace.package]
-name = "temple"
-version = "0.1.0"
-edition = "2021"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace]
@@ -11,11 +6,20 @@ members = [
     "portal",
 ]
 
+[workspace.package]
+# name = "temple"
+version = "0.1.0"
+edition = "2021"
+
 [workspace.dependencies]
 async-trait = { version = "0.1.72" }
 chrono = { version = "0.4.26" }
 foundation = { path = "./foundation" }
+prost = { version = "0.11" }
+prost-types = { version = "0.11" }
+serde = { version = "1.0.179", default-features = false, features = ['derive'] }
+serde_json = { version = "1.0.104" }
 sluggify = { version = "0.1.0" }
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread", "sync"] }
+tonic = { version = "0.9" }
 uuid = { version = "1.4.1", features = ["v4"]}
-

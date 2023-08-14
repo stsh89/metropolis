@@ -28,27 +28,40 @@ message Model {
     repeated ModelAttribute attributes = 7;
 }
 
+// Representation of the Model Attribute dimension.
 message ModelAttribute {
     // Unique identifier for the Model. Text representation of the UUID.
     string model_id = 1;
 
+    // The name of the Model.
     string name = 2;
 
+    // The description of the Model.
     string description = 3;
 
     oneof kind {
+        // Scalar attribute value.
         ModelScalarAttributeKind scalar = 4;
 
         // Unique identifier for the referenced Model. Text representation of the UUID.
         string reference = 5;
     }
 
+    // Specifies whether or not attribute is a collection.
     bool list = 6;
 }
 
+// List of available Model Attribute kinds.
 enum ModelScalarAttributeKind {
+    // Default value which is not allowed to use.
     MODEL_SCALAR_ATTRIBUTE_KIND_UNSPECIFIED = 0;
+
+    // String.
     MODEL_SCALAR_ATTRIBUTE_KIND_STRING = 1;
+
+    // Int64
     MODEL_SCALAR_ATTRIBUTE_KIND_INT64 = 2;
+
+    // Bool.
     MODEL_SCALAR_ATTRIBUTE_KIND_BOOL = 3;
 }

@@ -9,18 +9,21 @@ message Project {
     // Unique identifier for the Project. Text representation of the UUID.
     string id = 1;
 
-    // The name of the Project.
-    string name = 2;
-
     // The description of the Project.
-    string description = 3;
+    string description = 2;
 
-    // The creation time of the Project.
-    google.protobuf.Timestamp create_time = 4;
+    // The name of the Project.
+    string name = 3;
 
     // The slug of the Project. Unique identifier for the Project's web address.
-    string slug = 5;
+    string slug = 4;
 
-    // The archivation time of the Project.
-    google.protobuf.Timestamp archivation_time = 6;
+    // The timestamp when the Project was arcived.
+    google.protobuf.Timestamp archive_time = 5;
+
+    // The creation time of the Project.
+    google.protobuf.Timestamp create_time = 6;
+
+    // The timestamp of the last Project's udpate.
+    google.protobuf.Timestamp update_time = 7;
 }

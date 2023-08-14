@@ -1,0 +1,10 @@
+{
+  "server": {
+    "ip_address": "[::1]",
+    "port": "50051"
+  },
+  "database": {
+    "ip_address": "localhost",
+    "port": "50052"
+  }
+}

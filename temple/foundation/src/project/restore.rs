@@ -2,7 +2,7 @@ use crate::{datastore, FoundationResult};
 
 #[async_trait::async_trait]
 pub trait RestoreProject {
-    async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project>;
+    async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project>;
 
     async fn restore_project(
         &self,
@@ -17,7 +17,7 @@ pub struct Request {
 pub async fn execute(repo: &impl RestoreProject, request: Request) -> FoundationResult<()> {
     let Request { slug } = request;
 
-    let project_record = repo.get_project(&slug).await?;
+    let project_record = repo.get_project(slug).await?;
 
     repo.restore_project(project_record).await?;
 
@@ -34,8 +34,8 @@ mod tests {
 
     #[async_trait::async_trait]
     impl RestoreProject for ProjectRepo {
-        async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project> {
-            self.find_by_slug(slug).await
+        async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project> {
+            self.find_by_slug(&slug).await
         }
 
         async fn restore_project(

@@ -2,7 +2,7 @@ use crate::{datastore, project::Project, util, FoundationResult};
 
 #[async_trait::async_trait]
 pub trait RenameProject {
-    async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project>;
+    async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project>;
 
     async fn rename_project(
         &self,
@@ -22,7 +22,7 @@ pub struct Response {
 pub async fn execute(repo: &impl RenameProject, request: Request) -> FoundationResult<Response> {
     let Request { slug, name } = request;
 
-    let project_record = repo.get_project(&slug).await?;
+    let project_record = repo.get_project(slug).await?;
 
     let project_record = repo
         .rename_project(datastore::project::Project {
@@ -46,8 +46,8 @@ mod tests {
 
     #[async_trait::async_trait]
     impl RenameProject for ProjectRepo {
-        async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project> {
-            self.find_by_slug(slug).await
+        async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project> {
+            self.find_by_slug(&slug).await
         }
 
         async fn rename_project(

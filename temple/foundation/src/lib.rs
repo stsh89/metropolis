@@ -7,11 +7,11 @@ mod util;
 
 mod tests;
 
-pub use result::{FoundationError, FoundationResult};
+pub use result::{FoundationError, FoundationErrorCode, FoundationResult};
 
-type UtcDateTime = chrono::DateTime<chrono::Utc>;
-type Uuid = uuid::Uuid;
-type Utc = chrono::Utc;
+pub type UtcDateTime = chrono::DateTime<chrono::Utc>;
+pub type Uuid = uuid::Uuid;
+pub type Utc = chrono::Utc;
 
 // pub fn add(left: usize, right: usize) -> usize {
 //     left + right
