@@ -13,6 +13,16 @@ service Projects {
     rpc RestoreProject(RestoreProjectRequest) returns (RestoreProjectResponse);
     rpc DeleteProject(DeleteProjectRequest) returns (DeleteProjectResponse);
     rpc RenameProject(RenameProjectRequest) returns (RenameProjectResponse);
+
+    rpc ListModels(ListModelsRequest) returns (ListModelsResponse);
+    rpc CreateModel(CreateModelRequest) returns (CreateModelResponse);
+    rpc DeleteModel(DeleteModelRequest) returns (DeleteModelResponse);
+
+    rpc CreateModelAttribute(CreateModelAttributeRequest) returns (CreateModelAttributeResponse);
+    rpc DeleteModelAttribute(DeleteModelAttributeRequest) returns (DeleteModelAttributeResponse);
+
+    rpc CreateModelAssociation(CreateModelAssociationRequest) returns (CreateModelAssociationResponse);
+    rpc DeleteModelAssociation(DeleteModelAssociationRequest) returns (DeleteModelAssociationResponse);
 }
 
 message Project {
@@ -24,6 +34,56 @@ message Project {
 
     // Project's description.
     string description = 4;
+}
+
+message Model {
+    // Model's name.
+    string name = 1;
+
+    // Model's slug.
+    string slug = 2;
+
+    // Model's description.
+    string description = 3;
+}
+
+message ModelAttribute {
+    // ModelAttribute's description.
+    string description = 1;
+
+    // ModelAttribute's slug.
+    ModelAttributeKind kind = 2;
+
+    // ModelAttribute's name.
+    string name = 3;
+}
+
+enum ModelAttributeKind {
+    UnspecifiedAttributeKind = 0;
+    String = 1;
+    Int64 = 2;
+    Bool = 3;
+}
+
+message ModelAssociation {
+    // ModelAssociation's description.
+    string description = 1;
+
+    // ModelAssociation's slug.
+    ModelAssociationKind kind = 2;
+
+    // Associated Model.
+    Model model = 3;
+
+    // ModelAssociation's name.
+    string name = 4;
+}
+
+enum ModelAssociationKind {
+    UnspecifiedAssociationKind = 0;
+    BelongsTo = 1;
+    HasOne = 2;
+    HasMany = 3;
 }
 
 message ListProjectsRequest {}
@@ -81,3 +141,69 @@ message RenameProjectRequest {
 message RenameProjectResponse {
     Project project = 1;
 }
+
+message ListModelsRequest {
+    string project_slug = 1;
+}
+
+message ListModelsResponse {
+    repeated Model models = 1;
+}
+
+message CreateModelRequest {
+    string project_slug = 1;
+    string description = 2;
+    string name = 3;
+}
+
+message CreateModelResponse {
+    Model model = 1;
+}
+
+message DeleteModelRequest {
+    string project_slug = 1;
+    string model_slug = 2;
+}
+
+message DeleteModelResponse {}
+
+message CreateModelAttributeRequest {
+    string project_slug = 1;
+    string model_slug = 2;
+    string description = 3;
+    ModelAttributeKind kind = 4;
+    string name = 5;
+}
+
+message CreateModelAttributeResponse {
+    ModelAttribute model_attribute = 1;
+}
+
+message DeleteModelAttributeRequest {
+    string project_slug = 1;
+    string model_slug = 2;
+    string model_attribute_name = 5;
+}
+
+message DeleteModelAttributeResponse {}
+
+message CreateModelAssociationRequest {
+    string project_slug = 1;
+    string model_slug = 2;
+    string associated_model_slug = 3;
+    string description = 4;
+    ModelAssociationKind kind = 5;
+    string name = 6;
+}
+
+message CreateModelAssociationResponse {
+    ModelAssociation model_association = 1;
+}
+
+message DeleteModelAssociationRequest {
+    string project_slug = 1;
+    string model_slug = 2;
+    string model_association_name = 5;
+}
+
+message DeleteModelAssociationResponse {}

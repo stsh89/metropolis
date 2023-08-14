@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "proto/gymnasium/v1/dimensions/project.proto";
+import "proto/gymnasium/v1/dimensions/model.proto";
 
 package proto.gymnasium.v1;
 
@@ -12,6 +13,19 @@ service Dimensions {
     rpc RestoreProjectRecord(RestoreProjectRecordRequest) returns (RestoreProjectRecordResponse);
     rpc DeleteProjectRecord(DeleteProjectRecordRequest) returns (DeleteProjectRecordResponse);
     rpc RenameProjectRecord(RenameProjectRecordRequest) returns (RenameProjectRecordResponse);
+
+    rpc ListModelRecords(ListModelRecordsRequest) returns (ListModelRecordsResponse);
+    rpc CreateModelRecord(CreateModelRecordRequest) returns (CreateModelRecordResponse);
+    rpc GetModelRecord(GetModelRecordRequest) returns (GetModelRecordResponse);
+    rpc DeleteModelRecord(DeleteModelRecordRequest) returns (DeleteModelRecordResponse);
+
+    rpc CreateModelAttributeRecord(CreateModelAttributeRecordRequest) returns (CreateModelAttributeRecordResponse);
+    rpc GetModelAttributeRecord(GetModelAttributeRecordRequest) returns (GetModelAttributeRecordResponse);
+    rpc DeleteModelAttributeRecord(DeleteModelAttributeRecordRequest) returns (DeleteModelAttributeRecordResponse);
+
+    rpc CreateModelAssociationRecord(CreateModelAssociationRecordRequest) returns (CreateModelAssociationRecordResponse);
+    rpc GetModelAssociationRecord(GetModelAssociationRecordRequest) returns (GetModelAssociationRecordResponse);
+    rpc DeleteModelAssociationRecord(DeleteModelAssociationRecordRequest) returns (DeleteModelAssociationRecordResponse);
 }
 
 message ListProjectRecordsRequest{
@@ -80,3 +94,109 @@ message RenameProjectRecordRequest {
 message RenameProjectRecordResponse {
     dimensions.Project project_record = 1;
 }
+
+message ListModelRecordsRequest{
+    string project_slug = 1;
+}
+
+message ListModelRecordsResponse{
+    repeated dimensions.Model model_records = 1;
+}
+
+message CreateModelRecordRequest {
+    string project_id = 1;
+
+    // The description of the Model.
+    string description = 2;
+
+    // The name of the Model.
+    string name = 3;
+
+    // The slug of the Model. Unique identifier for the Model's web address.
+    string slug = 4;
+}
+
+message CreateModelRecordResponse {
+    dimensions.Model model_record = 1;
+}
+
+message GetModelRecordRequest {
+    string project_slug = 1;
+    string model_slug = 2;
+}
+
+message GetModelRecordResponse {
+    dimensions.Model model_record = 1;
+}
+
+message DeleteModelRecordRequest {
+    string id = 1;
+}
+
+message DeleteModelRecordResponse {}
+
+message CreateModelAttributeRecordRequest {
+    string model_id = 1;
+
+    // The description of the ModelAttribute.
+    string description = 2;
+
+    dimensions.ModelAttributeKind kind = 3;
+
+    // The name of the ModelAttribute.
+    string name = 4;
+}
+
+message CreateModelAttributeRecordResponse {
+    dimensions.ModelAttribute model_attribute_record = 1;
+}
+
+message GetModelAttributeRecordRequest {
+    string project_slug = 1;
+    string model_slug = 2;
+    string attribute_name = 3;
+}
+
+message GetModelAttributeRecordResponse {
+    dimensions.ModelAttribute model_attribute_record = 1;
+}
+
+message DeleteModelAttributeRecordRequest {
+    string id = 1;
+}
+
+message DeleteModelAttributeRecordResponse {}
+
+message CreateModelAssociationRecordRequest {
+    string model_id = 1;
+
+    string associated_model_id = 2;
+
+    // The description of the ModelAssociation.
+    string description = 3;
+
+    dimensions.ModelAssociationKind kind = 4;
+
+    // The name of the ModelAssociation.
+    string name = 5;
+}
+
+message CreateModelAssociationRecordResponse {
+    dimensions.ModelAssociation model_Association_record = 1;
+}
+
+message GetModelAssociationRecordRequest {
+    string project_slug = 1;
+    string model_slug = 2;
+    string association_name = 3;
+}
+
+message GetModelAssociationRecordResponse {
+    dimensions.ModelAssociation model_Association_record = 1;
+}
+
+message DeleteModelAssociationRecordRequest {
+    string id = 1;
+}
+
+message DeleteModelAssociationRecordResponse {}
