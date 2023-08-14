@@ -1,6 +1,9 @@
 // use crate::{datastore::Repo, model::Project, service, util};
 use crate::{repo::Repo, PortalError};
-use foundation::project::{self, Project};
+use foundation::{
+    model::{self, Model},
+    project::{self, Project},
+};
 use tonic::{Request, Response, Status};
 
 pub mod proto {
@@ -148,6 +151,222 @@ impl proto::projects_server::Projects for Projects {
             project: Some(to_proto_project(project)),
         }))
     }
+
+    async fn list_models(
+        &self,
+        request: Request<proto::ListModelsRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::ListModelsResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::ListModelsRequest { project_slug } = request.into_inner();
+
+        let models = model::list::execute(&self.repo, model::list::Request { project_slug })
+            .await
+            .map_err(Into::<PortalError>::into)?
+            .models
+            .into_iter()
+            .map(to_proto_model)
+            .collect();
+
+        Ok(Response::new(proto::ListModelsResponse { models }))
+    }
+
+    async fn create_model(
+        &self,
+        request: Request<proto::CreateModelRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::CreateModelResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::CreateModelRequest {
+            project_slug,
+            description,
+            name,
+        } = request.into_inner();
+
+        let model = model::create::execute(
+            &self.repo,
+            model::create::Request {
+                project_slug,
+                description,
+                name,
+            },
+        )
+        .await
+        .map_err(Into::<PortalError>::into)?
+        .model;
+
+        Ok(Response::new(proto::CreateModelResponse {
+            model: Some(to_proto_model(model)),
+        }))
+    }
+
+    async fn delete_model(
+        &self,
+        request: Request<proto::DeleteModelRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::DeleteModelResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::DeleteModelRequest {
+            project_slug,
+            model_slug,
+        } = request.into_inner();
+
+        model::delete::execute(
+            &self.repo,
+            model::delete::Request {
+                project_slug,
+                model_slug,
+            },
+        )
+        .await
+        .map_err(Into::<PortalError>::into)?;
+
+        Ok(Response::new(proto::DeleteModelResponse {}))
+    }
+
+    async fn create_model_attribute(
+        &self,
+        request: Request<proto::CreateModelAttributeRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::CreateModelAttributeResponse>, Status> {
+        use proto::ModelAttributeKind::*;
+
+        println!("Got a request: {:?}", request);
+
+        let proto::CreateModelAttributeRequest {
+            project_slug,
+            model_slug,
+            kind,
+            description,
+            name,
+        } = request.into_inner();
+
+        let Some(attribute_kind) = proto::ModelAttributeKind::from_i32(kind) else {
+            return Err(PortalError::invalid_argument("kind").into());
+        };
+
+        let model_attribute = model::create_attribute::execute(
+            &self.repo,
+            model::create_attribute::Request {
+                project_slug,
+                model_slug,
+                description,
+                kind: match attribute_kind {
+                    UnspecifiedAttributeKind => "unspecified",
+                    String => "string",
+                    Int64 => "int64",
+                    Bool => "bool",
+                }
+                .to_string(),
+                name,
+            },
+        )
+        .await
+        .map_err(Into::<PortalError>::into)?
+        .model_attribute;
+
+        Ok(Response::new(proto::CreateModelAttributeResponse {
+            model_attribute: Some(to_proto_model_attribute(model_attribute)),
+        }))
+    }
+
+    async fn delete_model_attribute(
+        &self,
+        request: Request<proto::DeleteModelAttributeRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::DeleteModelAttributeResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::DeleteModelAttributeRequest {
+            project_slug,
+            model_slug,
+            model_attribute_name,
+        } = request.into_inner();
+
+        model::delete_attribute::execute(
+            &self.repo,
+            model::delete_attribute::Request {
+                project_slug,
+                model_slug,
+                model_attribute_name,
+            },
+        )
+        .await
+        .map_err(Into::<PortalError>::into)?;
+
+        Ok(Response::new(proto::DeleteModelAttributeResponse {}))
+    }
+
+    async fn create_model_association(
+        &self,
+        request: Request<proto::CreateModelAssociationRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::CreateModelAssociationResponse>, Status> {
+        use proto::ModelAssociationKind::*;
+
+        println!("Got a request: {:?}", request);
+
+        let proto::CreateModelAssociationRequest {
+            project_slug,
+            model_slug,
+            associated_model_slug,
+            description,
+            kind,
+            name,
+        } = request.into_inner();
+
+        let Some(association_kind) = proto::ModelAssociationKind::from_i32(kind) else {
+            return Err(PortalError::invalid_argument("kind").into());
+        };
+
+        let model_association = model::create_association::execute(
+            &self.repo,
+            model::create_association::Request {
+                project_slug,
+                model_slug,
+                associated_model_slug,
+                description,
+                kind: match association_kind {
+                    UnspecifiedAssociationKind => "unspecified",
+                    HasMany => "has_many",
+                    HasOne => "has_one",
+                    BelongsTo => "belongs_to",
+                }
+                .to_string(),
+                name,
+            },
+        )
+        .await
+        .map_err(Into::<PortalError>::into)?
+        .model_association;
+
+        Ok(Response::new(proto::CreateModelAssociationResponse {
+            model_association: Some(to_proto_model_association(model_association)),
+        }))
+    }
+
+    async fn delete_model_association(
+        &self,
+        request: Request<proto::DeleteModelAssociationRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::DeleteModelAssociationResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::DeleteModelAssociationRequest {
+            project_slug,
+            model_slug,
+            model_association_name,
+        } = request.into_inner();
+
+        model::delete_association::execute(
+            &self.repo,
+            model::delete_association::Request {
+                project_slug,
+                model_slug,
+                model_association_name,
+            },
+        )
+        .await
+        .map_err(Into::<PortalError>::into)?;
+
+        Ok(Response::new(proto::DeleteModelAssociationResponse {}))
+    }
 }
 
 fn to_proto_project(project: Project) -> proto::Project {
@@ -155,5 +374,44 @@ fn to_proto_project(project: Project) -> proto::Project {
         description: project.description.unwrap_or_default(),
         name: project.name,
         slug: project.slug,
+    }
+}
+
+fn to_proto_model(model: Model) -> proto::Model {
+    proto::Model {
+        description: model.description.unwrap_or_default(),
+        name: model.name,
+        slug: model.slug,
+    }
+}
+
+fn to_proto_model_association(model_association: model::Association) -> proto::ModelAssociation {
+    use proto::ModelAssociationKind::*;
+
+    proto::ModelAssociation {
+        description: model_association.description.unwrap_or_default(),
+        name: model_association.name,
+        kind: match model_association.kind {
+            model::AssociationKind::BelongsTo => BelongsTo,
+            model::AssociationKind::HasOne => HasOne,
+            model::AssociationKind::HasMany => HasMany,
+        }
+        .into(),
+        model: Some(to_proto_model(model_association.model)),
+    }
+}
+
+fn to_proto_model_attribute(model_attribute: model::Attribute) -> proto::ModelAttribute {
+    use proto::ModelAttributeKind::*;
+
+    proto::ModelAttribute {
+        description: model_attribute.description.unwrap_or_default(),
+        name: model_attribute.name,
+        kind: match model_attribute.kind {
+            model::AttributeKind::String => String,
+            model::AttributeKind::Int64 => Int64,
+            model::AttributeKind::Bool => Bool,
+        }
+        .into(),
     }
 }
