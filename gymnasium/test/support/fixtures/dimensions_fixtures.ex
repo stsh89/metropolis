@@ -31,10 +31,29 @@ defmodule Gymnasium.DimensionsFixtures do
         description: "Book model",
         name: "Book",
         slug: "book",
-        project_id: attrs[:project_id]
+        project_id: attrs.project_id
       })
       |> Gymnasium.Dimensions.create_model()
 
     model
+  end
+
+  @doc """
+  Generate a model.
+  """
+  def model_attribute_fixture(attrs \\ %{}) do
+    {:ok, model_attribute} =
+      attrs
+      |> Enum.into(%{
+        description: "The title of the Book",
+        name: "title",
+        model_id: attrs.model_id,
+        kind: "scalar",
+        kind_value: "string",
+        list_indicator: "not_a_list"
+      })
+      |> Gymnasium.Dimensions.create_model_attribute()
+
+    model_attribute
   end
 end
