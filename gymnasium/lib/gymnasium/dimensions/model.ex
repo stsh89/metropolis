@@ -20,7 +20,7 @@ defmodule Gymnasium.Dimensions.Model do
     model
     |> cast(attrs, [:description, :name, :slug, :project_id])
     |> validate_required([:name, :slug, :project_id])
-    |> unique_constraint(:name, name: :models_name_index)
-    |> unique_constraint(:slug, name: :models_slug_index)
+    |> unique_constraint([:project_id, :name])
+    |> unique_constraint([:project_id, :slug])
   end
 end

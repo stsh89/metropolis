@@ -4,15 +4,52 @@ defmodule GymnasiumGrpc.Dimensions.Model do
   alias Proto.Gymnasium.V1.Dimensions.Model, as: ProtoModel
 
   alias Proto.Gymnasium.V1.{
-    FindDimensionRecordResponse,
-    ModelRecordParameters,
-    RemoveDimensionRecordResponse,
-    SelectDimensionRecordsResponse,
-    StoreDimensionRecordResponse
+    CreateModelRecordResponse,
+    ListModelRecordsResponse,
+    DeleteModelRecordResponse,
+    GetModelRecordResponse
   }
 
+  def create(attrs \\ %{}) do
+    {:ok, model} = Dimensions.create_model(attrs)
+
+    %CreateModelRecordResponse{
+      model_record: to_proto_model(model)
+    }
+  end
+
+  def list(attrs \\ %{}) do
+    model_records =
+      attrs
+      |> Dimensions.list_models()
+      |> Enum.map(fn model -> to_proto_model(model) end)
+
+    %ListModelRecordsResponse{
+      model_records: model_records
+    }
+  end
+
+  def delete(id) do
+    model = Dimensions.get_model!(id)
+
+    {:ok, _model} = Dimensions.delete_model(model)
+
+    %DeleteModelRecordResponse{}
+  end
+
+  def find(attrs \\ %{}) do
+    model_record =
+      attrs
+      |> Dimensions.find_model!()
+      |> to_proto_model
+
+    %GetModelRecordResponse{
+      model_record: model_record
+    }
+  end
+
 #   def select(parameters = %ModelRecordParameters{}) do
-#     query_attributes = %{ projec_id: parameters.projec_id }
+#     query_attributes = %{ project_id: parameters.project_id }
 
 #     model_records =
 #       Dimensions.list_models(query_attributes)
@@ -83,7 +120,7 @@ defmodule GymnasiumGrpc.Dimensions.Model do
 #       description: proto_model.description,
 #       name: proto_model.name,
 #       slug: proto_model.slug,
-#       projec_id: proto_model.project_id
+#       project_id: proto_model.project_id
 #     }
 
 #     Dimensions.create_model(attributes)
@@ -145,4 +182,16 @@ defmodule GymnasiumGrpc.Dimensions.Model do
 #         raise GRPC.RPCError, status: :invalid_argument, message: "malformed UUID"
 #     end
 #   end
+
+  defp to_proto_model(%Model{} = model) do
+    %ProtoModel{
+      id: model.id,
+      project_id: model.project_id,
+      description: model.description,
+      name: model.name,
+      slug: model.slug,
+      create_time: Helpers.to_proto_timestamp(model.inserted_at),
+      update_time:  Helpers.to_proto_timestamp(model.updated_at)
+    }
+  end
 end

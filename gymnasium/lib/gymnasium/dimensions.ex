@@ -41,10 +41,12 @@ defmodule Gymnasium.Dimensions do
       [%Model{}, ...]
 
   """
-  def list_models(query_attributes \\ []) do
+  def list_models(attrs \\ %{}) do
     query =
       from m in Model,
-        where: [project_id: ^query_attributes[:project_id]],
+        join: p in Project,
+        on: p.id == m.project_id,
+        where: p.slug == ^attrs.project_slug,
         order_by: [desc: m.inserted_at]
 
     Repo.all(query)
@@ -98,10 +100,15 @@ defmodule Gymnasium.Dimensions do
       ** (Ecto.NoResultsError)
 
   """
-  def find_model!(project_id, model_slug) do
-    project = get_project!(project_id)
+  def find_model!(attrs \\ %{}) do
+    query =
+        from m in Model,
+          join: p in Project,
+          on: p.id == m.project_id,
+          where: p.slug == ^attrs.project_slug and m.slug == ^attrs.model_slug,
+          order_by: [desc: m.inserted_at]
 
-    Repo.get_by!(Model, project_id: project.id, slug: model_slug)
+    Repo.one!(query)
   end
 
   @doc """

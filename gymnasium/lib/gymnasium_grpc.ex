@@ -14,7 +14,11 @@ defmodule Proto.Gymnasium.V1.Dimensions.Server do
     GetProjectRecordRequest,
     ArchiveProjectRecordRequest,
     RestoreProjectRecordRequest,
-    DeleteProjectRecordRequest
+    DeleteProjectRecordRequest,
+    CreateModelRecordRequest,
+    ListModelRecordsRequest,
+    DeleteModelRecordRequest,
+    GetModelRecordRequest
   }
 
   def list_project_records(%ListProjectRecordsRequest{} = request, _stream) do
@@ -43,6 +47,34 @@ defmodule Proto.Gymnasium.V1.Dimensions.Server do
 
   def delete_project_record(%DeleteProjectRecordRequest{} = request, _stream) do
     GymnasiumGrpc.Dimensions.Project.delete(request.id)
+  end
+
+  def create_model_record(%CreateModelRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.Model.create(%{
+        project_id: request.project_id,
+        description: request.description,
+        name: request.name,
+        slug: request.slug
+      })
+  end
+
+  def list_model_records(%ListModelRecordsRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.Model.list(%{
+        project_slug: request.project_slug,
+      })
+  end
+
+  def delete_model_record(%DeleteModelRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.Model.delete(request.id)
+  end
+
+  def get_model_record(%GetModelRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.Model.find(%{
+      project_slug: request.project_slug,
+      model_slug: request.model_slug,
+      preload_attributes: request.preload_attributes,
+      preload_associations: request.preload_associations,
+    })
   end
 
 #   def select_dimension_records(request, _stream) do

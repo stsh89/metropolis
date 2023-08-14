@@ -1,0 +1,12 @@
+#!/bin/sh
+
+grpcurl -d @ \
+    -import-path ./protobuf \
+    -proto ./protobuf/proto/gymnasium/v1/dimensions.proto \
+    -plaintext \
+    localhost:50052 \
+    proto.gymnasium.v1.Dimensions/DeleteModelRecord <<EOM
+{
+    "id": "843692cf-fcab-40a4-bb7b-c172be579d07"
+}
+EOM
