@@ -5,8 +5,8 @@ grpcurl -d @ \
     -proto ./protobuf/proto/gymnasium/v1/dimensions.proto \
     -plaintext \
     localhost:50052 \
-    proto.gymnasium.v1.Dimensions/FindDimensionRecord <<EOM
+    proto.gymnasium.v1.Dimensions/RestoreProjectRecord <<EOM
 {
-    "project_record_id": "5f528fc2-5370-4646-9d97-93d4dbc5ec41"
+    "id": "2cceca59-c2a3-428d-aa58-7010e97f298b"
 }
 EOM

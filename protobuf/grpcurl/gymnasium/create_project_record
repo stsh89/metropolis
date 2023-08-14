@@ -5,12 +5,10 @@ grpcurl -d @ \
     -proto ./protobuf/proto/gymnasium/v1/dimensions.proto \
     -plaintext \
     localhost:50052 \
-    proto.gymnasium.v1.Dimensions/StoreDimensionRecord <<EOM
+    proto.gymnasium.v1.Dimensions/CreateProjectRecord <<EOM
 {
-    "project_record": {
-        "name": "Free food service",
-        "slug": "free-food-service",
-        "description": "Share your food preferences with others."
-    }
+    "description": "Share your food preferences with others.",
+    "name": "Free food service",
+    "slug": "free-food-service"
 }
 EOM

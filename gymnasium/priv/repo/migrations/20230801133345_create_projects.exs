@@ -3,10 +3,13 @@ defmodule Gymnasium.Repo.Migrations.CreateProjects do
 
   def change do
     create table(:projects) do
-      add :description, :string
-      add :name, :string
-      add :slug, :string
       add :archived_at, :utc_datetime_usec
+
+      add :description, :string
+
+      add :name, :string
+
+      add :slug, :string
 
       timestamps()
     end

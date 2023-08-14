@@ -23,4 +23,16 @@ defmodule Gymnasium.Dimensions.Project do
     |> unique_constraint(:name, name: :projects_name_index)
     |> unique_constraint(:slug, name: :projects_slug_index)
   end
+
+  @doc false
+  def archive_changeset(project) do
+    project
+    |> change(archived_at: DateTime.utc_now())
+  end
+
+  @doc false
+  def restore_changeset(project) do
+    project
+    |> change(archived_at: nil)
+  end
 end

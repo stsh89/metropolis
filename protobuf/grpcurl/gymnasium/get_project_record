@@ -5,8 +5,8 @@ grpcurl -d @ \
     -proto ./protobuf/proto/gymnasium/v1/dimensions.proto \
     -plaintext \
     localhost:50052 \
-    proto.gymnasium.v1.Dimensions/RemoveDimensionRecord <<EOM
+    proto.gymnasium.v1.Dimensions/GetProjectRecord <<EOM
 {
-    "project_record_id": "5a472f6a-cb65-42ff-8f88-0f8702e7107b"
+    "slug": "free-food-service"
 }
 EOM

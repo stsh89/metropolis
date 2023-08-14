@@ -1,12 +1,23 @@
-defmodule Proto.Gymnasium.V1.Dimensions.ModelScalarAttributeKind do
+defmodule Proto.Gymnasium.V1.Dimensions.ModelAttributeKind do
   @moduledoc false
 
   use Protobuf, enum: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
-  field :MODEL_SCALAR_ATTRIBUTE_KIND_UNSPECIFIED, 0
-  field :MODEL_SCALAR_ATTRIBUTE_KIND_STRING, 1
-  field :MODEL_SCALAR_ATTRIBUTE_KIND_INT64, 2
-  field :MODEL_SCALAR_ATTRIBUTE_KIND_BOOL, 3
+  field :UnspecifiedAttributeKind, 0
+  field :String, 1
+  field :Int64, 2
+  field :Bool, 3
+end
+
+defmodule Proto.Gymnasium.V1.Dimensions.ModelAssociationKind do
+  @moduledoc false
+
+  use Protobuf, enum: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :UnspecifiedAssociationKind, 0
+  field :BelongsTo, 1
+  field :HasOne, 2
+  field :HasMany, 3
 end
 
 defmodule Proto.Gymnasium.V1.Dimensions.Model do
@@ -14,13 +25,13 @@ defmodule Proto.Gymnasium.V1.Dimensions.Model do
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
-  field :project_id, 1, type: :string, json_name: "projectId"
-  field :id, 2, type: :string
-  field :name, 3, type: :string
-  field :description, 4, type: :string
-  field :create_time, 5, type: Google.Protobuf.Timestamp, json_name: "createTime"
-  field :slug, 6, type: :string
-  field :attributes, 7, repeated: true, type: Proto.Gymnasium.V1.Dimensions.ModelAttribute
+  field :id, 1, type: :string
+  field :project_id, 2, type: :string, json_name: "projectId"
+  field :description, 3, type: :string
+  field :name, 4, type: :string
+  field :slug, 5, type: :string
+  field :create_time, 6, type: Google.Protobuf.Timestamp, json_name: "createTime"
+  field :update_time, 7, type: Google.Protobuf.Timestamp, json_name: "updateTime"
 end
 
 defmodule Proto.Gymnasium.V1.Dimensions.ModelAttribute do
@@ -28,17 +39,30 @@ defmodule Proto.Gymnasium.V1.Dimensions.ModelAttribute do
 
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
-  oneof :kind, 0
-
-  field :model_id, 1, type: :string, json_name: "modelId"
-  field :name, 2, type: :string
+  field :id, 1, type: :string
+  field :model_id, 2, type: :string, json_name: "modelId"
   field :description, 3, type: :string
+  field :kind, 4, type: Proto.Gymnasium.V1.Dimensions.ModelAttributeKind, enum: true
+  field :name, 5, type: :string
+  field :create_time, 6, type: Google.Protobuf.Timestamp, json_name: "createTime"
+  field :update_time, 7, type: Google.Protobuf.Timestamp, json_name: "updateTime"
+end
 
-  field :scalar, 4,
-    type: Proto.Gymnasium.V1.Dimensions.ModelScalarAttributeKind,
-    enum: true,
-    oneof: 0
+defmodule Proto.Gymnasium.V1.Dimensions.ModelAssociation do
+  @moduledoc false
 
-  field :reference, 5, type: :string, oneof: 0
-  field :list, 6, type: :bool
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :id, 1, type: :string
+  field :model_id, 2, type: :string, json_name: "modelId"
+
+  field :associated_model, 3,
+    type: Proto.Gymnasium.V1.Dimensions.Model,
+    json_name: "associatedModel"
+
+  field :description, 4, type: :string
+  field :kind, 5, type: Proto.Gymnasium.V1.Dimensions.ModelAssociationKind, enum: true
+  field :name, 6, type: :string
+  field :create_time, 7, type: Google.Protobuf.Timestamp, json_name: "createTime"
+  field :update_time, 8, type: Google.Protobuf.Timestamp, json_name: "updateTime"
 end

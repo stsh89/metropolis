@@ -5,8 +5,7 @@ grpcurl -d @ \
     -proto ./protobuf/proto/gymnasium/v1/dimensions.proto \
     -plaintext \
     localhost:50052 \
-    proto.gymnasium.v1.Dimensions/SelectDimensionRecords <<EOM
+    proto.gymnasium.v1.Dimensions/ListProjectRecords <<EOM
 {
-    "project_record_parameters": {}
 }
 EOM

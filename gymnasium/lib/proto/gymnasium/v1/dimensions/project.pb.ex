@@ -4,9 +4,10 @@ defmodule Proto.Gymnasium.V1.Dimensions.Project do
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   field :id, 1, type: :string
-  field :name, 2, type: :string
-  field :description, 3, type: :string
-  field :create_time, 4, type: Google.Protobuf.Timestamp, json_name: "createTime"
-  field :slug, 5, type: :string
-  field :archivation_time, 6, type: Google.Protobuf.Timestamp, json_name: "archivationTime"
+  field :description, 2, type: :string
+  field :name, 3, type: :string
+  field :slug, 4, type: :string
+  field :archive_time, 5, type: Google.Protobuf.Timestamp, json_name: "archiveTime"
+  field :create_time, 6, type: Google.Protobuf.Timestamp, json_name: "createTime"
+  field :update_time, 7, type: Google.Protobuf.Timestamp, json_name: "updateTime"
 end

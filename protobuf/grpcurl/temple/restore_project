@@ -5,8 +5,8 @@ grpcurl -d @ \
     -proto ./protobuf/proto/temple/v1/projects.proto \
     -plaintext \
     '[::1]:50051' \
-    proto.temple.v1.Projects/RecoverProject <<EOM
+    proto.temple.v1.Projects/RestoreProject <<EOM
 {
-    "id": "61f4d35f-8535-44db-b10f-58a0841392e5"
+    "slug": "marvel"
 }
 EOM
