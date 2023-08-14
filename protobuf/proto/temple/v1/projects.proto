@@ -15,6 +15,7 @@ service Projects {
     rpc RenameProject(RenameProjectRequest) returns (RenameProjectResponse);
 
     rpc ListModels(ListModelsRequest) returns (ListModelsResponse);
+    rpc GetModel(GetModelRequest) returns (GetModelResponse);
     rpc CreateModel(CreateModelRequest) returns (CreateModelResponse);
     rpc DeleteModel(DeleteModelRequest) returns (DeleteModelResponse);
 
@@ -148,6 +149,17 @@ message ListModelsRequest {
 
 message ListModelsResponse {
     repeated Model models = 1;
+}
+
+message GetModelRequest {
+    string project_slug = 1;
+    string model_slug = 2;
+}
+
+message GetModelResponse {
+    Model model = 1;
+    repeated ModelAttribute attributes = 2;
+    repeated ModelAssociation associations = 3;
 }
 
 message CreateModelRequest {

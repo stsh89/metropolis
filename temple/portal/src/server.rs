@@ -70,6 +70,42 @@ impl proto::projects_server::Projects for Projects {
         }))
     }
 
+    async fn get_model(
+        &self,
+        request: Request<proto::GetModelRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::GetModelResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::GetModelRequest {
+            project_slug,
+            model_slug,
+        } = request.into_inner();
+
+        let response = model::get::execute(
+            &self.repo,
+            model::get::Request {
+                project_slug,
+                model_slug,
+            },
+        )
+        .await
+        .map_err(Into::<PortalError>::into)?;
+
+        Ok(Response::new(proto::GetModelResponse {
+            model: Some(to_proto_model(response.model)),
+            attributes: response
+                .attributes
+                .into_iter()
+                .map(to_proto_model_attribute)
+                .collect(),
+            associations: response
+                .associations
+                .into_iter()
+                .map(to_proto_model_association)
+                .collect(),
+        }))
+    }
+
     async fn create_project(
         &self,
         request: Request<proto::CreateProjectRequest>, // Accept request of type HelloRequest

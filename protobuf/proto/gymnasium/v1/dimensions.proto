@@ -123,10 +123,14 @@ message CreateModelRecordResponse {
 message GetModelRecordRequest {
     string project_slug = 1;
     string model_slug = 2;
+    bool preload_attributes = 3;
+    bool preload_associations = 4;
 }
 
 message GetModelRecordResponse {
     dimensions.Model model_record = 1;
+    repeated dimensions.ModelAssociation model_association_records = 2;
+    repeated dimensions.ModelAttribute model_attribute_records = 3;
 }
 
 message DeleteModelRecordRequest {

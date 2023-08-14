@@ -242,6 +242,27 @@ impl model::delete_association::DeleteModelAssociation for Repo {
     }
 }
 
+#[async_trait::async_trait]
+impl model::get::GetModel for Repo {
+    async fn get_model(
+        &self,
+        project_slug: &str,
+        model_slug: &str,
+    ) -> FoundationResult<model::get::GetModelResponse> {
+        let (model, associations, attributes) = self
+            .get_model_full(project_slug.to_owned(), model_slug.to_owned())
+            .await?;
+
+        let response = model::get::GetModelResponse {
+            model,
+            associations,
+            attributes,
+        };
+
+        Ok(response)
+    }
+}
+
 impl Repo {
     async fn connect(
         &self,
@@ -417,6 +438,7 @@ impl Repo {
             .get_model_record(proto::GetModelRecordRequest {
                 project_slug,
                 model_slug,
+                ..proto::GetModelRecordRequest::default()
             })
             .await?
             .into_inner();
@@ -428,6 +450,47 @@ impl Repo {
         let model = from_proto_model(proto_model)?;
 
         Ok(model)
+    }
+
+    async fn get_model_full(
+        &self,
+        project_slug: String,
+        model_slug: String,
+    ) -> PortalResult<(
+        datastore::model::Model,
+        Vec<datastore::model::Association>,
+        Vec<datastore::model::Attribute>,
+    )> {
+        let mut client = self.connect().await?;
+
+        let response = client
+            .get_model_record(proto::GetModelRecordRequest {
+                project_slug,
+                model_slug,
+                preload_attributes: true,
+                preload_associations: true,
+            })
+            .await?
+            .into_inner();
+
+        let proto_model = response
+            .model_record
+            .ok_or(PortalError::internal("empty model_record"))?;
+
+        let model = from_proto_model(proto_model)?;
+        let associations = response
+            .model_association_records
+            .into_iter()
+            .map(from_proto_model_association)
+            .collect::<PortalResult<Vec<datastore::model::Association>>>()?;
+
+        let attributes = response
+            .model_attribute_records
+            .into_iter()
+            .map(from_proto_model_attribute)
+            .collect::<PortalResult<Vec<datastore::model::Attribute>>>()?;
+
+        Ok((model, associations, attributes))
     }
 
     async fn list_models(
