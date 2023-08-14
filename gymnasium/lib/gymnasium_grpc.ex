@@ -8,46 +8,95 @@ end
 defmodule Proto.Gymnasium.V1.Dimensions.Server do
   use GRPC.Server, service: Proto.Gymnasium.V1.Dimensions.Service
 
-  def select_dimension_records(request, _stream) do
-    case request.record_parameters do
-      {:project_record_parameters, parameters} ->
-        GymnasiumGrpc.Dimensions.Project.select(parameters)
+  alias Proto.Gymnasium.V1.{
+    ListProjectRecordsRequest,
+    CreateProjectRecordRequest,
+    GetProjectRecordRequest,
+    ArchiveProjectRecordRequest,
+    RestoreProjectRecordRequest,
+    DeleteProjectRecordRequest
+  }
 
-      _ ->
-        raise GRPC.RPCError, status: :invalid_argument
-    end
+  def list_project_records(%ListProjectRecordsRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.Project.list(%{archived: request.archived})
   end
 
-  def store_dimension_record(request, _stream) do
-    case request.record do
-      {:project_record, record} ->
-        GymnasiumGrpc.Dimensions.Project.store(record)
-
-      _ ->
-        raise GRPC.RPCError, status: :invalid_argument
-    end
+  def create_project_record(%CreateProjectRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.Project.create(%{
+      description: request.description,
+      name: request.name,
+      slug: request.slug
+    })
   end
 
-  def find_dimension_record(request, _stream) do
-    case request.id do
-      {:project_record_slug, slug} ->
-        GymnasiumGrpc.Dimensions.Project.find(slug)
-
-      {:project_record_id, id} ->
-        GymnasiumGrpc.Dimensions.Project.get(id)
-
-      _ ->
-        raise GRPC.RPCError, status: :invalid_argument
-    end
+  def get_project_record(%GetProjectRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.Project.find(request.slug)
   end
 
-  def remove_dimension_record(request, _stream) do
-    case request.id do
-      {:project_record_id, id} ->
-        GymnasiumGrpc.Dimensions.Project.remove(id)
-
-      _ ->
-        raise GRPC.RPCError, status: :invalid_argument
-    end
+  def archive_project_record(%ArchiveProjectRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.Project.archive(request.id)
   end
+
+  def restore_project_record(%RestoreProjectRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.Project.restore(request.id)
+  end
+
+  def delete_project_record(%DeleteProjectRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.Project.delete(request.id)
+  end
+
+#   def select_dimension_records(request, _stream) do
+#     case request.record_parameters do
+#       {:project_record_parameters, parameters} ->
+#         GymnasiumGrpc.Dimensions.Project.select(parameters)
+
+#         {:model_record_parameters, parameters} ->
+#             GymnasiumGrpc.Dimensions.Model.select(parameters)
+
+#       _ ->
+#         raise GRPC.RPCError, status: :invalid_argument
+#     end
+#   end
+
+#   def store_dimension_record(request, _stream) do
+#     case request.record do
+#       {:project_record, record} ->
+#         GymnasiumGrpc.Dimensions.Project.store(record)
+
+#         {:model_record, record} ->
+#             GymnasiumGrpc.Dimensions.Model.store(record)
+
+#       _ ->
+#         raise GRPC.RPCError, status: :invalid_argument
+#     end
+#   end
+
+#   def find_dimension_record(request, _stream) do
+#     case request.id do
+#       {:project_record_slug, slug} ->
+#         GymnasiumGrpc.Dimensions.Project.find(slug)
+
+#       {:project_record_id, id} ->
+#         GymnasiumGrpc.Dimensions.Project.get(id)
+
+#         {:model_record_slug, slug} ->
+#             GymnasiumGrpc.Dimensions.Model.find(slug)
+
+#           {:model_record_id, id} ->
+#             GymnasiumGrpc.Dimensions.Model.get(id)
+
+#       _ ->
+#         raise GRPC.RPCError, status: :invalid_argument
+#     end
+#   end
+
+#   def remove_dimension_record(request, _stream) do
+#     case request.id do
+#       {:project_record_id, id} ->
+#         GymnasiumGrpc.Dimensions.Project.remove(id)
+
+#       _ ->
+#         raise GRPC.RPCError, status: :invalid_argument
+#     end
+#   end
 end
