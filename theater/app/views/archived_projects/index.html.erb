@@ -1,25 +1,18 @@
 <div class="columns">
-  <div class="column"></div>
-  <div class="column is-three-fifths">
-    <div class="box">
-      <nav class="breadcrumb" aria-label="breadcrumbs">
-        <ul>
-          <li>
-            <%= link_to "Dashboard", root_path %>
-          </li>
-          <li>
-            <%= link_to "Projects", projects_path %>
-          </li>
-          <li class="is-active"><a href="#" aria-current="page">Archive</a></li>
-        </ul>
-      </nav>
-
-      <div class="block">
-        <% if @page.projects.present? %>
-          <%= render "projects", projects: @page.projects %>
-        <% end %>
-      </div>
-    </div>
+  <div class="column has-text-centered">
+    <h1 class="title">Archived Projects</h1><br>
   </div>
-  <div class="column"></div>
 </div>
+
+<div class="columns">
+  <div class="column">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><%= link_to "Dashboard", root_path %></li>
+        <li class="is-active"><a href="#" aria-current="page">Archived Projects</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<%= render "projects", projects: @page.projects %>

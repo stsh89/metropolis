@@ -8,7 +8,6 @@ module Proto
   module Temple
     module V1
       module Projects
-        # List of available actions around Project resource.
         class Service
 
           include ::GRPC::GenericService
@@ -17,22 +16,22 @@ module Proto
           self.unmarshal_class_method = :decode
           self.service_name = 'proto.temple.v1.Projects'
 
-          # List showcased Projects.
-          rpc :ShowcaseProjects, ::Proto::Temple::V1::ShowcaseProjectsRequest, ::Proto::Temple::V1::ShowcaseProjectsResponse
-          # Create a Project.
-          rpc :InitializeProject, ::Proto::Temple::V1::InitializeProjectRequest, ::Proto::Temple::V1::InitializeProjectResponse
-          # Change Project's name.
-          rpc :RenameProject, ::Proto::Temple::V1::RenameProjectRequest, ::Proto::Temple::V1::RenameProjectResponse
-          # Show Project details.
-          rpc :CheckProjectDetails, ::Proto::Temple::V1::CheckProjectDetailsRequest, ::Proto::Temple::V1::CheckProjectDetailsResponse
-          # Move a Project from the Showcase to the Museum.
+          rpc :ListProjects, ::Proto::Temple::V1::ListProjectsRequest, ::Proto::Temple::V1::ListProjectsResponse
+          rpc :ListArchivedProjects, ::Proto::Temple::V1::ListArchivedProjectsRequest, ::Proto::Temple::V1::ListArchivedProjectsResponse
+          rpc :GetProject, ::Proto::Temple::V1::GetProjectRequest, ::Proto::Temple::V1::GetProjectResponse
+          rpc :CreateProject, ::Proto::Temple::V1::CreateProjectRequest, ::Proto::Temple::V1::CreateProjectResponse
           rpc :ArchiveProject, ::Proto::Temple::V1::ArchiveProjectRequest, ::Proto::Temple::V1::ArchiveProjectResponse
-          # Move a Project from the Museum to the Showcase.
-          rpc :RecoverProject, ::Proto::Temple::V1::RecoverProjectRequest, ::Proto::Temple::V1::RecoverProjectResponse
-          # Get a list of archived Projects.
-          rpc :InquireArchivedProjects, ::Proto::Temple::V1::InquireArchivedProjectsRequest, ::Proto::Temple::V1::InquireArchivedProjectsResponse
-          # Purge a Project from the Museum history.
+          rpc :RestoreProject, ::Proto::Temple::V1::RestoreProjectRequest, ::Proto::Temple::V1::RestoreProjectResponse
           rpc :DeleteProject, ::Proto::Temple::V1::DeleteProjectRequest, ::Proto::Temple::V1::DeleteProjectResponse
+          rpc :RenameProject, ::Proto::Temple::V1::RenameProjectRequest, ::Proto::Temple::V1::RenameProjectResponse
+          rpc :ListModels, ::Proto::Temple::V1::ListModelsRequest, ::Proto::Temple::V1::ListModelsResponse
+          rpc :GetModel, ::Proto::Temple::V1::GetModelRequest, ::Proto::Temple::V1::GetModelResponse
+          rpc :CreateModel, ::Proto::Temple::V1::CreateModelRequest, ::Proto::Temple::V1::CreateModelResponse
+          rpc :DeleteModel, ::Proto::Temple::V1::DeleteModelRequest, ::Proto::Temple::V1::DeleteModelResponse
+          rpc :CreateModelAttribute, ::Proto::Temple::V1::CreateModelAttributeRequest, ::Proto::Temple::V1::CreateModelAttributeResponse
+          rpc :DeleteModelAttribute, ::Proto::Temple::V1::DeleteModelAttributeRequest, ::Proto::Temple::V1::DeleteModelAttributeResponse
+          rpc :CreateModelAssociation, ::Proto::Temple::V1::CreateModelAssociationRequest, ::Proto::Temple::V1::CreateModelAssociationResponse
+          rpc :DeleteModelAssociation, ::Proto::Temple::V1::DeleteModelAssociationRequest, ::Proto::Temple::V1::DeleteModelAssociationResponse
         end
 
         Stub = Service.rpc_stub_class

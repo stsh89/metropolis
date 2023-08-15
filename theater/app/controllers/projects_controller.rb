@@ -25,7 +25,7 @@ class ProjectsController < ApplicationController
     @page = CreateProjectPage.new(project_params)
 
     if @page.create_project
-      redirect_to projects_path, notice: "Project was successfully created."
+      redirect_to project_path(@page.project.slug), notice: "Project was successfully created."
     else
       render :new, status: :unprocessable_entity
     end

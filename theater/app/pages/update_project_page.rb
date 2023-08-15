@@ -1,16 +1,18 @@
 class UpdateProjectPage
-  def initialize(project_id, params)
-    @project_id = project_id
+  def initialize(project_slug, params)
+    @project_slug = project_slug
     @params = params
-    @project = nil
   end
 
   def update_project
-    @project =
-      if @params[:archive]
-        ProjectsDataProvider.new.archive_project(@project_id)
-      end
+    puts @params
+    puts @project_slug
+    puts "xxxxxxxxxxxxxx"
 
-    @project
+    if @params[:archive]
+      ProjectsDataProvider.new.archive_project(@project_slug)
+    end
+
+    true
   end
 end

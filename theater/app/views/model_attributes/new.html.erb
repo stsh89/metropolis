@@ -1,6 +1,6 @@
 <div class="columns">
   <div class="column has-text-centered">
-    <h1 class="title">New Project</h1><br>
+    <h1 class="title">New Model attribute</h1><br>
   </div>
 </div>
 
@@ -10,7 +10,9 @@
       <ul>
         <li><%= link_to "Dashboard", root_path %></li>
         <li><%= link_to "Projects", projects_path %></li>
-        <li class="is-active"><a href="#" aria-current="page">New Project</a></li>
+        <li><%= link_to @page.project.name, project_path(@page.project.slug) %></li>
+        <li><%= link_to @page.model.name, project_model_path(@page.project.slug, @page.model.slug) %></li>
+        <li class="is-active"><a href="#" aria-current="page">New Model attribute</a></li>
       </ul>
     </nav>
   </div>
@@ -20,7 +22,7 @@
   <div class="column">
     <div class="box">
       <div class="block">
-        <%= render "form", project: @page.project %>
+        <%= render "form", model: @page.model, project: @page.project %>
       </div>
     </div>
   </div>

@@ -1,8 +1,15 @@
-<%= form_with(model: project) do |form| %>
+<%= form_with scope: :model_attribute, url: project_model_model_attribute_path do |form| %>
   <div class="field">
     <label class="label">Name</label>
     <div class="control">
       <%= form.text_field :name, class: "input", placeholder: "Name", autofocus: true %>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="label">Kind</label>
+    <div class="control">
+      <%= form.select :kind, [["String", "String"], ["Integer", "Int64"], ["Boolean", "Bool"]], selected: "String" %>
     </div>
   </div>
 

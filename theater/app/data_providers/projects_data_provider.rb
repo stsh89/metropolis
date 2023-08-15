@@ -8,16 +8,16 @@ class ProjectsDataProvider
       .new(TheaterConfig.projects_client.socket_address, :this_channel_is_insecure)
   end
 
-  def showcase_projects
-    message = @stub.showcase_projects(Proto::Temple::V1::ShowcaseProjectsRequest.new())
+  def list_projects
+    message = @stub.list_projects(Proto::Temple::V1::ListProjectsRequest.new())
 
     message.projects.map do |proto_project|
       ProjectsDataProvider.from_proto(proto_project)
     end
   end
 
-  def initialize_project(attributes)
-    message = @stub.initialize_project(Proto::Temple::V1::InitializeProjectRequest.new(
+  def create_project(attributes)
+    message = @stub.create_project(Proto::Temple::V1::CreateProjectRequest.new(
       name: attributes[:name],
       description: attributes[:description]
     ))
@@ -25,50 +25,44 @@ class ProjectsDataProvider
     ProjectsDataProvider.from_proto(message.project)
   end
 
-  def check_project_details(project_slug)
-    message = @stub.check_project_details(Proto::Temple::V1::CheckProjectDetailsRequest.new(
-      slug: project_slug
+  def get_project(slug)
+    message = @stub.get_project(Proto::Temple::V1::GetProjectRequest.new(
+      slug: slug
     ))
 
     ProjectsDataProvider.from_proto(message.project)
   end
 
-  def inquire_archived_projects
-    message = @stub.inquire_archived_projects(Proto::Temple::V1::InquireArchivedProjectsRequest.new())
+  def list_archived_projects
+    message = @stub.list_archived_projects(Proto::Temple::V1::ListArchivedProjectsRequest.new())
 
     message.projects.map do |proto_project|
       ProjectsDataProvider.from_proto(proto_project)
     end
   end
 
-  def archive_project(id)
-    message = @stub.archive_project(Proto::Temple::V1::ArchiveProjectRequest.new(
-      id: id
+  def archive_project(project_slug)
+    @stub.archive_project(Proto::Temple::V1::ArchiveProjectRequest.new(
+      slug: project_slug
     ))
-
-    ProjectsDataProvider.from_proto(message.project)
   end
 
-  def recover_project(id)
-    message = @stub.recover_project(Proto::Temple::V1::RecoverProjectRequest.new(
-      id: id
+  def restore_project(project_slug)
+    @stub.restore_project(Proto::Temple::V1::RestoreProjectRequest.new(
+      slug: project_slug
     ))
-
-    ProjectsDataProvider.from_proto(message.project)
   end
 
-  def delete_project(id)
+  def delete_project(project_slug)
     @stub.delete_project(Proto::Temple::V1::DeleteProjectRequest.new(
-      id: id
+      slug: project_slug
     ))
   end
 
   class << self
     def from_proto(proto_project)
       Project.new(
-        create_time: proto_project.create_time.to_time,
         description: proto_project.description,
-        id: proto_project.id,
         name: proto_project.name,
         slug: proto_project.slug
       )

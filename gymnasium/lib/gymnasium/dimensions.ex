@@ -26,7 +26,7 @@ defmodule Gymnasium.Dimensions do
           from p in query, where: not is_nil(p.archived_at)
 
         _ ->
-          query
+          from p in query, where: is_nil(p.archived_at)
       end
 
     Repo.all(query)

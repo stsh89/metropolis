@@ -1,11 +1,11 @@
 class DeleteArchivedProjectPage
-  def initialize(project_id)
-    @project_id = project_id
+  def initialize(project_slug)
+    @project_slug = project_slug
   end
 
   def delete_project
-    ProjectsDataProvider.new.delete_project(@project_id)
+    ProjectsDataProvider.new.delete_project(@project_slug)
 
-    @project_id
+    @project_slug
   end
 end

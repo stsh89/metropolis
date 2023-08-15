@@ -1,8 +1,18 @@
-<tr>
-  <td><%= project.name %></td>
-  <td><%= project.description %></td>
-  <td><%= project_create_time(project.create_time) %></td>
-  <td>
-    <%= link_to 'Recover', archived_project_path(project.id, project: {recover: true}), data: {"turbo-method": :put} %> | <%= link_to 'Delete', project_path(project.id), data: {"turbo-method": :delete} %>
-  </td>
-</tr>
+<div class="column is-3">
+  <div class="card is-equal-height">
+    <div class="card-content">
+      <div class="content">
+        <p>
+          <%= project.name %>
+        </p>
+        <p>
+          <%= project.description %>
+        </p>
+      </div>
+    </div>
+    <footer class="card-footer">
+      <%= link_to "Restore", archived_project_path(project.slug, project: {restore: true}), class: "card-footer-item", data: { "turbo-method": :put } %>
+      <%= link_to "Delete", archived_project_path(project.slug), class: "card-footer-item", data: { "turbo-method": :delete } %>
+    </footer>
+  </div>
+</div>

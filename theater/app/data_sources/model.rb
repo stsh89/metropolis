@@ -1,4 +1,4 @@
-class Project
+class Model
   include ActiveModel::API
 
   attr_accessor :description

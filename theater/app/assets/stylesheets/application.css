@@ -13,3 +13,13 @@
  *= require_tree .
  *= require_self
  */
+
+.is-equal-height {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.is-equal-height .card-footer {
+    margin-top: auto;
+}

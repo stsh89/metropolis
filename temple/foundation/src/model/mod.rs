@@ -211,7 +211,7 @@ impl FromStr for AttributeKind {
         match s {
             "string" => Ok(AttributeKind::String),
             "int64" => Ok(AttributeKind::Int64),
-            "Bool" => Ok(AttributeKind::Bool),
+            "bool" => Ok(AttributeKind::Bool),
             other => Err(FoundationError::invalid_argument(format! {
                 "`#{other}` is not a valid AttributeKind for the Model"
             })),

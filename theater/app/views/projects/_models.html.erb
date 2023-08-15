@@ -1,0 +1,32 @@
+<div class="row columns is-multiline">
+  <div class="column is-3">
+    <div class="card is-equal-height">
+      <div class="card-content">
+        <div class="content">
+          <p>
+            <%= link_to "New Model", new_project_model_path(project.slug) %>
+          </p>
+          <p>
+            Create a new Model.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column is-3">
+    <div class="card is-equal-height">
+      <div class="card-content">
+        <div class="content">
+          <p>
+            <%= link_to "Archive Project", project_path(project.slug, project: {archive: true}), data: { "turbo-method": :put } %>
+          </p>
+          <p>
+            Move Project to Archive.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <%= render partial: 'model', collection: models, locals: { project: project } %>
+</div>
+

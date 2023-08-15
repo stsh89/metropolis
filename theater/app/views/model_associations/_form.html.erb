@@ -1,8 +1,22 @@
-<%= form_with(model: project) do |form| %>
+<%= form_with scope: :model_association, url: project_model_model_association_path do |form| %>
   <div class="field">
     <label class="label">Name</label>
     <div class="control">
       <%= form.text_field :name, class: "input", placeholder: "Name", autofocus: true %>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="label">Kind</label>
+    <div class="control">
+      <%= form.text_field :kind, class: "input", placeholder: "Kind" %>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="label">Model</label>
+    <div class="control">
+      <%= form.text_field :model, class: "input", placeholder: "Model" %>
     </div>
   </div>
 

@@ -1,0 +1,20 @@
+<div class="column is-3">
+  <div class="card is-equal-height">
+    <div class="card-content">
+      <div class="content">
+        <p>
+          <%= model_attribute.name %>
+        </p>
+        <p>
+          <%= model_attribute.kind %>
+        </p>
+        <p>
+          <%= model_attribute.description %>
+        </p>
+      </div>
+    </div>
+    <footer class="card-footer">
+      <%= link_to "Delete", project_model_model_attribute_path(project.slug, model.slug, model_attribute: {name: model_attribute.name}), class: "card-footer-item", data: { "turbo-method": :delete } %>
+    </footer>
+  </div>
+</div>

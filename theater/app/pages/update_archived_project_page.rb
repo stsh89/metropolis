@@ -1,18 +1,16 @@
 class UpdateArchivedProjectPage
   attr_reader :project
 
-  def initialize(project_id, params)
-    @project_id = project_id
+  def initialize(project_slug, params)
+    @project_slug = project_slug
     @params = params
-    @project = nil
   end
 
   def update_project
-    @project =
-      if @params[:recover]
-        ProjectsDataProvider.new.recover_project(@project_id)
-      end
+    if @params[:restore]
+      ProjectsDataProvider.new.restore_project(@project_slug)
+    end
 
-    @project
+    true
   end
 end
