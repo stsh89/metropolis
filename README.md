@@ -61,17 +61,28 @@ mix phx.server
 
 ### Run tests
 ```
-./theater/bin/rake -C ./theater spec
+mix test
 ```
 
 ### Build gRPC libs
 ```
-protoc --elixir_out=plugins=grpc:./lib --proto_path=../proto/gymnasium/ ../proto/gymnasium/projects.proto
+mix protobuf.compile
 ```
 
 ### Seed database
 ```
 mix run priv/repo/seeds.exs
+```
+
+### Documentation
+Generate documentation:
+```
+mix docs
+```
+
+Serve documentation:
+```
+python3 -m http.server 9000 --directory doc
 ```
 
 ## Docs

@@ -55,7 +55,10 @@ defmodule Gymnasium.MixProject do
       # Looks like will be resolved in 0.6.1: https://github.com/elixir-grpc/grpc/issues/327
       # {:grpc, "~> 0.6.0"},
       {:grpc, git: "https://github.com/elixir-grpc/grpc", branch: "master"},
-      {:google_protos, "~> 0.3.0"}
+      {:google_protos, "~> 0.3.0"},
+
+      # ExDoc is a tool to generate documentation for your Elixir projects.
+      {:ex_doc, "~> 0.27", only: :dev, runtime: false},
     ]
   end
 
