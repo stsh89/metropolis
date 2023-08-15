@@ -38,152 +38,40 @@ defmodule GymnasiumGrpc.Dimensions.Model do
   end
 
   def find(attrs \\ %{}) do
-    model_record =
-      attrs
-      |> Dimensions.find_model!()
-      |> to_proto_model
+    model = Dimensions.find_model!(attrs)
+
+    model_association_records =
+      if attrs[:preload_associations] == true do
+        Enum.map(
+          model.associations,
+          fn association ->
+            GymnasiumGrpc.Dimensions.ModelAssociation.to_proto_model_association(association)
+          end
+        )
+      else
+        []
+      end
+
+    model_attribute_records =
+      if attrs[:preload_attributes] == true do
+        Enum.map(
+          model.attributes,
+          fn attribute ->
+            GymnasiumGrpc.Dimensions.ModelAttribute.to_proto_model_attribute(attribute)
+          end
+        )
+      else
+        []
+      end
 
     %GetModelRecordResponse{
-      model_record: model_record
+      model_record: to_proto_model(model),
+      model_association_records: model_association_records,
+      model_attribute_records: model_attribute_records
     }
   end
 
-#   def select(parameters = %ModelRecordParameters{}) do
-#     query_attributes = %{ project_id: parameters.project_id }
-
-#     model_records =
-#       Dimensions.list_models(query_attributes)
-#       |> Enum.map(fn model -> to_proto_model(model) end)
-
-#     %SelectDimensionRecordsResponse{
-#       records: {:model_records, %{records: model_records}}
-#     }
-#   end
-
-#   def store(%ProtoModel{} = model) do
-#     result =
-#       case model.id do
-#         "" -> create(model)
-#         _ -> update(model)
-#       end
-
-#     store_response(result)
-#   end
-
-#   def find(project_id, slug) do
-#     model_record =
-#       project_id
-#       |> do_find(slug)
-#       |> to_proto_model
-
-#     %FindDimensionRecordResponse{
-#       record: {:model_record, model_record}
-#     }
-#   end
-
-#   def get(id) do
-#     model_record =
-#       id
-#       |> do_get
-#       |> to_proto_model
-
-#     %FindDimensionRecordResponse{
-#       record: {:model_record, model_record}
-#     }
-#   end
-
-#   defp store_response({:ok, %Model{} = model}) do
-#     %StoreDimensionRecordResponse{
-#       record: {:model_record, to_proto_model(model)}
-#     }
-#   end
-
-#   defp store_response({:error, changeset = %Ecto.Changeset{}}) do
-#     error = List.first(changeset.errors)
-
-#     case error do
-#       {field, {message, _validation}} ->
-#         raise GRPC.RPCError, status: :invalid_argument, message: "#{field}: #{message}"
-
-#       _ ->
-#         raise GRPC.RPCError, status: :invalid_argument
-#     end
-#   end
-
-#   defp create(proto_model = %ProtoModel{}) do
-#     archived_at =
-#       if proto_model.archivation_time do
-#         Helpers.from_proto_timestamp(proto_model.archivation_time)
-#       end
-
-#     attributes = %{
-#       description: proto_model.description,
-#       name: proto_model.name,
-#       slug: proto_model.slug,
-#       project_id: proto_model.project_id
-#     }
-
-#     Dimensions.create_model(attributes)
-#   end
-
-#   defp update(%ProtoModel{id: id} = proto_model) do
-#     attributes = %{
-#       description: proto_model.description,
-#       name: proto_model.name,
-#       slug: proto_model.slug
-#     }
-
-#     model = do_get(id)
-
-#     Dimensions.update_model(model, attributes)
-#   end
-
-#   def remove(id) do
-#     result =
-#       id
-#       |> do_get
-#       |> Dimensions.delete_model()
-
-#     case result do
-#       {:ok, %Model{}} ->
-#         %RemoveDimensionRecordResponse{}
-
-#       {:error, %Ecto.Changeset{}} ->
-#         raise GRPC.RPCError, status: :invalid_argument
-#     end
-#   end
-
-#   defp to_proto_model(%Model{} = model) do
-#     %ProtoModel{
-#       create_time: Helpers.to_proto_timestamp(model.inserted_at),
-#       description: model.description,
-#       id: model.id,
-#       name: model.name,
-#       slug: model.slug
-#     }
-#   end
-
-#   defp do_find(project_id, slug) do
-#     try do
-#       Dimensions.find_model!(project_id, slug)
-#     rescue
-#       Ecto.NoResultsError -> raise GRPC.RPCError, status: :not_found
-#     end
-#   end
-
-#   defp do_get(id) do
-#     try do
-#       Dimensions.get_model!(id)
-#     rescue
-#       Ecto.NoResultsError ->
-#         raise GRPC.RPCError, status: :not_found
-
-#       Ecto.Query.CastError ->
-#         raise GRPC.RPCError, status: :invalid_argument, message: "malformed UUID"
-#     end
-#   end
-
-  defp to_proto_model(%Model{} = model) do
+  def to_proto_model(%Model{} = model) do
     %ProtoModel{
       id: model.id,
       project_id: model.project_id,
@@ -191,7 +79,7 @@ defmodule GymnasiumGrpc.Dimensions.Model do
       name: model.name,
       slug: model.slug,
       create_time: Helpers.to_proto_timestamp(model.inserted_at),
-      update_time:  Helpers.to_proto_timestamp(model.updated_at)
+      update_time: Helpers.to_proto_timestamp(model.updated_at)
     }
   end
 end

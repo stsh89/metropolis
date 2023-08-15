@@ -1,0 +1,12 @@
+#!/bin/sh
+
+grpcurl -d @ \
+    -import-path ./protobuf \
+    -proto ./protobuf/proto/gymnasium/v1/dimensions.proto \
+    -plaintext \
+    localhost:50052 \
+    proto.gymnasium.v1.Dimensions/DeleteModelAttributeRecord <<EOM
+{
+    "id": "cecc706f-d977-4fd9-b0e3-6f02e64902c5"
+}
+EOM

@@ -18,7 +18,13 @@ defmodule Proto.Gymnasium.V1.Dimensions.Server do
     CreateModelRecordRequest,
     ListModelRecordsRequest,
     DeleteModelRecordRequest,
-    GetModelRecordRequest
+    GetModelRecordRequest,
+    CreateModelAttributeRecordRequest,
+    GetModelAttributeRecordRequest,
+    DeleteModelAttributeRecordRequest,
+    CreateModelAssociationRecordRequest,
+    GetModelAssociationRecordRequest,
+    DeleteModelAssociationRecordRequest
   }
 
   def list_project_records(%ListProjectRecordsRequest{} = request, _stream) do
@@ -51,17 +57,17 @@ defmodule Proto.Gymnasium.V1.Dimensions.Server do
 
   def create_model_record(%CreateModelRecordRequest{} = request, _stream) do
     GymnasiumGrpc.Dimensions.Model.create(%{
-        project_id: request.project_id,
-        description: request.description,
-        name: request.name,
-        slug: request.slug
-      })
+      project_id: request.project_id,
+      description: request.description,
+      name: request.name,
+      slug: request.slug
+    })
   end
 
   def list_model_records(%ListModelRecordsRequest{} = request, _stream) do
     GymnasiumGrpc.Dimensions.Model.list(%{
-        project_slug: request.project_slug,
-      })
+      project_slug: request.project_slug
+    })
   end
 
   def delete_model_record(%DeleteModelRecordRequest{} = request, _stream) do
@@ -73,62 +79,105 @@ defmodule Proto.Gymnasium.V1.Dimensions.Server do
       project_slug: request.project_slug,
       model_slug: request.model_slug,
       preload_attributes: request.preload_attributes,
-      preload_associations: request.preload_associations,
+      preload_associations: request.preload_associations
     })
   end
 
-#   def select_dimension_records(request, _stream) do
-#     case request.record_parameters do
-#       {:project_record_parameters, parameters} ->
-#         GymnasiumGrpc.Dimensions.Project.select(parameters)
+  def create_model_attribute_record(%CreateModelAttributeRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.ModelAttribute.create(%{
+      model_id: request.model_id,
+      description: request.description,
+      kind: request.kind,
+      name: request.name
+    })
+  end
 
-#         {:model_record_parameters, parameters} ->
-#             GymnasiumGrpc.Dimensions.Model.select(parameters)
+  def get_model_attribute_record(%GetModelAttributeRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.ModelAttribute.find(%{
+      project_slug: request.project_slug,
+      model_slug: request.model_slug,
+      attribute_name: request.attribute_name
+    })
+  end
 
-#       _ ->
-#         raise GRPC.RPCError, status: :invalid_argument
-#     end
-#   end
+  def delete_model_attribute_record(%DeleteModelAttributeRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.ModelAttribute.delete(request.id)
+  end
 
-#   def store_dimension_record(request, _stream) do
-#     case request.record do
-#       {:project_record, record} ->
-#         GymnasiumGrpc.Dimensions.Project.store(record)
+  def create_model_association_record(%CreateModelAssociationRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.ModelAssociation.create(%{
+      model_id: request.model_id,
+      associated_model_id: request.associated_model_id,
+      description: request.description,
+      kind: request.kind,
+      name: request.name
+    })
+  end
 
-#         {:model_record, record} ->
-#             GymnasiumGrpc.Dimensions.Model.store(record)
+  def get_model_association_record(%GetModelAssociationRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.ModelAssociation.find(%{
+      project_slug: request.project_slug,
+      model_slug: request.model_slug,
+      association_name: request.association_name
+    })
+  end
 
-#       _ ->
-#         raise GRPC.RPCError, status: :invalid_argument
-#     end
-#   end
+  def delete_model_association_record(%DeleteModelAssociationRecordRequest{} = request, _stream) do
+    GymnasiumGrpc.Dimensions.ModelAssociation.delete(request.id)
+  end
 
-#   def find_dimension_record(request, _stream) do
-#     case request.id do
-#       {:project_record_slug, slug} ->
-#         GymnasiumGrpc.Dimensions.Project.find(slug)
+  #   def select_dimension_records(request, _stream) do
+  #     case request.record_parameters do
+  #       {:project_record_parameters, parameters} ->
+  #         GymnasiumGrpc.Dimensions.Project.select(parameters)
 
-#       {:project_record_id, id} ->
-#         GymnasiumGrpc.Dimensions.Project.get(id)
+  #         {:model_record_parameters, parameters} ->
+  #             GymnasiumGrpc.Dimensions.Model.select(parameters)
 
-#         {:model_record_slug, slug} ->
-#             GymnasiumGrpc.Dimensions.Model.find(slug)
+  #       _ ->
+  #         raise GRPC.RPCError, status: :invalid_argument
+  #     end
+  #   end
 
-#           {:model_record_id, id} ->
-#             GymnasiumGrpc.Dimensions.Model.get(id)
+  #   def store_dimension_record(request, _stream) do
+  #     case request.record do
+  #       {:project_record, record} ->
+  #         GymnasiumGrpc.Dimensions.Project.store(record)
 
-#       _ ->
-#         raise GRPC.RPCError, status: :invalid_argument
-#     end
-#   end
+  #         {:model_record, record} ->
+  #             GymnasiumGrpc.Dimensions.Model.store(record)
 
-#   def remove_dimension_record(request, _stream) do
-#     case request.id do
-#       {:project_record_id, id} ->
-#         GymnasiumGrpc.Dimensions.Project.remove(id)
+  #       _ ->
+  #         raise GRPC.RPCError, status: :invalid_argument
+  #     end
+  #   end
 
-#       _ ->
-#         raise GRPC.RPCError, status: :invalid_argument
-#     end
-#   end
+  #   def find_dimension_record(request, _stream) do
+  #     case request.id do
+  #       {:project_record_slug, slug} ->
+  #         GymnasiumGrpc.Dimensions.Project.find(slug)
+
+  #       {:project_record_id, id} ->
+  #         GymnasiumGrpc.Dimensions.Project.get(id)
+
+  #         {:model_record_slug, slug} ->
+  #             GymnasiumGrpc.Dimensions.Model.find(slug)
+
+  #           {:model_record_id, id} ->
+  #             GymnasiumGrpc.Dimensions.Model.get(id)
+
+  #       _ ->
+  #         raise GRPC.RPCError, status: :invalid_argument
+  #     end
+  #   end
+
+  #   def remove_dimension_record(request, _stream) do
+  #     case request.id do
+  #       {:project_record_id, id} ->
+  #         GymnasiumGrpc.Dimensions.Project.remove(id)
+
+  #       _ ->
+  #         raise GRPC.RPCError, status: :invalid_argument
+  #     end
+  #   end
 end

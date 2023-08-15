@@ -8,6 +8,6 @@ grpcurl -d @ \
     proto.temple.v1.Projects/GetModel <<EOM
 {
     "project_slug": "free-food-service",
-    "model_slug": "tea"
+    "model_slug": "spoon"
 }
 EOM

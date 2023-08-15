@@ -5,11 +5,11 @@ grpcurl -d @ \
     -proto ./protobuf/proto/gymnasium/v1/dimensions.proto \
     -plaintext \
     localhost:50052 \
-    proto.gymnasium.v1.Dimensions/CreateModelRecord <<EOM
+    proto.gymnasium.v1.Dimensions/CreateModelAttributeRecord <<EOM
 {
-    "project_id": "67d3c279-6505-4bc5-8fed-a21637c883eb",
+    "model_id": "59eecd63-8acd-4a07-ad53-230fdf31e3da",
     "description": "",
-    "name": "Spoon",
-    "slug": "spoon"
+    "kind": "String",
+    "name": "arabika"
 }
 EOM

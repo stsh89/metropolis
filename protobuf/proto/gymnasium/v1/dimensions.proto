@@ -186,7 +186,7 @@ message CreateModelAssociationRecordRequest {
 }
 
 message CreateModelAssociationRecordResponse {
-    dimensions.ModelAssociation model_Association_record = 1;
+    dimensions.ModelAssociation model_association_record = 1;
 }
 
 message GetModelAssociationRecordRequest {
@@ -196,7 +196,7 @@ message GetModelAssociationRecordRequest {
 }
 
 message GetModelAssociationRecordResponse {
-    dimensions.ModelAssociation model_Association_record = 1;
+    dimensions.ModelAssociation model_association_record = 1;
 }
 
 message DeleteModelAssociationRecordRequest {

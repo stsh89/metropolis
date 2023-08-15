@@ -1,0 +1,16 @@
+#!/bin/sh
+
+grpcurl -d @ \
+    -import-path ./protobuf \
+    -proto ./protobuf/proto/gymnasium/v1/dimensions.proto \
+    -plaintext \
+    localhost:50052 \
+    proto.gymnasium.v1.Dimensions/CreateModelAssociationRecord <<EOM
+{
+    "model_id": "59eecd63-8acd-4a07-ad53-230fdf31e3da",
+    "associated_model_id": "2904c919-62d3-435e-b8a7-b1f7851919d3",
+    "description": "",
+    "kind": "HasOne",
+    "name": "Spoon"
+}
+EOM

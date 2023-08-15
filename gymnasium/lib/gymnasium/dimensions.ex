@@ -6,7 +6,7 @@ defmodule Gymnasium.Dimensions do
   import Ecto.Query, warn: false
   alias Gymnasium.Repo
 
-  alias Gymnasium.Dimensions.{Project, Model, ModelAttribute}
+  alias Gymnasium.Dimensions.{Project, Model, ModelAttribute, ModelAssociation}
 
   @doc """
   Returns the list of projects.
@@ -102,11 +102,88 @@ defmodule Gymnasium.Dimensions do
   """
   def find_model!(attrs \\ %{}) do
     query =
-        from m in Model,
-          join: p in Project,
-          on: p.id == m.project_id,
-          where: p.slug == ^attrs.project_slug and m.slug == ^attrs.model_slug,
-          order_by: [desc: m.inserted_at]
+      from m in Model,
+        join: p in Project,
+        on: p.id == m.project_id,
+        where: p.slug == ^attrs.project_slug and m.slug == ^attrs.model_slug,
+        order_by: [desc: m.name]
+
+    query =
+      case attrs[:preload_associations] do
+        true ->
+          from m in query, preload: [associations: :associated_model]
+
+        _ ->
+          query
+      end
+
+    query =
+      case attrs[:preload_attributes] do
+        true ->
+          from m in query, preload: :attributes
+
+        _ ->
+          query
+      end
+
+    Repo.one!(query)
+  end
+
+  @doc """
+  Find a single model by project's slug and it's slug.
+
+  Raises `Ecto.NoResultsError` if the Project or Model does not exist.
+
+  ## Examples
+
+      iex> find_model_attribute!("Title")
+      %Model{}
+
+      iex> find_model_attribute!("Publisher")
+      ** (Ecto.NoResultsError)
+
+  """
+  def find_model_attribute!(attrs \\ %{}) do
+    query =
+      from ma in ModelAttribute,
+        join: m in Model,
+        on: m.id == ma.model_id,
+        join: p in Project,
+        on: p.id == m.project_id,
+        where:
+          p.slug == ^attrs.project_slug and m.slug == ^attrs.model_slug and
+            ma.name == ^attrs.attribute_name,
+        order_by: [desc: ma.name]
+
+    Repo.one!(query)
+  end
+
+  @doc """
+  Find a single model by project's slug and it's slug.
+
+  Raises `Ecto.NoResultsError` if the Project or Model does not exist.
+
+  ## Examples
+
+      iex> find_model_association!("Title")
+      %Model{}
+
+      iex> find_model_association!("Publisher")
+      ** (Ecto.NoResultsError)
+
+  """
+  def find_model_association!(attrs \\ %{}) do
+    query =
+      from ma in ModelAssociation,
+        join: m in Model,
+        on: m.id == ma.model_id,
+        join: p in Project,
+        on: p.id == m.project_id,
+        where:
+          p.slug == ^attrs.project_slug and m.slug == ^attrs.model_slug and
+            ma.name == ^attrs.association_name,
+        order_by: [desc: ma.name],
+        preload: :associated_model
 
     Repo.one!(query)
   end
@@ -196,6 +273,22 @@ defmodule Gymnasium.Dimensions do
   def get_model_attribute!(id), do: Repo.get!(ModelAttribute, id)
 
   @doc """
+  Gets a single model association.
+
+  Raises `Ecto.NoResultsError` if the Model Attribute does not exist.
+
+  ## Examples
+
+      iex> get_model_association!("8e3b5275-bc1b-4490-a2d8-23c68d9b0fd5")
+      %Model{}
+
+      iex> get_model_association!("8844f7c8-1f83-4fdf-817f-41780c9e5d05")
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_model_association!(id), do: Repo.get!(ModelAssociation, id)
+
+  @doc """
   Creates a project.
 
   ## Examples
@@ -232,14 +325,14 @@ defmodule Gymnasium.Dimensions do
   end
 
   @doc """
-  Creates a model.
+  Creates a model attribute.
 
   ## Examples
 
-      iex> create_model(%{field: value})
+      iex> create_model_attribute(%{field: value})
       {:ok, %model{}}
 
-      iex> create_model(%{field: bad_value})
+      iex> create_model_attribute(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
@@ -247,6 +340,27 @@ defmodule Gymnasium.Dimensions do
     %ModelAttribute{}
     |> ModelAttribute.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Creates a model association.
+
+  ## Examples
+
+      iex> create_model_association(%{field: value})
+      {:ok, %model{}}
+
+      iex> create_model_association(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_model_association(attrs \\ %{}) do
+    {:ok, model_association} =
+      %ModelAssociation{}
+      |> ModelAssociation.changeset(attrs)
+      |> Repo.insert()
+
+    Repo.preload(model_association, :associated_model)
   end
 
   @doc """
@@ -349,6 +463,22 @@ defmodule Gymnasium.Dimensions do
   """
   def delete_model_attribute(%ModelAttribute{} = model_attribute) do
     Repo.delete(model_attribute)
+  end
+
+  @doc """
+  Deletes a model association.
+
+  ## Examples
+
+      iex> delete_model_association(model_association)
+      {:ok, %Model{}}
+
+      iex> delete_model_association(model_association)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_model_association(%ModelAssociation{} = model_association) do
+    Repo.delete(model_association)
   end
 
   @doc """

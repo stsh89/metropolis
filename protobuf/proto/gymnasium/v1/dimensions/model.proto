@@ -28,37 +28,6 @@ message Model {
     google.protobuf.Timestamp update_time = 7;
 }
 
-// Representation of the ModelAttribute dimension.
-message ModelAttribute {
-    // Unique identifier for the ModelAttribute. Text representation of the UUID.
-    string id = 1;
-
-    // Unique identifier for the Model to which ModelAttribute belongs. Text representation of the UUID.
-    string model_id = 2;
-
-    // The description of the ModelAttribute.
-    string description = 3;
-
-    // The kind of the ModelAttribute.
-    ModelAttributeKind kind = 4;
-
-    // The name of the ModelAttribute.
-    string name = 5;
-
-    // The creation time of the ModelAttribute.
-    google.protobuf.Timestamp create_time = 6;
-
-    // The timestamp of the last ModelAttribute's udpate.
-    google.protobuf.Timestamp update_time = 7;
-}
-
-enum ModelAttributeKind {
-    UnspecifiedAttributeKind = 0;
-    String = 1;
-    Int64 = 2;
-    Bool = 3;
-}
-
 // Representation of the ModelAssociation dimension.
 message ModelAssociation {
     // Unique identifier for the ModelAssociation. Text representation of the UUID.
@@ -90,4 +59,35 @@ enum ModelAssociationKind {
     BelongsTo = 1;
     HasOne = 2;
     HasMany = 3;
+}
+
+// Representation of the ModelAttribute dimension.
+message ModelAttribute {
+    // Unique identifier for the ModelAttribute. Text representation of the UUID.
+    string id = 1;
+
+    // Unique identifier for the Model to which ModelAttribute belongs. Text representation of the UUID.
+    string model_id = 2;
+
+    // The description of the ModelAttribute.
+    string description = 3;
+
+    // The kind of the ModelAttribute.
+    ModelAttributeKind kind = 4;
+
+    // The name of the ModelAttribute.
+    string name = 5;
+
+    // The creation time of the ModelAttribute.
+    google.protobuf.Timestamp create_time = 6;
+
+    // The timestamp of the last ModelAttribute's udpate.
+    google.protobuf.Timestamp update_time = 7;
+}
+
+enum ModelAttributeKind {
+    UnspecifiedAttributeKind = 0;
+    String = 1;
+    Int64 = 2;
+    Bool = 3;
 }

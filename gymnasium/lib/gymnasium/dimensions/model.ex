@@ -1,16 +1,21 @@
 defmodule Gymnasium.Dimensions.Model do
-  alias Gymnasium.Dimensions.{Project, ModelAttribute}
+  alias Gymnasium.Dimensions.{Project, ModelAttribute, ModelAssociation}
 
   use Gymnasium.Schema
   import Ecto.Changeset
 
   schema "models" do
-    field :description, :string
-    field :name, :string
-    field :slug, :string
-
     belongs_to :project, Project
+
+    has_many :associations, ModelAssociation
+
     has_many :attributes, ModelAttribute
+
+    field :description, :string
+
+    field :name, :string
+
+    field :slug, :string
 
     timestamps()
   end

@@ -5,11 +5,10 @@ grpcurl -d @ \
     -proto ./protobuf/proto/gymnasium/v1/dimensions.proto \
     -plaintext \
     localhost:50052 \
-    proto.gymnasium.v1.Dimensions/GetModelRecord <<EOM
+    proto.gymnasium.v1.Dimensions/GetModelAssociationRecord <<EOM
 {
     "project_slug": "free-food-service",
     "model_slug": "coffee",
-    "preload_associations": true,
-    "preload_attributes": true
+    "association_name": "Spoon"
 }
 EOM
