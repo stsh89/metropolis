@@ -7,6 +7,6 @@ grpcurl -d @ \
     localhost:50052 \
     proto.gymnasium.v1.Dimensions/DeleteProjectRecord <<EOM
 {
-    "id": "1c611f65-e25a-4c05-a53c-932984995ee2"
+    "id": "67d3c279-6505-4bc5-8fed-a21637c883eb"
 }
 EOM

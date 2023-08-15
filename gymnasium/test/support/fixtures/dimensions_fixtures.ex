@@ -45,12 +45,10 @@ defmodule Gymnasium.DimensionsFixtures do
     {:ok, model_attribute} =
       attrs
       |> Enum.into(%{
-        description: "The title of the Book",
-        name: "title",
         model_id: attrs.model_id,
-        kind: "scalar",
-        kind_value: "string",
-        list_indicator: "not_a_list"
+        description: "The title of the Book",
+        kind: "string",
+        name: "title"
       })
       |> Gymnasium.Dimensions.create_model_attribute()
 

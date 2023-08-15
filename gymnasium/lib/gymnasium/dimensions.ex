@@ -430,7 +430,23 @@ defmodule Gymnasium.Dimensions do
 
   """
   def delete_project(%Project{} = project) do
-    Repo.delete(project)
+    model_ids = Repo.all(from m in Model, where: m.project_id == ^project.id, select: m.id)
+
+    model_association_ids =
+      Repo.all(from ma in ModelAssociation, where: ma.model_id in ^model_ids, select: ma.id)
+
+    model_attribute_ids =
+      Repo.all(from ma in ModelAttribute, where: ma.model_id in ^model_ids, select: ma.id)
+
+    Repo.transaction(fn ->
+      Repo.delete_all(from m in Model, where: m.id in ^model_ids)
+      Repo.delete_all(from ma in ModelAssociation, where: ma.id in ^model_association_ids)
+      Repo.delete_all(from ma in ModelAttribute, where: ma.id in ^model_attribute_ids)
+
+      Repo.delete!(project)
+    end)
+
+    {:ok, project}
   end
 
   @doc """

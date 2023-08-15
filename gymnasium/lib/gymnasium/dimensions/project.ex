@@ -5,12 +5,15 @@ defmodule Gymnasium.Dimensions.Project do
   import Ecto.Changeset
 
   schema "projects" do
-    field :description, :string
-    field :name, :string
-    field :slug, :string
+    has_many :models, Model
+
     field :archived_at, :utc_datetime_usec
 
-    has_many :models, Model
+    field :description, :string
+
+    field :name, :string
+
+    field :slug, :string
 
     timestamps()
   end

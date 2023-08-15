@@ -21,7 +21,7 @@ defmodule Gymnasium.DimensionsTest do
       project = project_fixture()
       model = model_fixture(%{project_id: project.id})
 
-      assert Dimensions.list_models(project_id: project.id) == [model]
+      assert Dimensions.list_models(%{project_slug: project.slug}) == [model]
     end
 
     test "list_model_attributes/1 returns all model attributes for the given model id" do
@@ -57,11 +57,12 @@ defmodule Gymnasium.DimensionsTest do
       assert Dimensions.find_project!(project.slug) == project
     end
 
-    test "find_model!/3 returns the model with given slug" do
+    test "find_model!/1 returns the model with given slug" do
       project = project_fixture()
       model = model_fixture(%{project_id: project.id})
 
-      assert Dimensions.find_model!(project.id, model.slug) == model
+      assert Dimensions.find_model!(%{project_slug: project.slug, model_slug: model.slug}) ==
+               model
     end
 
     test "create_project/1 with valid data creates a project" do
@@ -98,22 +99,18 @@ defmodule Gymnasium.DimensionsTest do
       model = model_fixture(%{project_id: project.id})
 
       valid_attrs = %{
-        description: "The title of the Book",
-        name: "title",
         model_id: model.id,
-        kind: "scalar",
-        kind_value: "string",
-        list_indicator: "not_a_list"
+        description: "The title of the Book",
+        kind: "string",
+        name: "title"
       }
 
       assert {:ok, %ModelAttribute{} = model_attribute} =
                Dimensions.create_model_attribute(valid_attrs)
 
       assert model_attribute.description == "The title of the Book"
+      assert model_attribute.kind == "string"
       assert model_attribute.name == "title"
-      assert model_attribute.kind == "scalar"
-      assert model_attribute.kind_value == "string"
-      assert model_attribute.list_indicator == "not_a_list"
     end
 
     test "create_project/1 with invalid data returns error changeset" do
@@ -165,20 +162,18 @@ defmodule Gymnasium.DimensionsTest do
       model_attribute = model_attribute_fixture(%{model_id: model.id})
 
       update_attrs = %{
-        description: "The edition of the Book",
-        name: "edition",
+        description: "Number of pages in the Book",
+        name: "number_of_pages",
         model_id: model.id,
-        kind: "scalar",
-        kind_value: "int64",
-        list_indicator: "not_a_list"
+        kind: "int64"
       }
 
       assert {:ok, %ModelAttribute{} = model_attribute} =
                Dimensions.update_model_attribute(model_attribute, update_attrs)
 
-      assert model_attribute.description == "The edition of the Book"
-      assert model_attribute.name == "edition"
-      assert model_attribute.kind_value == "int64"
+      assert model_attribute.description == "Number of pages in the Book"
+      assert model_attribute.name == "number_of_pages"
+      assert model_attribute.kind == "int64"
     end
 
     test "update_project/2 with invalid data returns error changeset" do
