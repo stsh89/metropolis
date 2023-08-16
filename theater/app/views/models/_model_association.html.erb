@@ -1,0 +1,23 @@
+<div class="column is-3">
+  <div class="card is-equal-height">
+    <div class="card-content">
+      <div class="content">
+        <p>
+          <%= model_association.name %>
+        </p>
+        <p>
+          <%= model_association.kind %>
+        </p>
+        <p>
+          <%= link_to model_association.model.name, project_model_path(params[:project_id], model_association.model.slug) %>
+        </p>
+        <p>
+          <%= model_association.description %>
+        </p>
+      </div>
+    </div>
+    <footer class="card-footer">
+      <%= link_to "Delete", project_model_model_association_path(project.slug, model.slug, model_association: {name: model_association.name}), class: "card-footer-item", data: { "turbo-method": :delete } %>
+    </footer>
+  </div>
+</div>

@@ -38,6 +38,9 @@ class ModelsDataProvider
       model: ModelsDataProvider.from_proto(message.model),
       attributes: message.attributes.map do |model_attribute|
         ModelAttributeDataProvider.from_proto(model_attribute)
+      end,
+      associations: message.associations.map do |model_association|
+        ModelAssociationDataProvider.from_proto(model_association)
       end
     }
   end

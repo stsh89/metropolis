@@ -48,4 +48,6 @@
   </div>
 
   <%= render partial: 'model_attribute', collection: @page.model_attributes, locals: {project: @page.project, model: @page.model} %>
+
+  <%= render partial: 'model_association', collection: @page.model_associations, locals: {project: @page.project, model: @page.model} %>
 </div>

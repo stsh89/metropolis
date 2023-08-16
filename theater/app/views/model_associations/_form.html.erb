@@ -1,4 +1,7 @@
 <%= form_with scope: :model_association, url: project_model_model_association_path do |form| %>
+  <%= form.hidden_field :project_slug, value: params[:project_id] %>
+  <%= form.hidden_field :model_slug, value: params[:model_id] %>
+
   <div class="field">
     <label class="label">Name</label>
     <div class="control">
@@ -9,14 +12,14 @@
   <div class="field">
     <label class="label">Kind</label>
     <div class="control">
-      <%= form.text_field :kind, class: "input", placeholder: "Kind" %>
+      <%= form.select :kind, [["Belongs To", "BelongsTo"], ["Has Many", "HasMany"], ["Has One", "HasOne"]], selected: "BelongsTo" %>
     </div>
   </div>
 
   <div class="field">
-    <label class="label">Model</label>
+    <label class="label">Kind</label>
     <div class="control">
-      <%= form.text_field :model, class: "input", placeholder: "Model" %>
+      <%= form.select :associated_model_slug, models.map { |m| [m.name, m.slug] }  %>
     </div>
   </div>
 
