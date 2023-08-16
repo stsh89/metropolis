@@ -1,3 +1,4 @@
+pub mod get_class_diagram;
 pub mod create;
 pub mod create_association;
 pub mod create_attribute;

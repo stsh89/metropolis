@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
-
 package proto.temple.v1;
 
 service Projects {
@@ -24,6 +22,8 @@ service Projects {
 
     rpc CreateModelAssociation(CreateModelAssociationRequest) returns (CreateModelAssociationResponse);
     rpc DeleteModelAssociation(DeleteModelAssociationRequest) returns (DeleteModelAssociationResponse);
+
+    rpc GetModelClassDiagram(GetModelClassDiagramRequest) returns (GetModelClassDiagramResponse);
 }
 
 message Project {
@@ -219,3 +219,12 @@ message DeleteModelAssociationRequest {
 }
 
 message DeleteModelAssociationResponse {}
+
+message GetModelClassDiagramRequest {
+    string project_slug = 1;
+    string model_slug = 2;
+}
+
+message GetModelClassDiagramResponse {
+    string diagram = 1;
+}

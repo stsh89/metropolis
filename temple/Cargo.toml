@@ -3,6 +3,7 @@
 [workspace]
 members = [
     "foundation",
+    "mermaid",
     "portal",
 ]
 
@@ -15,6 +16,7 @@ edition = "2021"
 async-trait = { version = "0.1.72" }
 chrono = { version = "0.4.26" }
 foundation = { path = "./foundation" }
+mermaid = { path = "./mermaid" }
 prost = { version = "0.11" }
 prost-types = { version = "0.11" }
 serde = { version = "1.0.179", default-features = false, features = ['derive'] }

@@ -46,6 +46,20 @@
       </div>
     </div>
   </div>
+  <div class="column is-3">
+    <div class="card is-equal-height">
+      <div class="card-content">
+        <div class="content">
+          <p>
+            <%= link_to "Class Diagram", project_model_class_diagram_path(@page.project.slug, @page.model.slug) %>
+          </p>
+          <p>
+            Show Class Diagram.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <%= render partial: 'model_attribute', collection: @page.model_attributes, locals: {project: @page.project, model: @page.model} %>
 

@@ -45,6 +45,15 @@ class ModelsDataProvider
     }
   end
 
+  def get_model_class_diagram(project_slug, model_slug)
+    message = @stub.get_model_class_diagram(Proto::Temple::V1::GetModelClassDiagramRequest.new(
+      project_slug: project_slug,
+      model_slug: model_slug
+    ))
+
+    message.diagram
+  end
+
   class << self
     def from_proto(proto_model)
       Model.new(

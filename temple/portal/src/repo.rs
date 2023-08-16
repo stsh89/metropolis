@@ -263,6 +263,27 @@ impl model::get::GetModel for Repo {
     }
 }
 
+#[async_trait::async_trait]
+impl model::get_class_diagram::GetModel for Repo {
+    async fn get_model(
+        &self,
+        project_slug: &str,
+        model_slug: &str,
+    ) -> FoundationResult<model::get_class_diagram::GetModelResponse> {
+        let (model, associations, attributes) = self
+            .get_model_full(project_slug.to_owned(), model_slug.to_owned())
+            .await?;
+
+        let response = model::get_class_diagram::GetModelResponse {
+            model,
+            associations,
+            attributes,
+        };
+
+        Ok(response)
+    }
+}
+
 impl Repo {
     async fn connect(
         &self,

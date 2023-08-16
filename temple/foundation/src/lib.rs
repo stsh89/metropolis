@@ -2,6 +2,7 @@ pub mod datastore;
 pub mod model;
 pub mod project;
 
+mod diagram;
 mod result;
 mod util;
 

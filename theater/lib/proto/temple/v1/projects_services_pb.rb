@@ -32,6 +32,7 @@ module Proto
           rpc :DeleteModelAttribute, ::Proto::Temple::V1::DeleteModelAttributeRequest, ::Proto::Temple::V1::DeleteModelAttributeResponse
           rpc :CreateModelAssociation, ::Proto::Temple::V1::CreateModelAssociationRequest, ::Proto::Temple::V1::CreateModelAssociationResponse
           rpc :DeleteModelAssociation, ::Proto::Temple::V1::DeleteModelAssociationRequest, ::Proto::Temple::V1::DeleteModelAssociationResponse
+          rpc :GetModelClassDiagram, ::Proto::Temple::V1::GetModelClassDiagramRequest, ::Proto::Temple::V1::GetModelClassDiagramResponse
         end
 
         Stub = Service.rpc_stub_class

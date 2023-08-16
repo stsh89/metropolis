@@ -403,6 +403,32 @@ impl proto::projects_server::Projects for Projects {
 
         Ok(Response::new(proto::DeleteModelAssociationResponse {}))
     }
+
+    async fn get_model_class_diagram(
+        &self,
+        request: Request<proto::GetModelClassDiagramRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::GetModelClassDiagramResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::GetModelClassDiagramRequest {
+            project_slug,
+            model_slug,
+        } = request.into_inner();
+
+        let response = model::get_class_diagram::execute(
+            &self.repo,
+            model::get_class_diagram::Request {
+                project_slug,
+                model_slug,
+            },
+        )
+        .await
+        .map_err(Into::<PortalError>::into)?;
+
+        Ok(Response::new(proto::GetModelClassDiagramResponse {
+            diagram: response.diagram,
+        }))
+    }
 }
 
 fn to_proto_project(project: Project) -> proto::Project {

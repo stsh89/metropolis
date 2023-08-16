@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     resources :models do
       resource :model_association
       resource :model_attribute
+      resource :class_diagram
     end
   end
 

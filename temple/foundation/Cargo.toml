@@ -6,8 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = { workspace = true }
-uuid = { workspace = true }
 async-trait = { workspace = true }
+chrono = { workspace = true }
+mermaid = { workspace = true }
 sluggify = { workspace = true }
 tokio = { workspace = true }
+uuid = { workspace = true }
+
