@@ -31,6 +31,17 @@ rtx install ruby@3.2.2
 ./theater/bin/rake -C ./theater grpc:build
 ```
 
+### Docs
+Generate docs
+```
+bundle exec yard -o docs
+```
+
+Serve docs
+```
+python3 -m http.server 8002 --directory docs
+```
+
 ## Gymnasium
 Datastore based on the Phoenix framework.
 
