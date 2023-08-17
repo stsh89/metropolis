@@ -22,3 +22,9 @@ cargo install mdbook-mermaid
 // Serve documentation folder
 mdbook serve ./docs -p 8000 -n 127.0.0.1
 ```
+
+## Roadmap
+* [x] - Diagram data structures
+* [ ] - Generate [Postgresql](https://www.postgresql.org/) table migration(s) for Model(s).
+* [ ] - Generate programming language code (Rust, Ruby, Elixir) for created Model(s).
+* [ ] - Implement the ability to add use cases.
