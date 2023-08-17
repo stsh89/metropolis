@@ -11,7 +11,8 @@ export default class extends Controller {
     const output = this.outputTarget;
 
     const drawDiagram = async function () {
-      const graphDefinition = input.innerHTML;
+      const graphDefinition = input.value;
+      console.log(graphDefinition);
       const { svg  } = await mermaid.render('graphDiv', graphDefinition);
       output.innerHTML = svg;
     };

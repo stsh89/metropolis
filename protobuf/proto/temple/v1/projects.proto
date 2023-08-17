@@ -24,6 +24,7 @@ service Projects {
     rpc DeleteModelAssociation(DeleteModelAssociationRequest) returns (DeleteModelAssociationResponse);
 
     rpc GetModelClassDiagram(GetModelClassDiagramRequest) returns (GetModelClassDiagramResponse);
+    rpc GetProjectClassDiagram(GetProjectClassDiagramRequest) returns (GetProjectClassDiagramResponse);
 }
 
 message Project {
@@ -226,5 +227,13 @@ message GetModelClassDiagramRequest {
 }
 
 message GetModelClassDiagramResponse {
+    string diagram = 1;
+}
+
+message GetProjectClassDiagramRequest {
+    string project_slug = 1;
+}
+
+message GetProjectClassDiagramResponse {
     string diagram = 1;
 }

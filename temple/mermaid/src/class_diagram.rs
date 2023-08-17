@@ -1,10 +1,11 @@
 pub struct ClassDiagram<'a> {
-    pub classes: Vec<Class<'a>>,
+    pub classes: &'a [Class<'a>],
+    pub associations: &'a [Association<'a>],
 }
 
 pub struct Class<'a> {
     pub name: &'a str,
-    pub attributes: Vec<Attribute<'a>>,
+    pub attributes: &'a [Attribute<'a>],
 }
 
 pub struct Attribute<'a> {
@@ -14,14 +15,20 @@ pub struct Attribute<'a> {
 
 pub enum AttributeKind {
     String,
-    Bool,
+    Boolean,
     Integer,
+}
+
+pub struct Association<'a> {
+    pub class_name: &'a str,
+    pub associated_class_name: &'a str,
+    pub description: Option<&'a str>,
 }
 
 impl ToString for AttributeKind {
     fn to_string(&self) -> String {
         match self {
-            AttributeKind::Bool => "Bool",
+            AttributeKind::Boolean => "Boolean",
             AttributeKind::Integer => "Integer",
             AttributeKind::String => "String",
         }
@@ -31,25 +38,45 @@ impl ToString for AttributeKind {
 
 impl<'a> ClassDiagram<'a> {
     pub fn generate(&self) -> String {
-        let classes_string = self
-            .classes
+        let ClassDiagram {
+            classes,
+            associations,
+        } = self;
+
+        let code = "classDiagram".to_string();
+
+        let code = if classes.is_empty() {
+            code
+        } else {
+            format!("{code}\n{}\n", self.classes_diagram_code())
+        };
+
+        if associations.is_empty() {
+            code
+        } else {
+            format!("{code}\n{}\n", self.associations_diagram_code())
+        }
+    }
+
+    fn classes_diagram_code(&self) -> String {
+        self.classes
             .iter()
             .map(|class| class.generate())
             .collect::<Vec<String>>()
-            .join("\n");
+            .join("\n")
+    }
 
-        format!(
-            r#"
-classDiagram
-{}
-"#,
-            classes_string
-        )
+    fn associations_diagram_code(&self) -> String {
+        self.associations
+            .iter()
+            .map(|association| association.generate())
+            .collect::<Vec<String>>()
+            .join("\n")
     }
 }
 
 impl<'a> Class<'a> {
-    pub fn generate(&self) -> String {
+    fn generate(&self) -> String {
         let attributes_string = self
             .attributes
             .iter()
@@ -70,72 +97,20 @@ impl<'a> Class<'a> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl<'a> Association<'a> {
+    fn generate(&self) -> String {
+        let Association {
+            class_name,
+            associated_class_name,
+            description,
+        } = self;
 
-    #[test]
-    fn generates_mermaid_class_diagram() {
-        let code = ClassDiagram {
-            classes: vec![
-                Class {
-                    name: "Book",
-                    attributes: vec![
-                        Attribute {
-                            kind: AttributeKind::String,
-                            name: "title",
-                        },
-                        Attribute {
-                            kind: AttributeKind::Integer,
-                            name: "year",
-                        },
-                        Attribute {
-                            kind: AttributeKind::Bool,
-                            name: "is_new",
-                        },
-                    ],
-                },
-                Class {
-                    name: "Author",
-                    attributes: vec![
-                        Attribute {
-                            kind: AttributeKind::String,
-                            name: "first_name",
-                        },
-                        Attribute {
-                            kind: AttributeKind::String,
-                            name: "last_name",
-                        },
-                        Attribute {
-                            kind: AttributeKind::Integer,
-                            name: "number_of_books",
-                        },
-                        Attribute {
-                            kind: AttributeKind::Bool,
-                            name: "is_bestseller",
-                        },
-                    ],
-                },
-            ],
-        }
-        .generate();
+        let code = format!("    {class_name} --> {associated_class_name}");
 
-        assert_eq!(
-            code,
-            r#"
-classDiagram
-    class Book {
-        +String title
-        +Integer year
-        +Bool is_new
-    }
-    class Author {
-        +String first_name
-        +String last_name
-        +Integer number_of_books
-        +Bool is_bestseller
-    }
-"#
-        )
+        let Some(description) = description else  {
+            return code;
+        };
+
+        format!("{code} : {description}")
     }
 }

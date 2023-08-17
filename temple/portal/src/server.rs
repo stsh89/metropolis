@@ -429,6 +429,26 @@ impl proto::projects_server::Projects for Projects {
             diagram: response.diagram,
         }))
     }
+
+    async fn get_project_class_diagram(
+        &self,
+        request: Request<proto::GetProjectClassDiagramRequest>, // Accept request of type HelloRequest
+    ) -> Result<Response<proto::GetProjectClassDiagramResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let proto::GetProjectClassDiagramRequest { project_slug } = request.into_inner();
+
+        let response = model::get_project_class_diagram::execute(
+            &self.repo,
+            model::get_project_class_diagram::Request { project_slug },
+        )
+        .await
+        .map_err(Into::<PortalError>::into)?;
+
+        Ok(Response::new(proto::GetProjectClassDiagramResponse {
+            diagram: response.diagram,
+        }))
+    }
 }
 
 fn to_proto_project(project: Project) -> proto::Project {

@@ -1,5 +1,7 @@
 use crate::{datastore, diagram, model::Attribute, FoundationResult};
 
+use super::Association;
+
 #[async_trait::async_trait]
 pub trait GetModel {
     async fn get_model(
@@ -38,7 +40,17 @@ pub async fn execute(repo: &impl GetModel, request: Request) -> FoundationResult
         .map(Into::into)
         .collect();
 
-    let diagram = diagram::model_class_diagram(&get_model_response.model.into(), &attributes);
+    let associations: Vec<Association> = get_model_response
+        .associations
+        .into_iter()
+        .map(Into::into)
+        .collect();
+
+    let diagram = diagram::model_class_diagram(diagram::ModelClass {
+        model: &get_model_response.model.into(),
+        attributes: attributes.as_slice(),
+        associations: &associations,
+    });
 
     let response = Response { diagram };
 
@@ -84,7 +96,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn it_returns_model_with_attributes_and_associations() -> FoundationResult<()> {
+    async fn it_returns_model_class_diagram() -> FoundationResult<()> {
         let project_record = project_record_fixture(Default::default());
         let model_record = model_record_fixture(ModelRecordFixture {
             project_id: Some(project_record.id),
@@ -132,11 +144,12 @@ mod tests {
 
         assert_eq!(
             response.diagram,
-            r#"
-classDiagram
+            r#"classDiagram
     class Book {
         +String Title
     }
+
+    Book --> Publisher
 "#
         );
 

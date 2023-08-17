@@ -284,6 +284,34 @@ impl model::get_class_diagram::GetModel for Repo {
     }
 }
 
+#[async_trait::async_trait]
+impl model::get_project_class_diagram::ListModels for Repo {
+    async fn list_models(
+        &self,
+        project_slug: &str,
+    ) -> FoundationResult<model::get_project_class_diagram::ListModelsResponse> {
+        let model_records = self.list_models(project_slug.to_owned()).await?;
+
+        let mut models = Vec::with_capacity(model_records.len());
+
+        for model_record in model_records {
+            let (model, associations, attributes) = self
+                .get_model_full(project_slug.to_owned(), model_record.slug)
+                .await?;
+
+            models.push(model::get_project_class_diagram::ModelData {
+                model,
+                associations,
+                attributes,
+            })
+        }
+
+        let response = model::get_project_class_diagram::ListModelsResponse { models };
+
+        Ok(response)
+    }
+}
+
 impl Repo {
     async fn connect(
         &self,

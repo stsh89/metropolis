@@ -1,6 +1,8 @@
 # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
   resources :projects do
+    resource :class_diagram
+
     resources :models do
       resource :model_association
       resource :model_attribute

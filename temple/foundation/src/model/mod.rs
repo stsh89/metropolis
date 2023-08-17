@@ -1,4 +1,3 @@
-pub mod get_class_diagram;
 pub mod create;
 pub mod create_association;
 pub mod create_attribute;
@@ -6,6 +5,8 @@ pub mod delete;
 pub mod delete_association;
 pub mod delete_attribute;
 pub mod get;
+pub mod get_class_diagram;
+pub mod get_project_class_diagram;
 pub mod list;
 
 use std::str::FromStr;

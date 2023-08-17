@@ -1,6 +1,10 @@
 <div class="columns">
   <div class="column has-text-centered">
-    <h1 class="title"><%= @page.model.name %> Class Diagram</h1><br>
+    <% if @page.model %>
+      <h1 class="title"><%= @page.model.name %> Model Class Diagram</h1><br>
+    <% else %>
+      <h1 class="title"><%= @page.project.name %> Project Class Diagram</h1><br>
+    <% end %>
   </div>
 </div>
 
@@ -11,7 +15,9 @@
         <li><%= link_to "Dashboard", root_path %></li>
         <li><%= link_to "Projects", projects_path %></li>
         <li><%= link_to @page.project.name, project_path(@page.project.slug) %></li>
-        <li><%= link_to @page.model.name, project_model_path(@page.project.slug, @page.model.slug) %></li>
+        <% if @page.model %>
+          <li><%= link_to @page.model.name, project_model_path(@page.project.slug, @page.model.slug) %></li>
+        <% end %>
         <li class="is-active"><a href="#" aria-current="page">Class Diagram</a></li>
       </ul>
     </nav>
@@ -19,9 +25,9 @@
 </div>
 
 <div class="row columns is-multiline" data-controller="mermaid">
-  <pre data-mermaid-target="input" class="is-hidden">
-    <%= @page.class_diagram %>
-  </pre>
+  <textarea data-mermaid-target="input" class="is-hidden" readonly="true">
+    <%= @page.class_diagram.html_safe %>
+  </textarea>
 
   <div data-mermaid-target="output">
   </div>
