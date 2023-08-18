@@ -1,5 +1,5 @@
 defmodule GymnasiumGrpc.Dimensions.Project do
-  alias GymnasiumGrpc.Helpers
+  alias GymnasiumGrpc.Util
   alias Gymnasium.{Dimensions.Project, Dimensions}
   alias Proto.Gymnasium.V1.Dimensions.Project, as: ProtoProject
 
@@ -74,7 +74,7 @@ defmodule GymnasiumGrpc.Dimensions.Project do
   end
 
   defp to_proto_project(project = %Project{}) do
-    archive_time = if project.archived_at, do: Helpers.to_proto_timestamp(project.archived_at)
+    archive_time = if project.archived_at, do: Util.to_proto_timestamp(project.archived_at)
 
     %ProtoProject{
       id: project.id,
@@ -82,8 +82,8 @@ defmodule GymnasiumGrpc.Dimensions.Project do
       description: project.description,
       name: project.name,
       slug: project.slug,
-      create_time: Helpers.to_proto_timestamp(project.inserted_at),
-      update_time: Helpers.to_proto_timestamp(project.updated_at)
+      create_time: Util.to_proto_timestamp(project.inserted_at),
+      update_time: Util.to_proto_timestamp(project.updated_at)
     }
   end
 end

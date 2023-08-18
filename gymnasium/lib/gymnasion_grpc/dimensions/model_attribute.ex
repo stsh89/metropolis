@@ -1,5 +1,5 @@
 defmodule GymnasiumGrpc.Dimensions.ModelAttribute do
-  alias GymnasiumGrpc.Helpers
+  alias GymnasiumGrpc.Util
   alias Gymnasium.{Dimensions.ModelAttribute, Dimensions}
   alias Proto.Gymnasium.V1.Dimensions.ModelAttribute, as: ProtoModelAttribute
 
@@ -59,8 +59,8 @@ defmodule GymnasiumGrpc.Dimensions.ModelAttribute do
       description: model_attribute.description,
       kind: kind_to_proto(model_attribute.kind),
       name: model_attribute.name,
-      create_time: Helpers.to_proto_timestamp(model_attribute.inserted_at),
-      update_time: Helpers.to_proto_timestamp(model_attribute.updated_at)
+      create_time: Util.to_proto_timestamp(model_attribute.inserted_at),
+      update_time: Util.to_proto_timestamp(model_attribute.updated_at)
     }
   end
 end

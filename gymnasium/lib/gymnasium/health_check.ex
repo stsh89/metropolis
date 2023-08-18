@@ -7,7 +7,7 @@ defmodule Gymnasium.HealthCheck do
   alias Gymnasium.Repo
 
   def query_database do
-    query = from p in Gymnasium.Dimensions.Project, limit: 1
+    query = from p in Gymnasium.Dimensions.Project, select: [:id], limit: 1
 
     Repo.all(query)
   end

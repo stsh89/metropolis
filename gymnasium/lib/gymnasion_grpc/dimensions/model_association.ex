@@ -1,5 +1,5 @@
 defmodule GymnasiumGrpc.Dimensions.ModelAssociation do
-  alias GymnasiumGrpc.Helpers
+  alias GymnasiumGrpc.Util
   alias Gymnasium.{Dimensions.ModelAssociation, Dimensions}
   alias Proto.Gymnasium.V1.Dimensions.ModelAssociation, as: ProtoModelAssociation
 
@@ -63,8 +63,8 @@ defmodule GymnasiumGrpc.Dimensions.ModelAssociation do
       description: model_association.description,
       kind: kind_to_proto(model_association.kind),
       name: model_association.name,
-      create_time: Helpers.to_proto_timestamp(model_association.inserted_at),
-      update_time: Helpers.to_proto_timestamp(model_association.updated_at)
+      create_time: Util.to_proto_timestamp(model_association.inserted_at),
+      update_time: Util.to_proto_timestamp(model_association.updated_at)
     }
   end
 end

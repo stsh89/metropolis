@@ -3,7 +3,7 @@ defmodule GymnasiumGrpc.HealthCheckServer do
 
   alias Proto.Gymnasium.V1.{
     GetHealthCheckRequest,
-    GetHealthCheckResponse,
+    GetHealthCheckResponse
   }
 
   @valid_health_check_statuses [
@@ -36,11 +36,10 @@ defmodule GymnasiumGrpc.HealthCheckServer do
   end
 
   defp get_health_check_response(status) when status in @valid_health_check_statuses do
-    %GetHealthCheckResponse { status: status }
+    %GetHealthCheckResponse{status: status}
   end
 
   defp get_health_check_response(_) do
     get_health_check_response(:HealthCheckStatusUnspecified)
   end
 end
-

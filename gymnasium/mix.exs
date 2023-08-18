@@ -58,7 +58,7 @@ defmodule Gymnasium.MixProject do
       {:google_protos, "~> 0.3.0"},
 
       # ExDoc is a tool to generate documentation for your Elixir projects.
-      {:ex_doc, "~> 0.27", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.27", only: :dev, runtime: false}
     ]
   end
 

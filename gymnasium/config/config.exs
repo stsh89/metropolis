@@ -7,7 +7,7 @@
 # General application configuration
 import Config
 
-config :gymnasium, project_root_path: File.cwd!
+config :gymnasium, project_root_path: File.cwd!()
 
 config :gymnasium,
   ecto_repos: [Gymnasium.Repo]

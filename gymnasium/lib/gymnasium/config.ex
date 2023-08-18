@@ -1,9 +1,9 @@
 defmodule Gymnasium.Config do
   @config :gymnasium
-    |> Application.compile_env(:project_root_path)
-    |> Path.join("config.json")
-    |> File.read!()
-    |> Jason.decode!(keys: :atoms)
+          |> Application.compile_env(:project_root_path)
+          |> Path.join("config.json")
+          |> File.read!()
+          |> Jason.decode!(keys: :atoms)
 
   def grpc_server_port do
     @config
