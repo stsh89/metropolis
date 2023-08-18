@@ -370,18 +370,14 @@ impl Repo {
     }
 
     async fn get_project(&self, slug: String) -> PortalResult<datastore::project::Project> {
-        let mut client = self.connect().await?;
+        let mut client = self.projects_client().await?;
 
-        let response = client
-            .get_project_record(proto::GetProjectRecordRequest { slug })
+        let proto_project = client
+            .find_project(proto::FindProjectRequest { slug })
             .await?
             .into_inner();
 
-        let proto_project = response
-            .project_record
-            .ok_or(PortalError::internal("empty project_record"))?;
-
-        let project = from_proto_project(proto_project)?;
+        let project = datastore_project(proto_project)?;
 
         Ok(project)
     }
