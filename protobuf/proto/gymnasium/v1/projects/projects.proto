@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package proto.gymnasium.v1.projects;
+
+// Projects service definitions.
+service Projects {
+    // Projects listing definition.
+    rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+}
+
+// Representation of the Project.
+message Project {
+    // Unique identifier for the Project. Text representation of the UUID.
+    string id = 1;
+
+    // The description of the Project.
+    string description = 2;
+
+    // The name of the Project.
+    string name = 3;
+
+    // The slug of the Project. Unique identifier for the Project's web address.
+    string slug = 4;
+
+    // The timestamp when the Project was arcived.
+    google.protobuf.Timestamp archive_time = 5;
+
+    // The creation time of the Project.
+    google.protobuf.Timestamp create_time = 6;
+
+    // The timestamp of the last Project's udpate.
+    google.protobuf.Timestamp update_time = 7;
+}
+
+// Request definition for Projects listing.
+message ListProjectsRequest {
+    // Filter Projects by archivation state.
+    ProjectArchiveState archive_state = 1;
+}
+
+// Server's response on Projects listing request.
+message ListProjectsResponse {
+    // List of Projects.
+    repeated Project projects = 1;
+}
+
+// All possible Project archive state.
+enum ProjectArchiveState {
+    // Unspecified
+    PROJECT_ARCHIVE_STATE_UNSPECIFIED = 0;
+
+    // Archived
+    PROJECT_ARCHIVE_STATE_ARCHIVED = 1;
+
+    // Not archived
+    PROJECT_ARCHIVE_STATE_NOT_ARCHIVED = 2;
+
+    // Any
+    PROJECT_ARCHIVE_STATE_ANY = 3;
+}

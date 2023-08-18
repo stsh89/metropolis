@@ -346,107 +346,73 @@ defmodule Proto.Gymnasium.V1.Dimensions.Service do
 
   use GRPC.Service, name: "proto.gymnasium.v1.Dimensions", protoc_gen_elixir_version: "0.12.0"
 
-  rpc(
-    :ListProjectRecords,
-    Proto.Gymnasium.V1.ListProjectRecordsRequest,
-    Proto.Gymnasium.V1.ListProjectRecordsResponse
-  )
+  rpc :ListProjectRecords,
+      Proto.Gymnasium.V1.ListProjectRecordsRequest,
+      Proto.Gymnasium.V1.ListProjectRecordsResponse
 
-  rpc(
-    :GetProjectRecord,
-    Proto.Gymnasium.V1.GetProjectRecordRequest,
-    Proto.Gymnasium.V1.GetProjectRecordResponse
-  )
+  rpc :GetProjectRecord,
+      Proto.Gymnasium.V1.GetProjectRecordRequest,
+      Proto.Gymnasium.V1.GetProjectRecordResponse
 
-  rpc(
-    :CreateProjectRecord,
-    Proto.Gymnasium.V1.CreateProjectRecordRequest,
-    Proto.Gymnasium.V1.CreateProjectRecordResponse
-  )
+  rpc :CreateProjectRecord,
+      Proto.Gymnasium.V1.CreateProjectRecordRequest,
+      Proto.Gymnasium.V1.CreateProjectRecordResponse
 
-  rpc(
-    :ArchiveProjectRecord,
-    Proto.Gymnasium.V1.ArchiveProjectRecordRequest,
-    Proto.Gymnasium.V1.ArchiveProjectRecordResponse
-  )
+  rpc :ArchiveProjectRecord,
+      Proto.Gymnasium.V1.ArchiveProjectRecordRequest,
+      Proto.Gymnasium.V1.ArchiveProjectRecordResponse
 
-  rpc(
-    :RestoreProjectRecord,
-    Proto.Gymnasium.V1.RestoreProjectRecordRequest,
-    Proto.Gymnasium.V1.RestoreProjectRecordResponse
-  )
+  rpc :RestoreProjectRecord,
+      Proto.Gymnasium.V1.RestoreProjectRecordRequest,
+      Proto.Gymnasium.V1.RestoreProjectRecordResponse
 
-  rpc(
-    :DeleteProjectRecord,
-    Proto.Gymnasium.V1.DeleteProjectRecordRequest,
-    Proto.Gymnasium.V1.DeleteProjectRecordResponse
-  )
+  rpc :DeleteProjectRecord,
+      Proto.Gymnasium.V1.DeleteProjectRecordRequest,
+      Proto.Gymnasium.V1.DeleteProjectRecordResponse
 
-  rpc(
-    :RenameProjectRecord,
-    Proto.Gymnasium.V1.RenameProjectRecordRequest,
-    Proto.Gymnasium.V1.RenameProjectRecordResponse
-  )
+  rpc :RenameProjectRecord,
+      Proto.Gymnasium.V1.RenameProjectRecordRequest,
+      Proto.Gymnasium.V1.RenameProjectRecordResponse
 
-  rpc(
-    :ListModelRecords,
-    Proto.Gymnasium.V1.ListModelRecordsRequest,
-    Proto.Gymnasium.V1.ListModelRecordsResponse
-  )
+  rpc :ListModelRecords,
+      Proto.Gymnasium.V1.ListModelRecordsRequest,
+      Proto.Gymnasium.V1.ListModelRecordsResponse
 
-  rpc(
-    :CreateModelRecord,
-    Proto.Gymnasium.V1.CreateModelRecordRequest,
-    Proto.Gymnasium.V1.CreateModelRecordResponse
-  )
+  rpc :CreateModelRecord,
+      Proto.Gymnasium.V1.CreateModelRecordRequest,
+      Proto.Gymnasium.V1.CreateModelRecordResponse
 
-  rpc(
-    :GetModelRecord,
-    Proto.Gymnasium.V1.GetModelRecordRequest,
-    Proto.Gymnasium.V1.GetModelRecordResponse
-  )
+  rpc :GetModelRecord,
+      Proto.Gymnasium.V1.GetModelRecordRequest,
+      Proto.Gymnasium.V1.GetModelRecordResponse
 
-  rpc(
-    :DeleteModelRecord,
-    Proto.Gymnasium.V1.DeleteModelRecordRequest,
-    Proto.Gymnasium.V1.DeleteModelRecordResponse
-  )
+  rpc :DeleteModelRecord,
+      Proto.Gymnasium.V1.DeleteModelRecordRequest,
+      Proto.Gymnasium.V1.DeleteModelRecordResponse
 
-  rpc(
-    :CreateModelAttributeRecord,
-    Proto.Gymnasium.V1.CreateModelAttributeRecordRequest,
-    Proto.Gymnasium.V1.CreateModelAttributeRecordResponse
-  )
+  rpc :CreateModelAttributeRecord,
+      Proto.Gymnasium.V1.CreateModelAttributeRecordRequest,
+      Proto.Gymnasium.V1.CreateModelAttributeRecordResponse
 
-  rpc(
-    :GetModelAttributeRecord,
-    Proto.Gymnasium.V1.GetModelAttributeRecordRequest,
-    Proto.Gymnasium.V1.GetModelAttributeRecordResponse
-  )
+  rpc :GetModelAttributeRecord,
+      Proto.Gymnasium.V1.GetModelAttributeRecordRequest,
+      Proto.Gymnasium.V1.GetModelAttributeRecordResponse
 
-  rpc(
-    :DeleteModelAttributeRecord,
-    Proto.Gymnasium.V1.DeleteModelAttributeRecordRequest,
-    Proto.Gymnasium.V1.DeleteModelAttributeRecordResponse
-  )
+  rpc :DeleteModelAttributeRecord,
+      Proto.Gymnasium.V1.DeleteModelAttributeRecordRequest,
+      Proto.Gymnasium.V1.DeleteModelAttributeRecordResponse
 
-  rpc(
-    :CreateModelAssociationRecord,
-    Proto.Gymnasium.V1.CreateModelAssociationRecordRequest,
-    Proto.Gymnasium.V1.CreateModelAssociationRecordResponse
-  )
+  rpc :CreateModelAssociationRecord,
+      Proto.Gymnasium.V1.CreateModelAssociationRecordRequest,
+      Proto.Gymnasium.V1.CreateModelAssociationRecordResponse
 
-  rpc(
-    :GetModelAssociationRecord,
-    Proto.Gymnasium.V1.GetModelAssociationRecordRequest,
-    Proto.Gymnasium.V1.GetModelAssociationRecordResponse
-  )
+  rpc :GetModelAssociationRecord,
+      Proto.Gymnasium.V1.GetModelAssociationRecordRequest,
+      Proto.Gymnasium.V1.GetModelAssociationRecordResponse
 
-  rpc(
-    :DeleteModelAssociationRecord,
-    Proto.Gymnasium.V1.DeleteModelAssociationRecordRequest,
-    Proto.Gymnasium.V1.DeleteModelAssociationRecordResponse
-  )
+  rpc :DeleteModelAssociationRecord,
+      Proto.Gymnasium.V1.DeleteModelAssociationRecordRequest,
+      Proto.Gymnasium.V1.DeleteModelAssociationRecordResponse
 end
 
 defmodule Proto.Gymnasium.V1.Dimensions.Stub do
@@ -460,11 +426,9 @@ defmodule Proto.Gymnasium.V1.HealthCheck.Service do
 
   use GRPC.Service, name: "proto.gymnasium.v1.HealthCheck", protoc_gen_elixir_version: "0.12.0"
 
-  rpc(
-    :GetHealthCheck,
-    Proto.Gymnasium.V1.GetHealthCheckRequest,
-    Proto.Gymnasium.V1.GetHealthCheckResponse
-  )
+  rpc :GetHealthCheck,
+      Proto.Gymnasium.V1.GetHealthCheckRequest,
+      Proto.Gymnasium.V1.GetHealthCheckResponse
 end
 
 defmodule Proto.Gymnasium.V1.HealthCheck.Stub do

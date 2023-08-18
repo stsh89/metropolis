@@ -7,7 +7,12 @@
       "core::0127::http-annotation",
       "core::0123::resource-annotation",
       "core::0132::request-parent-required",
-      "core::0203::field-behavior-required"
+      "core::0203::field-behavior-required",
+      "core::0158::response-next-page-token-field",
+      "core::0132::request-unknown-fields",
+      "core::0158::request-page-token-field",
+      "core::0158::request-page-size-field",
+      "core::0216::state-field-output-only"
     ]
   }
 ]

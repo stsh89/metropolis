@@ -5,6 +5,7 @@ defmodule GymnasiumGrpc.Endpoint do
 
   run([
     GymnasiumGrpc.DimensionsServer,
-    GymnasiumGrpc.HealthCheckServer
+    GymnasiumGrpc.HealthCheckServer,
+    GymnasiumGrpc.ProjectsServer,
   ])
 end
