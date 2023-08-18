@@ -8,6 +8,9 @@ package proto.gymnasium.v1.projects;
 service Projects {
     // Projects listing definition.
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+
+    // Find Project by it's web unique identifier.
+    rpc FindProject(FindProjectRequest) returns (Project);
 }
 
 // Representation of the Project.
@@ -44,6 +47,12 @@ message ListProjectsRequest {
 message ListProjectsResponse {
     // List of Projects.
     repeated Project projects = 1;
+}
+
+// Request definition for Project finding.
+message FindProjectRequest {
+    // Project's unique web identifier.
+    string slug = 1;
 }
 
 // All possible Project archive state.

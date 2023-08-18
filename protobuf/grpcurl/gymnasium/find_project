@@ -2,10 +2,10 @@
 
 grpcurl -d @ \
     -import-path ./protobuf \
-    -proto ./protobuf/proto/gymnasium/v1/dimensions.proto \
+    -proto ./protobuf/proto/gymnasium/v1/projects/projects.proto \
     -plaintext \
     localhost:50052 \
-    proto.gymnasium.v1.Dimensions/GetProjectRecord <<EOM
+    proto.gymnasium.v1.projects.Projects/FindProject <<EOM
 {
     "slug": "book-store"
 }

@@ -2,10 +2,11 @@ defmodule GymnasiumGrpc.ProjectServiceTest do
   use Gymnasium.DataCase
 
   alias GymnasiumGrpc.ProjectService
+  alias Gymnasium.Dimensions.Project
+
+  import Gymnasium.ProjectsFixtures
 
   describe "filter projects by archive state" do
-    import Gymnasium.ProjectsFixtures
-
     setup do
       archived_project = archived_project_fixture()
       project = project_fixture()
@@ -53,6 +54,18 @@ defmodule GymnasiumGrpc.ProjectServiceTest do
       context
       |> projects_list()
       |> Enum.filter(fn p -> p.archived_at == nil end)
+    end
+  end
+
+  describe "find Project by slug" do
+    test "find_project/1 returns found Project" do
+      project = %Project{slug: slug} = project_fixture()
+
+      assert ProjectService.find_project(slug) == project
+    end
+
+    test "find_project/1 returns nil when Project is not found" do
+      assert ProjectService.find_project("") == nil
     end
   end
 end

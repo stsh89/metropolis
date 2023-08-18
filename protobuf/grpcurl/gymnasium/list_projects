@@ -7,6 +7,6 @@ grpcurl -d @ \
     localhost:50052 \
     proto.gymnasium.v1.projects.Projects/ListProjects <<EOM
 {
-    "archive_state": 5
+    "archive_state": 0
 }
 EOM

@@ -2,10 +2,11 @@ defmodule Gymnasium.ProjectsTest do
   use Gymnasium.DataCase
 
   alias Gymnasium.Projects
+  alias Gymnasium.Dimensions.Project
+
+  import Gymnasium.ProjectsFixtures
 
   describe "filter projects by `archived_at` field`" do
-    import Gymnasium.ProjectsFixtures
-
     setup do
       archived_project = archived_project_fixture()
       project = project_fixture()
@@ -47,6 +48,18 @@ defmodule Gymnasium.ProjectsTest do
       context
       |> projects_list()
       |> Enum.filter(fn p -> p.archived_at == nil end)
+    end
+  end
+
+  describe "get a single Project by it's slug" do
+    test "find_project/1 returns single Project" do
+      project = %Project{slug: slug} = project_fixture()
+
+      assert Projects.find_project!(slug) == project
+    end
+
+    test "find_project/1 raises error when Project is not found" do
+      assert_raise Ecto.NoResultsError, fn -> Projects.find_project!("") end
     end
   end
 end

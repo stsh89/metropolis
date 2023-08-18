@@ -12,7 +12,10 @@
       "core::0132::request-unknown-fields",
       "core::0158::request-page-token-field",
       "core::0158::request-page-size-field",
-      "core::0216::state-field-output-only"
+      "core::0216::state-field-output-only",
+      "core::0131::method-signature",
+      "core::0131::request-name-required",
+      "core::0131::request-unknown-fields"
     ]
   }
 ]

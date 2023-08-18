@@ -5,12 +5,42 @@ defmodule GymnasiumGrpc.ProjectsServerTest do
 
   alias Proto.Gymnasium.V1.Projects.{
     ListProjectsRequest,
-    ListProjectsResponse
+    ListProjectsResponse,
+    FindProjectRequest
   }
 
-  describe "Projects listing" do
-    import Gymnasium.ProjectsFixtures
+  alias Gymnasium.Dimensions.Project
 
+  import Gymnasium.ProjectsFixtures
+
+  describe "find Project by slug" do
+    test "find_project/2 returns found Project" do
+      %Project{slug: slug, name: name} = project_fixture()
+
+      proto_project =
+        ProjectsServer.find_project(
+          %FindProjectRequest{
+            slug: slug
+          },
+          nil
+        )
+
+      assert name == proto_project.name
+    end
+
+    test "find_project/2 raises NotFound error" do
+      assert_raise GRPC.RPCError, "Project with the slug \"\" was not found.", fn ->
+        ProjectsServer.find_project(
+          %FindProjectRequest{
+            slug: ""
+          },
+          nil
+        )
+      end
+    end
+  end
+
+  describe "Projects listing" do
     setup do
       archived_project = archived_project_fixture()
       project = project_fixture()

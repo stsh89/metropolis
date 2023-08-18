@@ -42,6 +42,14 @@ defmodule Proto.Gymnasium.V1.Projects.ListProjectsResponse do
   field :projects, 1, repeated: true, type: Proto.Gymnasium.V1.Projects.Project
 end
 
+defmodule Proto.Gymnasium.V1.Projects.FindProjectRequest do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :slug, 1, type: :string
+end
+
 defmodule Proto.Gymnasium.V1.Projects.Projects.Service do
   @moduledoc false
 
@@ -53,6 +61,12 @@ defmodule Proto.Gymnasium.V1.Projects.Projects.Service do
     :ListProjects,
     Proto.Gymnasium.V1.Projects.ListProjectsRequest,
     Proto.Gymnasium.V1.Projects.ListProjectsResponse
+  )
+
+  rpc(
+    :FindProject,
+    Proto.Gymnasium.V1.Projects.FindProjectRequest,
+    Proto.Gymnasium.V1.Projects.Project
   )
 end
 

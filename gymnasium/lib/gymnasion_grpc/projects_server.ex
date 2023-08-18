@@ -8,10 +8,26 @@ defmodule GymnasiumGrpc.ProjectsServer do
 
   alias Proto.Gymnasium.V1.Projects.{
     ListProjectsRequest,
-    ListProjectsResponse
+    ListProjectsResponse,
+    FindProjectRequest
   }
 
   alias GymnasiumGrpc.ProjectService
+
+  def find_project(%FindProjectRequest{} = request, _stream) do
+    %FindProjectRequest{
+      slug: slug
+    } = request
+
+    case ProjectService.find_project(slug) do
+      %Project{} = project ->
+        to_proto_project(project)
+
+      _ ->
+        message = "Project with the slug \"#{slug}\" was not found."
+        raise GRPC.RPCError, status: :not_found, message: message
+    end
+  end
 
   def list_projects(%ListProjectsRequest{} = request, _stream) do
     %ListProjectsRequest{
