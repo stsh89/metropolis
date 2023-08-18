@@ -2,6 +2,8 @@ use crate::{util, PortalError, PortalErrorCode, PortalResult};
 use foundation::{datastore, model, project, FoundationError, FoundationResult};
 
 pub mod proto {
+    tonic::include_proto!("proto.gymnasium.v1.projects");
+
     tonic::include_proto!("proto.gymnasium.v1");
 
     pub mod dimensions {
@@ -321,35 +323,47 @@ impl Repo {
             .map_err(|err| PortalError::internal(err.to_string()))
     }
 
+    async fn projects_client(
+        &self,
+    ) -> PortalResult<proto::projects_client::ProjectsClient<tonic::transport::Channel>> {
+        proto::projects_client::ProjectsClient::connect(self.connection_string.clone())
+            .await
+            .map_err(|err| PortalError::internal(err.to_string()))
+    }
+
     async fn list_projects(&self) -> PortalResult<Vec<datastore::project::Project>> {
-        let mut client = self.connect().await?;
+        let mut client = self.projects_client().await?;
 
         let response = client
-            .list_project_records(proto::ListProjectRecordsRequest { archived: false })
+            .list_projects(proto::ListProjectsRequest {
+                archive_state: proto::ProjectArchiveState::NotArchived.into(),
+            })
             .await?
             .into_inner();
 
         let projects = response
-            .project_records
+            .projects
             .into_iter()
-            .map(from_proto_project)
+            .map(datastore_project)
             .collect::<PortalResult<Vec<datastore::project::Project>>>()?;
 
         Ok(projects)
     }
 
     async fn list_archived_projects(&self) -> PortalResult<Vec<datastore::project::Project>> {
-        let mut client = self.connect().await?;
+        let mut client = self.projects_client().await?;
 
         let response = client
-            .list_project_records(proto::ListProjectRecordsRequest { archived: true })
+            .list_projects(proto::ListProjectsRequest {
+                archive_state: proto::ProjectArchiveState::Archived.into(),
+            })
             .await?
             .into_inner();
 
         let projects = response
-            .project_records
+            .projects
             .into_iter()
-            .map(from_proto_project)
+            .map(datastore_project)
             .collect::<PortalResult<Vec<datastore::project::Project>>>()?;
 
         Ok(projects)
@@ -751,6 +765,31 @@ impl Repo {
 
         Ok(())
     }
+}
+
+fn datastore_project(proto_project: proto::Project) -> PortalResult<datastore::project::Project> {
+    let create_time = proto_project
+        .create_time
+        .ok_or(PortalError::internal("missing #create_time for Project"))?;
+
+    let update_time = proto_project
+        .update_time
+        .ok_or(PortalError::internal("missing #update_time for Project"))?;
+
+    let project = datastore::project::Project {
+        id: util::proto::uuid_from_proto_string(&proto_project.id, "id")?,
+        archived_at: proto_project
+            .archive_time
+            .map(|timestamp| util::proto::from_proto_timestamp(timestamp, "archive_time"))
+            .transpose()?,
+        description: proto_project.description,
+        name: proto_project.name,
+        slug: proto_project.slug,
+        inserted_at: util::proto::from_proto_timestamp(create_time, "insert_time")?,
+        updated_at: util::proto::from_proto_timestamp(update_time, "update_time")?,
+    };
+
+    Ok(project)
 }
 
 fn from_proto_project(

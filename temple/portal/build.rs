@@ -10,6 +10,7 @@ fn compile_proto_gymnasium_v1() -> Result<(), Box<dyn std::error::Error>> {
         "dimensions.proto",
         "dimensions/project.proto",
         "dimensions/model.proto",
+        "projects/projects.proto",
     ];
 
     let protos: Vec<String> = files
