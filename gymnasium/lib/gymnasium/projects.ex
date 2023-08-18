@@ -20,17 +20,19 @@ defmodule Gymnasium.Projects do
   def list_projects(attrs \\ []) do
     query = from p in Project, order_by: [desc: p.inserted_at]
 
-    query = if attrs[:archived_only] do
-      from p in query, where: not is_nil(p.archived_at)
-    else
-      query
-    end
+    query =
+      if attrs[:archived_only] do
+        from p in query, where: not is_nil(p.archived_at)
+      else
+        query
+      end
 
-    query = if attrs[:not_archived_only] do
-      from p in query, where: is_nil(p.archived_at)
-    else
-      query
-    end
+    query =
+      if attrs[:not_archived_only] do
+        from p in query, where: is_nil(p.archived_at)
+      else
+        query
+      end
 
     Repo.all(query)
   end

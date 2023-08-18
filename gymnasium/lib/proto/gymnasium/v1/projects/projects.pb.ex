@@ -49,9 +49,11 @@ defmodule Proto.Gymnasium.V1.Projects.Projects.Service do
     name: "proto.gymnasium.v1.projects.Projects",
     protoc_gen_elixir_version: "0.12.0"
 
-  rpc :ListProjects,
-      Proto.Gymnasium.V1.Projects.ListProjectsRequest,
-      Proto.Gymnasium.V1.Projects.ListProjectsResponse
+  rpc(
+    :ListProjects,
+    Proto.Gymnasium.V1.Projects.ListProjectsRequest,
+    Proto.Gymnasium.V1.Projects.ListProjectsResponse
+  )
 end
 
 defmodule Proto.Gymnasium.V1.Projects.Projects.Stub do
