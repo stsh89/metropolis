@@ -1,10 +1,3 @@
-defmodule Proto.Gymnasium.Endpoint do
-  use GRPC.Endpoint
-
-  intercept GRPC.Server.Interceptors.Logger
-  run(Proto.Gymnasium.V1.Dimensions.Server)
-end
-
 defmodule Proto.Gymnasium.V1.Dimensions.Server do
   use GRPC.Server, service: Proto.Gymnasium.V1.Dimensions.Service
 

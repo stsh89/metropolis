@@ -28,6 +28,22 @@ service Dimensions {
     rpc DeleteModelAssociationRecord(DeleteModelAssociationRecordRequest) returns (DeleteModelAssociationRecordResponse);
 }
 
+service HealthCheck {
+    rpc GetHealthCheck(GetHealthCheckRequest) returns (GetHealthCheckResponse);
+}
+
+message GetHealthCheckRequest {}
+
+enum HealthCheckStatus {
+    HealthCheckStatusUnspecified = 0;
+    HealthCheckStatusHealthy = 1;
+    HealthCheckStatusUnhealthy = 2;
+}
+
+message GetHealthCheckResponse {
+    HealthCheckStatus status = 1;
+}
+
 message ListProjectRecordsRequest{
     bool archived = 1;
 }
