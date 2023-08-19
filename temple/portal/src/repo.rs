@@ -451,10 +451,10 @@ impl Repo {
     }
 
     async fn delete_project(&self, project: datastore::project::Project) -> PortalResult<()> {
-        let mut client = self.connect().await?;
+        let mut client = self.projects_client().await?;
 
         client
-            .delete_project_record(proto::DeleteProjectRecordRequest {
+            .delete_project(proto::DeleteProjectRequest {
                 id: project.id.to_string(),
             })
             .await?;
