@@ -406,48 +406,28 @@ impl Repo {
         Ok(project)
     }
 
-    async fn archive_project(
-        &self,
-        project: datastore::project::Project,
-    ) -> PortalResult<datastore::project::Project> {
-        let mut client = self.connect().await?;
+    async fn archive_project(&self, project: datastore::project::Project) -> PortalResult<()> {
+        let mut client = self.projects_client().await?;
 
-        let response = client
-            .archive_project_record(proto::ArchiveProjectRecordRequest {
+        client
+            .archive_project(proto::ArchiveProjectRequest {
                 id: project.id.to_string(),
             })
-            .await?
-            .into_inner();
+            .await?;
 
-        let proto_project = response
-            .project_record
-            .ok_or(PortalError::internal("empty project_record"))?;
-
-        let project = from_proto_project(proto_project)?;
-
-        Ok(project)
+        Ok(())
     }
 
-    async fn restore_project(
-        &self,
-        project: datastore::project::Project,
-    ) -> PortalResult<datastore::project::Project> {
-        let mut client = self.connect().await?;
+    async fn restore_project(&self, project: datastore::project::Project) -> PortalResult<()> {
+        let mut client = self.projects_client().await?;
 
-        let response = client
-            .restore_project_record(proto::RestoreProjectRecordRequest {
+        client
+            .restore_project(proto::RestoreProjectRequest {
                 id: project.id.to_string(),
             })
-            .await?
-            .into_inner();
+            .await?;
 
-        let proto_project = response
-            .project_record
-            .ok_or(PortalError::internal("empty project_record"))?;
-
-        let project = from_proto_project(proto_project)?;
-
-        Ok(project)
+        Ok(())
     }
 
     async fn delete_project(&self, project: datastore::project::Project) -> PortalResult<()> {
