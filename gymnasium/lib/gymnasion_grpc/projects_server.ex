@@ -10,7 +10,9 @@ defmodule GymnasiumGrpc.ProjectsServer do
     DeleteProjectRequest,
     FindProjectRequest,
     ListProjectsRequest,
-    ListProjectsResponse
+    ListProjectsResponse,
+    ArchiveProjectRequest,
+    RestoreProjectRequest
   }
 
   alias GymnasiumGrpc.ProjectService
@@ -63,11 +65,42 @@ defmodule GymnasiumGrpc.ProjectsServer do
     end
   end
 
+  def archive_project(%ArchiveProjectRequest{} = request, _stream) do
+    %ArchiveProjectRequest{
+      id: id
+    } = request
+
+    case ProjectService.archive_project(id) do
+      :ok ->
+        %Google.Protobuf.Empty{}
+
+      :error ->
+        raise GRPC.RPCError, status: :internal
+    end
+  end
+
+  def restore_project(%RestoreProjectRequest{} = request, _stream) do
+    %RestoreProjectRequest{
+      id: id
+    } = request
+
+    case ProjectService.restore_project(id) do
+      :ok ->
+        %Google.Protobuf.Empty{}
+
+      :error ->
+        raise GRPC.RPCError, status: :internal
+    end
+  end
+
   defp archive_state_from_proto(:PROJECT_ARCHIVE_STATE_UNSPECIFIED), do: :any
   defp archive_state_from_proto(:PROJECT_ARCHIVE_STATE_ARCHIVED), do: :archived_only
   defp archive_state_from_proto(:PROJECT_ARCHIVE_STATE_NOT_ARCHIVED), do: :not_archived_only
   defp archive_state_from_proto(:PROJECT_ARCHIVE_STATE_ANY), do: :any
   defp archive_state_from_proto(_), do: :any
+
+  defp project_archive_time(%DateTime{} = date_time), do: Util.to_proto_timestamp(date_time)
+  defp project_archive_time(_), do: nil
 
   defp to_proto_project(%Project{} = project) do
     %ProtoProject{
@@ -79,13 +112,5 @@ defmodule GymnasiumGrpc.ProjectsServer do
       create_time: Util.to_proto_timestamp(project.inserted_at),
       update_time: Util.to_proto_timestamp(project.updated_at)
     }
-  end
-
-  defp project_archive_time(%DateTime{} = date_time) do
-    Util.to_proto_timestamp(date_time)
-  end
-
-  defp project_archive_time(_) do
-    nil
   end
 end

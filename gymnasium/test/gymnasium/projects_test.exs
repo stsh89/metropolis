@@ -98,4 +98,36 @@ defmodule Gymnasium.ProjectsTest do
       end
     end
   end
+
+  describe "archive a project" do
+    test "archive_project/1 sets archivation timestamp" do
+      project = project_fixture()
+
+      assert {:ok, %Project{} = archived_project} = Projects.archive_project(project)
+      assert archived_project.archived_at != nil
+    end
+
+    test "archive_project/1 updates archivation timestamp" do
+      archived_project = archived_project_fixture()
+
+      assert {:ok, %Project{} = rearchived_project} = Projects.archive_project(archived_project)
+      assert DateTime.compare(rearchived_project.archived_at, archived_project.archived_at) == :gt
+    end
+  end
+
+  describe "restore a project" do
+    test "restore_project/1 removes archivation timestamp" do
+      archived_project = archived_project_fixture()
+
+      assert {:ok, %Project{} = project} = Projects.restore_project(archived_project)
+      assert project.archived_at == nil
+    end
+
+    test "archive_project/1 does nothing for project" do
+      project = project_fixture()
+
+      assert {:ok, updated_project} = Projects.restore_project(project)
+      assert updated_project == project
+    end
+  end
 end

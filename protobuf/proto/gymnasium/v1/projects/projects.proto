@@ -15,6 +15,12 @@ service Projects {
 
     // Delete a Project.
     rpc DeleteProject(DeleteProjectRequest) returns (google.protobuf.Empty);
+
+    // Mark Project as archived.
+    rpc ArchiveProject(ArchiveProjectRequest) returns (google.protobuf.Empty);
+
+    // Unmark Project as archived.
+    rpc RestoreProject(RestoreProjectRequest) returns (google.protobuf.Empty);
 }
 
 // Representation of the Project.
@@ -61,6 +67,18 @@ message FindProjectRequest {
 
 // Request definition for Project deletion.
 message DeleteProjectRequest {
+    // Unique Project identifier. UUID in a string form.
+    string id = 1;
+}
+
+// Request definition for Project archivation.
+message ArchiveProjectRequest {
+    // Unique Project identifier. UUID in a string form.
+    string id = 1;
+}
+
+// Request definition for Project restoretion.
+message RestoreProjectRequest {
     // Unique Project identifier. UUID in a string form.
     string id = 1;
 }

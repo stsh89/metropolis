@@ -7,7 +7,9 @@ defmodule GymnasiumGrpc.ProjectsServerTest do
     DeleteProjectRequest,
     FindProjectRequest,
     ListProjectsRequest,
-    ListProjectsResponse
+    ListProjectsResponse,
+    ArchiveProjectRequest,
+    RestoreProjectRequest
   }
 
   alias Gymnasium.Dimensions.Project
@@ -143,10 +145,64 @@ defmodule GymnasiumGrpc.ProjectsServerTest do
       assert %Google.Protobuf.Empty{} == response
     end
 
-    test "delete_project/2 raises NotFound error" do
+    test "delete_project/2 raises internal error" do
       assert_raise GRPC.RPCError, "Internal errors", fn ->
         ProjectsServer.delete_project(
           %DeleteProjectRequest{
+            id: Ecto.UUID.generate()
+          },
+          nil
+        )
+      end
+    end
+  end
+
+  describe "archive Project by id" do
+    test "archive_project/2 returns Google.Protobuf.Empty response" do
+      %Project{id: id} = project_fixture()
+
+      response =
+        ProjectsServer.archive_project(
+          %ArchiveProjectRequest{
+            id: id
+          },
+          nil
+        )
+
+      assert %Google.Protobuf.Empty{} == response
+    end
+
+    test "archive_project/2 raises internal error" do
+      assert_raise GRPC.RPCError, "Internal errors", fn ->
+        ProjectsServer.archive_project(
+          %ArchiveProjectRequest{
+            id: Ecto.UUID.generate()
+          },
+          nil
+        )
+      end
+    end
+  end
+
+  describe "restore Project by id" do
+    test "restore_project/2 returns Google.Protobuf.Empty response" do
+      %Project{id: id} = archived_project_fixture()
+
+      response =
+        ProjectsServer.restore_project(
+          %RestoreProjectRequest{
+            id: id
+          },
+          nil
+        )
+
+      assert %Google.Protobuf.Empty{} == response
+    end
+
+    test "restore_project/2 raises internal error" do
+      assert_raise GRPC.RPCError, "Internal errors", fn ->
+        ProjectsServer.restore_project(
+          %RestoreProjectRequest{
             id: Ecto.UUID.generate()
           },
           nil

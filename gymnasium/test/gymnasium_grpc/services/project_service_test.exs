@@ -3,6 +3,7 @@ defmodule GymnasiumGrpc.ProjectServiceTest do
 
   alias GymnasiumGrpc.ProjectService
   alias Gymnasium.Dimensions.Project
+  alias Gymnasium.Projects
 
   import Gymnasium.ProjectsFixtures
 
@@ -74,10 +75,37 @@ defmodule GymnasiumGrpc.ProjectServiceTest do
       %Project{id: id} = project_fixture()
 
       assert ProjectService.delete_project(id) == :ok
+      assert true == Projects.list_projects() |> Enum.empty?()
     end
 
     test "find_project/1 returns :error on failed deletion" do
-      assert ProjectService.delete_project("") == :error
+      assert ProjectService.delete_project(Ecto.UUID.generate()) == :error
+    end
+  end
+
+  describe "archive Project" do
+    test "archive_project/1 returns :ok on successfull archivation" do
+      %Project{id: id} = project_fixture()
+
+      assert ProjectService.archive_project(id) == :ok
+      assert true == Projects.list_projects(not_archived_only: true) |> Enum.empty?()
+    end
+
+    test "archive_project/1 returns :error on failed archivation" do
+      assert ProjectService.archive_project(Ecto.UUID.generate()) == :error
+    end
+  end
+
+  describe "restore Project" do
+    test "restore_project/1 returns :ok on successfull restoration" do
+      %Project{id: id} = archived_project_fixture()
+
+      assert ProjectService.restore_project(id) == :ok
+      assert true == Projects.list_projects(archived_only: true) |> Enum.empty?()
+    end
+
+    test "restore_project/1 returns :error on failed restoration" do
+      assert ProjectService.restore_project(Ecto.UUID.generate()) == :error
     end
   end
 end

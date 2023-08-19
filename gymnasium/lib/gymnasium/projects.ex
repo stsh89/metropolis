@@ -26,7 +26,7 @@ defmodule Gymnasium.Projects do
       [%Project{}, ...]
 
   """
-  @spec list_projects(Keyword.t()) :: t
+  @spec list_projects(Keyword.t()) :: [t]
   def list_projects(attrs \\ []) do
     query = from p in Project, order_by: [desc: p.inserted_at]
 
@@ -116,5 +116,58 @@ defmodule Gymnasium.Projects do
 
       Repo.delete!(project)
     end)
+  end
+
+  @doc """
+  Sets archivation timestamp on a project.
+  Updates archivation timestamp if a project was already archived.
+
+  ## Examples
+
+      iex> archive_project()
+      {:ok, %Project{}}
+
+      iex> archive_project()
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec archive_project(Project.t()) :: {:ok, Project.t()} | {:error, %Ecto.Changeset{}}
+  def archive_project(%Project{} = project) do
+    project
+    |> change_project(%{archived_at: DateTime.utc_now()})
+    |> Repo.update()
+  end
+
+  @doc """
+  Removes archivation timestamp from a project.
+  Does nothing if a project was not archived.
+
+  ## Examples
+
+      iex> restore_project()
+      {:ok, %Project{}}
+
+      iex> restore_project()
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec restore_project(Project.t()) :: {:ok, Project.t()} | {:error, %Ecto.Changeset{}}
+  def restore_project(%Project{} = project) do
+    project
+    |> change_project(%{archived_at: nil})
+    |> Repo.update()
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking project changes.
+
+  ## Examples
+
+      iex> change_project(project)
+      %Ecto.Changeset{data: %Project{}}
+
+  """
+  def change_project(%Project{} = project, attrs \\ %{}) do
+    Project.changeset(project, attrs)
   end
 end

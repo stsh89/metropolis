@@ -58,6 +58,22 @@ defmodule Proto.Gymnasium.V1.Projects.DeleteProjectRequest do
   field :id, 1, type: :string
 end
 
+defmodule Proto.Gymnasium.V1.Projects.ArchiveProjectRequest do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :id, 1, type: :string
+end
+
+defmodule Proto.Gymnasium.V1.Projects.RestoreProjectRequest do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :id, 1, type: :string
+end
+
 defmodule Proto.Gymnasium.V1.Projects.Projects.Service do
   @moduledoc false
 
@@ -78,6 +94,10 @@ defmodule Proto.Gymnasium.V1.Projects.Projects.Service do
   )
 
   rpc(:DeleteProject, Proto.Gymnasium.V1.Projects.DeleteProjectRequest, Google.Protobuf.Empty)
+
+  rpc(:ArchiveProject, Proto.Gymnasium.V1.Projects.ArchiveProjectRequest, Google.Protobuf.Empty)
+
+  rpc(:RestoreProject, Proto.Gymnasium.V1.Projects.RestoreProjectRequest, Google.Protobuf.Empty)
 end
 
 defmodule Proto.Gymnasium.V1.Projects.Projects.Stub do
