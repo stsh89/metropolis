@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 package proto.gymnasium.v1.projects;
 
@@ -11,6 +12,9 @@ service Projects {
 
     // Find Project by it's web unique identifier.
     rpc FindProject(FindProjectRequest) returns (Project);
+
+    // Delete a Project.
+    rpc DeleteProject(DeleteProjectRequest) returns (google.protobuf.Empty);
 }
 
 // Representation of the Project.
@@ -53,6 +57,12 @@ message ListProjectsResponse {
 message FindProjectRequest {
     // Project's unique web identifier.
     string slug = 1;
+}
+
+// Request definition for Project deletion.
+message DeleteProjectRequest {
+    // Unique Project identifier. UUID in a string form.
+    string id = 1;
 }
 
 // All possible Project archive state.

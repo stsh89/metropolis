@@ -50,6 +50,14 @@ defmodule Proto.Gymnasium.V1.Projects.FindProjectRequest do
   field :slug, 1, type: :string
 end
 
+defmodule Proto.Gymnasium.V1.Projects.DeleteProjectRequest do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :id, 1, type: :string
+end
+
 defmodule Proto.Gymnasium.V1.Projects.Projects.Service do
   @moduledoc false
 
@@ -68,6 +76,8 @@ defmodule Proto.Gymnasium.V1.Projects.Projects.Service do
     Proto.Gymnasium.V1.Projects.FindProjectRequest,
     Proto.Gymnasium.V1.Projects.Project
   )
+
+  rpc(:DeleteProject, Proto.Gymnasium.V1.Projects.DeleteProjectRequest, Google.Protobuf.Empty)
 end
 
 defmodule Proto.Gymnasium.V1.Projects.Projects.Stub do

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+grpcurl -d @ \
+    -import-path ./protobuf \
+    -proto ./protobuf/proto/gymnasium/v1/projects/projects.proto \
+    -plaintext \
+    localhost:50052 \
+    proto.gymnasium.v1.projects.Projects/DeleteProject <<EOM
+{
+    "id": "46a8c90e-c666-45b3-a7f9-55b7727503c2"
+}
+EOM

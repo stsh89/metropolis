@@ -68,4 +68,16 @@ defmodule GymnasiumGrpc.ProjectServiceTest do
       assert ProjectService.find_project("") == nil
     end
   end
+
+  describe "delete Project" do
+    test "delete_project/1 returns :ok on successfull deletion" do
+      %Project{id: id} = project_fixture()
+
+      assert ProjectService.delete_project(id) == :ok
+    end
+
+    test "find_project/1 returns :error on failed deletion" do
+      assert ProjectService.delete_project("") == :error
+    end
+  end
 end

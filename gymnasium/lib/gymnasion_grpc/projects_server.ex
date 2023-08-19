@@ -7,9 +7,10 @@ defmodule GymnasiumGrpc.ProjectsServer do
   alias Proto.Gymnasium.V1.Projects.Project, as: ProtoProject
 
   alias Proto.Gymnasium.V1.Projects.{
+    DeleteProjectRequest,
+    FindProjectRequest,
     ListProjectsRequest,
-    ListProjectsResponse,
-    FindProjectRequest
+    ListProjectsResponse
   }
 
   alias GymnasiumGrpc.ProjectService
@@ -46,6 +47,20 @@ defmodule GymnasiumGrpc.ProjectsServer do
     %ListProjectsResponse{
       projects: projects
     }
+  end
+
+  def delete_project(%DeleteProjectRequest{} = request, _stream) do
+    %DeleteProjectRequest{
+      id: id
+    } = request
+
+    case ProjectService.delete_project(id) do
+      :ok ->
+        %Google.Protobuf.Empty{}
+
+      :error ->
+        raise GRPC.RPCError, status: :internal
+    end
   end
 
   defp archive_state_from_proto(:PROJECT_ARCHIVE_STATE_UNSPECIFIED), do: :any

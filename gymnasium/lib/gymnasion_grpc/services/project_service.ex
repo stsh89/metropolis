@@ -35,6 +35,36 @@ defmodule GymnasiumGrpc.ProjectService do
     end
   end
 
+  @doc """
+  Delete Project by it's ID.
+
+  Returns :ok if the Project deleted, returns :error otherwise.
+
+  ## Examples
+
+      iex> delete_project("bookstore")
+      :ok
+
+      iex> delete_project("filestore")
+      :error
+
+  """
+  @spec delete_project(String.t()) :: :ok | :error
+  def delete_project(id) do
+    try do
+      id
+      |> Projects.get_project!()
+      |> Projects.delete_project!()
+
+      :ok
+    rescue
+      Ecto.NoResultsError -> :error
+      Ecto.StaleEntryError -> :error
+      Ecto.NoPrimaryKeyValueError -> :error
+      Ecto.Query.CastError -> :error
+    end
+  end
+
   defp archive_state_to_project_list_attrs(archive_state) when archive_state in @archive_states do
     case archive_state do
       :any ->

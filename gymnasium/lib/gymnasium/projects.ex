@@ -6,7 +6,7 @@ defmodule Gymnasium.Projects do
   import Ecto.Query, warn: false
   alias Gymnasium.Repo
 
-  alias Gymnasium.Dimensions.{Project}
+  alias Gymnasium.Dimensions.{Project, Model, ModelAttribute, ModelAssociation}
 
   @type t :: %Project{}
 
@@ -63,4 +63,58 @@ defmodule Gymnasium.Projects do
   """
   @spec find_project!(String.t()) :: t
   def find_project!(slug), do: Repo.get_by!(Project, slug: slug)
+
+  @doc """
+  Gets a single project.
+
+  Raises `Ecto.NoResultsError` if the Project does not exist.
+
+  ## Examples
+
+      iex> get_project!("8e3b5275-bc1b-4490-a2d8-23c68d9b0fd5")
+      %Project{}
+
+      iex> get_project!("8844f7c8-1f83-4fdf-817f-41780c9e5d05")
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_project!(id), do: Repo.get!(Project, id)
+
+  @doc """
+  Deletes a Project.
+
+  Returns the struct or raises `Ecto.NoResultsError` if the changeset is invalid.
+
+  ## Examples
+
+      iex> delete_project!(project)
+      %Project{}
+
+      iex> delete_project(project)
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec delete_project!(Project.t()) :: {:ok, Project.t()} | {:error, Project.t()}
+  def delete_project!(%Project{} = project) do
+    model_ids =
+      if project.id == nil do
+        []
+      else
+        Repo.all(from m in Model, where: m.project_id == ^project.id, select: m.id)
+      end
+
+    model_association_ids =
+      Repo.all(from ma in ModelAssociation, where: ma.model_id in ^model_ids, select: ma.id)
+
+    model_attribute_ids =
+      Repo.all(from ma in ModelAttribute, where: ma.model_id in ^model_ids, select: ma.id)
+
+    Repo.transaction(fn ->
+      Repo.delete_all(from m in Model, where: m.id in ^model_ids)
+      Repo.delete_all(from ma in ModelAssociation, where: ma.id in ^model_association_ids)
+      Repo.delete_all(from ma in ModelAttribute, where: ma.id in ^model_attribute_ids)
+
+      Repo.delete!(project)
+    end)
+  end
 end

@@ -1,10 +1,11 @@
 defmodule Gymnasium.ProjectsTest do
   use Gymnasium.DataCase
 
-  alias Gymnasium.Projects
+  alias Gymnasium.{Projects, Models}
   alias Gymnasium.Dimensions.Project
 
   import Gymnasium.ProjectsFixtures
+  import Gymnasium.ModelsFixtures
 
   describe "filter projects by `archived_at` field`" do
     setup do
@@ -60,6 +61,41 @@ defmodule Gymnasium.ProjectsTest do
 
     test "find_project/1 raises error when Project is not found" do
       assert_raise Ecto.NoResultsError, fn -> Projects.find_project!("") end
+    end
+  end
+
+  describe "delete project" do
+    test "delete_project/1 removes a Project" do
+      project = project_fixture()
+
+      assert {:ok, %Project{}} = Projects.delete_project!(project)
+      assert Projects.list_projects() == []
+    end
+
+    test "delete_project/1 removes a Project with all associations" do
+      project = project_fixture()
+      model = model_fixture(project_id: project.id)
+      associated_model = model_fixture(project_id: project.id, name: "Author", slug: "author")
+      model_attribute_fixture(model_id: model.id)
+      model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
+
+      assert {:ok, %Project{}} = Projects.delete_project!(project)
+      assert Projects.list_projects() == []
+      assert Models.list_models() == []
+      assert Models.list_model_attributes() == []
+      assert Models.list_model_associations() == []
+    end
+
+    test "delete_project/1 raises Ecto.NoPrimaryKeyValueError" do
+      assert_raise Ecto.NoPrimaryKeyValueError, fn ->
+        Projects.delete_project!(%Project{})
+      end
+    end
+
+    test "delete_project/1 raises Ecto.StaleEntryError" do
+      assert_raise Ecto.StaleEntryError, fn ->
+        Projects.delete_project!(%Project{id: Ecto.UUID.generate()})
+      end
     end
   end
 end

@@ -4,9 +4,10 @@ defmodule GymnasiumGrpc.ProjectsServerTest do
   alias GymnasiumGrpc.ProjectsServer
 
   alias Proto.Gymnasium.V1.Projects.{
+    DeleteProjectRequest,
+    FindProjectRequest,
     ListProjectsRequest,
-    ListProjectsResponse,
-    FindProjectRequest
+    ListProjectsResponse
   }
 
   alias Gymnasium.Dimensions.Project
@@ -124,6 +125,33 @@ defmodule GymnasiumGrpc.ProjectsServerTest do
       context
       |> projects_list()
       |> Enum.filter(fn p -> p.archived_at == nil end)
+    end
+  end
+
+  describe "delete Project by id" do
+    test "delete_project/2 returns Google.Protobuf.Empty response" do
+      %Project{id: id} = project_fixture()
+
+      response =
+        ProjectsServer.delete_project(
+          %DeleteProjectRequest{
+            id: id
+          },
+          nil
+        )
+
+      assert %Google.Protobuf.Empty{} == response
+    end
+
+    test "delete_project/2 raises NotFound error" do
+      assert_raise GRPC.RPCError, "Internal errors", fn ->
+        ProjectsServer.delete_project(
+          %DeleteProjectRequest{
+            id: Ecto.UUID.generate()
+          },
+          nil
+        )
+      end
     end
   end
 end
