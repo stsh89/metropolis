@@ -386,10 +386,10 @@ impl Repo {
         &self,
         project: project::Project,
     ) -> PortalResult<datastore::project::Project> {
-        let mut client = self.connect().await?;
+        let mut client = self.projects_client().await?;
 
-        let response = client
-            .create_project_record(proto::CreateProjectRecordRequest {
+        let proto_project = client
+            .create_project(proto::CreateProjectRequest {
                 description: project.description.unwrap_or_default(),
                 name: project.name,
                 slug: project.slug,
@@ -397,11 +397,7 @@ impl Repo {
             .await?
             .into_inner();
 
-        let proto_project = response
-            .project_record
-            .ok_or(PortalError::internal("empty project_record"))?;
-
-        let project = from_proto_project(proto_project)?;
+        let project = datastore_project(proto_project)?;
 
         Ok(project)
     }
