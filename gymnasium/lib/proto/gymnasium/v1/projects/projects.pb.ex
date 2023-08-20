@@ -23,6 +23,16 @@ defmodule Proto.Gymnasium.V1.Projects.Project do
   field :update_time, 7, type: Google.Protobuf.Timestamp, json_name: "updateTime"
 end
 
+defmodule Proto.Gymnasium.V1.Projects.CreateProjectRequest do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :description, 1, type: :string
+  field :name, 2, type: :string
+  field :slug, 3, type: :string
+end
+
 defmodule Proto.Gymnasium.V1.Projects.ListProjectsRequest do
   @moduledoc false
 
@@ -80,6 +90,12 @@ defmodule Proto.Gymnasium.V1.Projects.Projects.Service do
   use GRPC.Service,
     name: "proto.gymnasium.v1.projects.Projects",
     protoc_gen_elixir_version: "0.12.0"
+
+  rpc(
+    :CreateProject,
+    Proto.Gymnasium.V1.Projects.CreateProjectRequest,
+    Proto.Gymnasium.V1.Projects.Project
+  )
 
   rpc(
     :ListProjects,

@@ -7,6 +7,9 @@ package proto.gymnasium.v1.projects;
 
 // Projects service definitions.
 service Projects {
+    // Create Project definition.
+    rpc CreateProject(CreateProjectRequest) returns (Project);
+
     // Projects listing definition.
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
 
@@ -45,6 +48,18 @@ message Project {
 
     // The timestamp of the last Project's udpate.
     google.protobuf.Timestamp update_time = 7;
+}
+
+// Request to create the Project.
+message CreateProjectRequest {
+    // The description of the Project.
+    string description = 1;
+
+    // The name of the Project.
+    string name = 2;
+
+    // The slug of the Project. Unique identifier for the Project's web address.
+    string slug = 3;
 }
 
 // Request definition for Projects listing.

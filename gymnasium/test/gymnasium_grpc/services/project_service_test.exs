@@ -4,8 +4,31 @@ defmodule GymnasiumGrpc.ProjectServiceTest do
   alias GymnasiumGrpc.ProjectService
   alias Gymnasium.Dimensions.Project
   alias Gymnasium.Projects
+  alias GymnasiumGrpc.ProjectService.CreateProjectAttributes
 
   import Gymnasium.ProjectsFixtures
+
+  describe "crate a new Project" do
+    test "create_project/1 saves project" do
+      attributes = %CreateProjectAttributes{
+        name: "Book store",
+        slug: "book-store"
+      }
+
+      assert %Project{} = ProjectService.create_project(attributes)
+      assert false == Projects.list_projects() |> Enum.empty?()
+    end
+
+    test "create_project/1 does not save project with malformed arguments" do
+      attributes = %CreateProjectAttributes{
+        name: "",
+        slug: "book-store"
+      }
+
+      assert :error = ProjectService.create_project(attributes)
+      assert true == Projects.list_projects() |> Enum.empty?()
+    end
+  end
 
   describe "filter projects by archive state" do
     setup do

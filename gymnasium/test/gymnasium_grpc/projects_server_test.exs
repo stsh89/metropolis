@@ -4,17 +4,49 @@ defmodule GymnasiumGrpc.ProjectsServerTest do
   alias GymnasiumGrpc.ProjectsServer
 
   alias Proto.Gymnasium.V1.Projects.{
+    ArchiveProjectRequest,
+    CreateProjectRequest,
     DeleteProjectRequest,
     FindProjectRequest,
     ListProjectsRequest,
     ListProjectsResponse,
-    ArchiveProjectRequest,
     RestoreProjectRequest
   }
+
+  alias Proto.Gymnasium.V1.Projects.Project, as: ProtoProject
 
   alias Gymnasium.Dimensions.Project
 
   import Gymnasium.ProjectsFixtures
+
+  describe "create the Project" do
+    test "create_project/2 saves Project" do
+      proto_project =
+        ProjectsServer.create_project(
+          %CreateProjectRequest{
+            name: "Book store",
+            slug: "book-store",
+            description: "Buy and sell books platform."
+          },
+          nil
+        )
+
+      assert %ProtoProject{name: name} = proto_project
+      assert name == "Book store"
+    end
+
+    test "create_project/2 returns error when request values are malformed" do
+      assert_raise GRPC.RPCError, "Internal errors", fn ->
+        ProjectsServer.create_project(
+          %CreateProjectRequest{
+            name: "",
+            slug: ""
+          },
+          nil
+        )
+      end
+    end
+  end
 
   describe "find Project by slug" do
     test "find_project/2 returns found Project" do

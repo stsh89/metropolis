@@ -11,6 +11,25 @@ defmodule Gymnasium.Projects do
   @type t :: %Project{}
 
   @doc """
+  Creates a project.
+
+  ## Examples
+
+      iex> create_project(%{field: value})
+      {:ok, %Project{}}
+
+      iex> create_project(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec create_project(map()) :: {:ok, t} | {:error, %Ecto.Changeset{}}
+  def create_project(attrs \\ %{}) do
+    %Project{}
+    |> Project.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
   Returns the list of projects.
 
   ## Options

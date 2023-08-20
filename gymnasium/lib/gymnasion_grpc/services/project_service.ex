@@ -1,10 +1,39 @@
 defmodule GymnasiumGrpc.ProjectService do
   alias Gymnasium.Projects
   alias Gymnasium.Dimensions.Project
+  alias GymnasiumGrpc.ProjectService.CreateProjectAttributes
 
   @type t :: Project
 
   @archive_states [:any, :archived_only, :not_archived_only]
+
+  @doc """
+  Create a Project.
+
+  ## Examples
+
+      iex> create_project(%CreateProjectAttributes{name: "Book store", slug: "book-store"})
+      %Project{}
+
+      iex> create_project(%CreateProjectAttributes{})
+      :error
+
+  """
+  @spec create_project(CreateProjectAttributes.t()) :: t | :error
+  def create_project(%CreateProjectAttributes{} = attributes) do
+    result =
+      attributes
+      |> Map.from_struct()
+      |> Projects.create_project()
+
+    case result do
+      {:ok, project} ->
+        project
+
+      {:error, _changset} ->
+        :error
+    end
+  end
 
   @doc """
   Returns the list of projects.

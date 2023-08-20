@@ -7,6 +7,87 @@ defmodule Gymnasium.ProjectsTest do
   import Gymnasium.ProjectsFixtures
   import Gymnasium.ModelsFixtures
 
+  describe "create a project" do
+    test "create_project/1 saves Project" do
+      valid_attrs = %{
+        description: "An online platform for buying and selling books.",
+        name: "Bookstore",
+        slug: "bookstore"
+      }
+
+      assert {:ok, %Project{} = project} = Projects.create_project(valid_attrs)
+      assert false == Projects.list_projects() |> Enum.empty?()
+
+      assert project.description == "An online platform for buying and selling books."
+      assert project.name == "Bookstore"
+      assert project.slug == "bookstore"
+    end
+
+    test "create_project/1 returns error on missing name" do
+      valid_attrs = %{
+        description: "An online platform for buying and selling books.",
+        name: "",
+        slug: "some-slug"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Projects.create_project(valid_attrs)
+      assert errors == [name: {"can't be blank", [validation: :required]}]
+      assert true == Projects.list_projects() |> Enum.empty?()
+    end
+
+    test "create_project/1 returns error on missing slug" do
+      valid_attrs = %{
+        description: "An online platform for buying and selling books.",
+        name: "Some name",
+        slug: ""
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Projects.create_project(valid_attrs)
+      assert errors == [slug: {"can't be blank", [validation: :required]}]
+      assert true == Projects.list_projects() |> Enum.empty?()
+    end
+
+    test "create_project/1 returns error on existing name" do
+      project = %Project{name: name} = project_fixture()
+
+      valid_attrs = %{
+        description: "An online platform for buying and selling books.",
+        name: name,
+        slug: "some-slug"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Projects.create_project(valid_attrs)
+
+      assert errors == [
+               name:
+                 {"has already been taken",
+                  [constraint: :unique, constraint_name: "projects_name_index"]}
+             ]
+
+      assert [project] == Projects.list_projects()
+    end
+
+    test "create_project/1 returns error on existing slug" do
+      project = %Project{slug: slug} = project_fixture()
+
+      valid_attrs = %{
+        description: "An online platform for buying and selling books.",
+        name: "Some name",
+        slug: slug
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Projects.create_project(valid_attrs)
+
+      assert errors == [
+               slug:
+                 {"has already been taken",
+                  [constraint: :unique, constraint_name: "projects_slug_index"]}
+             ]
+
+      assert [project] == Projects.list_projects()
+    end
+  end
+
   describe "filter projects by `archived_at` field`" do
     setup do
       archived_project = archived_project_fixture()

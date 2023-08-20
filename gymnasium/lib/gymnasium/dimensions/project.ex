@@ -1,4 +1,14 @@
 defmodule Gymnasium.Dimensions.Project do
+  @type t() :: %__MODULE__{
+          id: Ecto.UUID.t(),
+          archived_at: Calendar.datetime() | nil,
+          description: String.t(),
+          name: String.t(),
+          slug: String.t(),
+          inserted_at: Calendar.datetime(),
+          updated_at: Calendar.datetime()
+        }
+
   alias Gymnasium.Dimensions.Model
 
   use Gymnasium.Schema

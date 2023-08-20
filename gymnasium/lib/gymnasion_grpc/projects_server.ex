@@ -7,15 +7,39 @@ defmodule GymnasiumGrpc.ProjectsServer do
   alias Proto.Gymnasium.V1.Projects.Project, as: ProtoProject
 
   alias Proto.Gymnasium.V1.Projects.{
+    ArchiveProjectRequest,
+    CreateProjectRequest,
     DeleteProjectRequest,
     FindProjectRequest,
     ListProjectsRequest,
     ListProjectsResponse,
-    ArchiveProjectRequest,
     RestoreProjectRequest
   }
 
   alias GymnasiumGrpc.ProjectService
+  alias GymnasiumGrpc.ProjectService.CreateProjectAttributes
+
+  def create_project(%CreateProjectRequest{} = request, _stream) do
+    %CreateProjectRequest{
+      description: description,
+      name: name,
+      slug: slug
+    } = request
+
+    attributes = %CreateProjectAttributes{
+      description: description,
+      name: name,
+      slug: slug
+    }
+
+    case ProjectService.create_project(attributes) do
+      %Project{} = project ->
+        to_proto_project(project)
+
+      _ ->
+        raise GRPC.RPCError, status: :internal
+    end
+  end
 
   def find_project(%FindProjectRequest{} = request, _stream) do
     %FindProjectRequest{
