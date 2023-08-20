@@ -120,18 +120,18 @@ defmodule Gymnasium.Projects do
   @doc """
   Deletes a Project.
 
-  Returns the struct or raises `Ecto.NoResultsError` if the changeset is invalid.
+  Returns the struct or raises somec Ecto error.
 
   ## Examples
 
       iex> delete_project!(project)
-      %Project{}
+      {:ok, %Project{}}
 
-      iex> delete_project(project)
-      ** (Ecto.NoResultsError)
+      iex> delete_project!(project)
+      Ecto.NoPrimaryKeyValueError
 
   """
-  @spec delete_project!(Project.t()) :: {:ok, Project.t()} | {:error, Project.t()}
+  @spec delete_project!(Project.t()) :: {:ok, Project.t()}
   def delete_project!(%Project{} = project) do
     model_ids =
       if project.id == nil do

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 package proto.gymnasium.v1.projects;
 
@@ -49,7 +49,7 @@ message Project {
     // The creation time of the Project.
     google.protobuf.Timestamp create_time = 6;
 
-    // The timestamp of the last Project's udpate.
+    // The timestamp of the last Project's update.
     google.protobuf.Timestamp update_time = 7;
 }
 

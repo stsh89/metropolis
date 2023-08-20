@@ -9,6 +9,80 @@ defmodule Gymnasium.Models do
   alias Gymnasium.Repo
 
   @doc """
+  Gets a single model.
+
+  Raises `Ecto.NoResultsError` if the Project does not exist.
+
+  ## Examples
+
+      iex> get_model!("8e3b5275-bc1b-4490-a2d8-23c68d9b0fd5")
+      %Project{}
+
+      iex> get_model!("8844f7c8-1f83-4fdf-817f-41780c9e5d05")
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec get_model!(String.t()) :: Model.t()
+  def get_model!(id), do: Repo.get!(Model, id)
+
+  @doc """
+  Creates a model.
+
+  ## Examples
+
+      iex> create_model(%{field: value})
+      {:ok, %Model{}}
+
+      iex> create_model(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec create_model(map()) :: {:ok, Model.t()} | {:error, %Ecto.Changeset{}}
+  def create_model(attrs \\ %{}) do
+    %Model{}
+    |> Model.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Deletes a Model.
+
+  Returns the struct or raises some Ecto error.
+
+  ## Examples
+
+      iex> delete_model!(model)
+      %Model{}
+
+      iex> delete_model!(model)
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec delete_model!(Model.t()) :: {:ok, Model.t()}
+  def delete_model!(%Model{} = model) do
+    model_association_ids =
+      if model.id == nil do
+        []
+      else
+        Repo.all(from ma in ModelAssociation, where: ma.model_id == ^model.id, select: ma.id)
+      end
+
+    model_attribute_ids =
+      if model.id == nil do
+        []
+      else
+        Repo.all(from ma in ModelAttribute, where: ma.model_id == ^model.id, select: ma.id)
+      end
+
+    Repo.transaction(fn ->
+      Repo.delete_all(from ma in ModelAssociation, where: ma.id in ^model_association_ids)
+      Repo.delete_all(from ma in ModelAttribute, where: ma.id in ^model_attribute_ids)
+
+      Repo.delete!(model)
+    end)
+  end
+
+  @doc """
   Returns the list of models.
 
   ## Examples

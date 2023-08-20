@@ -24,6 +24,6 @@ message Project {
     // The creation time of the Project.
     google.protobuf.Timestamp create_time = 6;
 
-    // The timestamp of the last Project's udpate.
+    // The timestamp of the last Project's update.
     google.protobuf.Timestamp update_time = 7;
 }

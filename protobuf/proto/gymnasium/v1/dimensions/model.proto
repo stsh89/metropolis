@@ -24,7 +24,7 @@ message Model {
     // The creation time of the Model.
     google.protobuf.Timestamp create_time = 6;
 
-    // The timestamp of the last Model's udpate.
+    // The timestamp of the last Model's update.
     google.protobuf.Timestamp update_time = 7;
 }
 
@@ -50,7 +50,7 @@ message ModelAssociation {
     // The creation time of the ModelAssociation.
     google.protobuf.Timestamp create_time = 7;
 
-    // The timestamp of the last ModelAssociation's udpate.
+    // The timestamp of the last ModelAssociation's update.
     google.protobuf.Timestamp update_time = 8;
 }
 
@@ -81,7 +81,7 @@ message ModelAttribute {
     // The creation time of the ModelAttribute.
     google.protobuf.Timestamp create_time = 6;
 
-    // The timestamp of the last ModelAttribute's udpate.
+    // The timestamp of the last ModelAttribute's update.
     google.protobuf.Timestamp update_time = 7;
 }
 
