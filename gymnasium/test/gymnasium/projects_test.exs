@@ -88,6 +88,113 @@ defmodule Gymnasium.ProjectsTest do
     end
   end
 
+  describe "update a project" do
+    setup do
+      project = project_fixture()
+
+      [project: project]
+    end
+
+    test "update_project/2 saves Project with updates fields", context do
+      project = context[:project]
+
+      update_attrs = %{
+        description: "Recipes sharing app",
+        name: "Food service",
+        slug: "food-service"
+      }
+
+      assert {:ok, %Project{} = project} =
+               Projects.update_project(project, update_attrs)
+
+      assert project.name == "Food service"
+      assert project.description == "Recipes sharing app"
+      assert project.slug == "food-service"
+    end
+
+    test "update_project/2 returns error on missing name", context do
+      project = context[:project]
+
+      update_attrs = %{
+        description: "Recipes sharing app",
+        name: "",
+        slug: "food-service"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} =
+               Projects.update_project(project, update_attrs)
+
+      assert errors == [name: {"can't be blank", [validation: :required]}]
+    end
+
+    test "update_project/1 returns error on missing slug", context do
+      project = context[:project]
+
+      update_attrs = %{
+        description: "Recipes sharing app",
+        name: "Food service",
+        slug: ""
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} =
+               Projects.update_project(project, update_attrs)
+
+      assert errors == [slug: {"can't be blank", [validation: :required]}]
+    end
+
+    test "update_project/2 returns error on existing name", context do
+      project = context[:project]
+
+      another_project =
+        project_fixture(
+          description: "Recipes sharing app",
+          name: "Food service",
+          slug: "food-service"
+        )
+
+      update_attrs = %{
+        description: "Recipes sharing app",
+        name: another_project.name,
+        slug: "some-slug"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} =
+               Projects.update_project(project, update_attrs)
+
+      assert errors == [
+               name:
+                 {"has already been taken",
+                  [constraint: :unique, constraint_name: "projects_name_index"]}
+             ]
+    end
+
+    test "update_project/2 returns error on existing slug", context do
+      project = context[:project]
+
+      another_project =
+        project_fixture(
+          description: "Recipes sharing app",
+          name: "Food service",
+          slug: "food-service"
+        )
+
+      update_attrs = %{
+        description: "Recipes sharing app",
+        name: "Some name",
+        slug: another_project.slug
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} =
+               Projects.update_project(project, update_attrs)
+
+      assert errors == [
+               slug:
+                 {"has already been taken",
+                  [constraint: :unique, constraint_name: "projects_slug_index"]}
+             ]
+    end
+  end
+
   describe "filter projects by `archived_at` field`" do
     setup do
       archived_project = archived_project_fixture()

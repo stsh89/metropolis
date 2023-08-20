@@ -10,6 +10,9 @@ service Projects {
     // Create Project definition.
     rpc CreateProject(CreateProjectRequest) returns (Project);
 
+    // Rename Project definition.
+    rpc RenameProject(RenameProjectRequest) returns (Project);
+
     // Projects listing definition.
     rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
 
@@ -56,6 +59,18 @@ message CreateProjectRequest {
     string description = 1;
 
     // The name of the Project.
+    string name = 2;
+
+    // The slug of the Project. Unique identifier for the Project's web address.
+    string slug = 3;
+}
+
+// Request to rename the Project.
+message RenameProjectRequest {
+    // Project's unique ID. UUID in a string form.
+    string id = 1;
+
+    // The new name of the Project.
     string name = 2;
 
     // The slug of the Project. Unique identifier for the Project's web address.

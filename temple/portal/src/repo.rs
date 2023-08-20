@@ -442,10 +442,10 @@ impl Repo {
         &self,
         project: datastore::project::Project,
     ) -> PortalResult<datastore::project::Project> {
-        let mut client = self.connect().await?;
+        let mut client = self.projects_client().await?;
 
-        let response = client
-            .rename_project_record(proto::RenameProjectRecordRequest {
+        let proto_project = client
+            .rename_project(proto::RenameProjectRequest {
                 id: project.id.to_string(),
                 name: project.name,
                 slug: project.slug,
@@ -453,11 +453,7 @@ impl Repo {
             .await?
             .into_inner();
 
-        let proto_project = response
-            .project_record
-            .ok_or(PortalError::internal("empty project_record"))?;
-
-        let project = from_proto_project(proto_project)?;
+        let project = datastore_project(proto_project)?;
 
         Ok(project)
     }
@@ -740,33 +736,6 @@ impl Repo {
 }
 
 fn datastore_project(proto_project: proto::Project) -> PortalResult<datastore::project::Project> {
-    let create_time = proto_project
-        .create_time
-        .ok_or(PortalError::internal("missing #create_time for Project"))?;
-
-    let update_time = proto_project
-        .update_time
-        .ok_or(PortalError::internal("missing #update_time for Project"))?;
-
-    let project = datastore::project::Project {
-        id: util::proto::uuid_from_proto_string(&proto_project.id, "id")?,
-        archived_at: proto_project
-            .archive_time
-            .map(|timestamp| util::proto::from_proto_timestamp(timestamp, "archive_time"))
-            .transpose()?,
-        description: proto_project.description,
-        name: proto_project.name,
-        slug: proto_project.slug,
-        inserted_at: util::proto::from_proto_timestamp(create_time, "insert_time")?,
-        updated_at: util::proto::from_proto_timestamp(update_time, "update_time")?,
-    };
-
-    Ok(project)
-}
-
-fn from_proto_project(
-    proto_project: proto::dimensions::Project,
-) -> PortalResult<datastore::project::Project> {
     let create_time = proto_project
         .create_time
         .ok_or(PortalError::internal("missing #create_time for Project"))?;

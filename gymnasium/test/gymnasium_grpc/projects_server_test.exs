@@ -10,7 +10,8 @@ defmodule GymnasiumGrpc.ProjectsServerTest do
     FindProjectRequest,
     ListProjectsRequest,
     ListProjectsResponse,
-    RestoreProjectRequest
+    RestoreProjectRequest,
+    RenameProjectRequest
   }
 
   alias Proto.Gymnasium.V1.Projects.Project, as: ProtoProject
@@ -182,6 +183,39 @@ defmodule GymnasiumGrpc.ProjectsServerTest do
         ProjectsServer.delete_project(
           %DeleteProjectRequest{
             id: Ecto.UUID.generate()
+          },
+          nil
+        )
+      end
+    end
+  end
+
+  describe "rename Project" do
+    test "rename_project/2 changes Projects name and slug" do
+      project = project_fixture()
+
+      proto_project =
+        ProjectsServer.rename_project(
+          %RenameProjectRequest{
+            id: project.id,
+            name: "Food service",
+            slug: "food-service"
+          },
+          nil
+        )
+
+      assert %ProtoProject{name: name, slug: slug} = proto_project
+      assert name == "Food service"
+      assert slug == "food-service"
+    end
+
+    test "rename_project/2 raises internal error" do
+      assert_raise GRPC.RPCError, "Internal errors", fn ->
+        ProjectsServer.rename_project(
+          %RenameProjectRequest{
+            id: Ecto.UUID.generate(),
+            name: "",
+            slug: ""
           },
           nil
         )

@@ -4,7 +4,7 @@ defmodule GymnasiumGrpc.ProjectServiceTest do
   alias GymnasiumGrpc.ProjectService
   alias Gymnasium.Dimensions.Project
   alias Gymnasium.Projects
-  alias GymnasiumGrpc.ProjectService.CreateProjectAttributes
+  alias GymnasiumGrpc.ProjectService.{CreateProjectAttributes, RenameProjectAttributes}
 
   import Gymnasium.ProjectsFixtures
 
@@ -27,6 +27,59 @@ defmodule GymnasiumGrpc.ProjectServiceTest do
 
       assert :error = ProjectService.create_project(attributes)
       assert true == Projects.list_projects() |> Enum.empty?()
+    end
+  end
+
+  describe "rename a Project" do
+    setup do
+      project = project_fixture()
+
+      [project: project]
+    end
+
+    test "rename_project/1 updates project's name and slug", context do
+      project = context[:project]
+
+      attributes = %RenameProjectAttributes{
+        id: project.id,
+        name: "Food service",
+        slug: "food-service"
+      }
+
+      assert %Project{} = ProjectService.rename_project(attributes)
+      assert %Project{name: name, slug: slug} = Projects.get_project!(project.id)
+      assert name == "Food service"
+      assert slug == "food-service"
+    end
+
+    test "rename_project/1 does not update project with malformed arguments", context do
+      project = context[:project]
+
+      attributes = %RenameProjectAttributes{
+        id: project.id,
+        name: "",
+        slug: "food-service"
+      }
+
+      assert :error = ProjectService.rename_project(attributes)
+      assert %Project{name: name, slug: slug} = Projects.get_project!(project.id)
+      assert name == project.name
+      assert slug == project.slug
+    end
+
+    test "rename_project/1 does not update project with empty id", context do
+      project = context[:project]
+
+      attributes = %RenameProjectAttributes{
+        id: "",
+        name: "Food service",
+        slug: "food-service"
+      }
+
+      assert :error = ProjectService.rename_project(attributes)
+      assert %Project{name: name, slug: slug} = Projects.get_project!(project.id)
+      assert name == project.name
+      assert slug == project.slug
     end
   end
 

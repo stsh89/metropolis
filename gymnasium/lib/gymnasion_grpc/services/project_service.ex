@@ -1,7 +1,7 @@
 defmodule GymnasiumGrpc.ProjectService do
   alias Gymnasium.Projects
   alias Gymnasium.Dimensions.Project
-  alias GymnasiumGrpc.ProjectService.CreateProjectAttributes
+  alias GymnasiumGrpc.ProjectService.{CreateProjectAttributes, RenameProjectAttributes}
 
   @type t :: Project
 
@@ -32,6 +32,49 @@ defmodule GymnasiumGrpc.ProjectService do
 
       {:error, _changset} ->
         :error
+    end
+  end
+
+  @doc """
+  Rename a Project.
+
+  ## Examples
+
+      iex> rename_project(%RenameProjectAttributes{
+      ...>   id: "29b5098f-abfa-45ed-9ff2-1e76ece9fe58",
+      ...>   name: "Book store",
+      ...>   slug: "book-store"
+      ...> })
+      %Project{}
+
+      iex> rename_project(%RenameProjectAttributes{})
+      :error
+
+  """
+  @spec rename_project(RenameProjectAttributes.t()) :: t | :error
+  def rename_project(%RenameProjectAttributes{} = attributes) do
+    try do
+      %RenameProjectAttributes{
+        id: id,
+        name: name,
+        slug: slug
+      } = attributes
+
+      result =
+        id
+        |> Projects.get_project!()
+        |> Projects.update_project(%{name: name, slug: slug})
+
+      case result do
+        {:ok, project} ->
+          project
+
+        {:error, _changset} ->
+          :error
+      end
+    rescue
+      Ecto.NoResultsError -> :error
+      Ecto.Query.CastError -> :error
     end
   end
 

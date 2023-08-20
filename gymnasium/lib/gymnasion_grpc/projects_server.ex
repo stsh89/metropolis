@@ -13,11 +13,12 @@ defmodule GymnasiumGrpc.ProjectsServer do
     FindProjectRequest,
     ListProjectsRequest,
     ListProjectsResponse,
-    RestoreProjectRequest
+    RestoreProjectRequest,
+    RenameProjectRequest
   }
 
   alias GymnasiumGrpc.ProjectService
-  alias GymnasiumGrpc.ProjectService.CreateProjectAttributes
+  alias GymnasiumGrpc.ProjectService.{CreateProjectAttributes, RenameProjectAttributes}
 
   def create_project(%CreateProjectRequest{} = request, _stream) do
     %CreateProjectRequest{
@@ -86,6 +87,28 @@ defmodule GymnasiumGrpc.ProjectsServer do
 
       :error ->
         raise GRPC.RPCError, status: :internal
+    end
+  end
+
+  def rename_project(%RenameProjectRequest{} = request, _stream) do
+    %RenameProjectRequest{
+      id: id,
+      name: name,
+      slug: slug
+    } = request
+
+    attributes = %RenameProjectAttributes{
+      id: id,
+      name: name,
+      slug: slug
+    }
+
+    case ProjectService.rename_project(attributes) do
+      :error ->
+        raise GRPC.RPCError, status: :internal
+
+      project ->
+        to_proto_project(project)
     end
   end
 

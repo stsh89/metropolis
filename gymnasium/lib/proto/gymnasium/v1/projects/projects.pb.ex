@@ -33,6 +33,16 @@ defmodule Proto.Gymnasium.V1.Projects.CreateProjectRequest do
   field :slug, 3, type: :string
 end
 
+defmodule Proto.Gymnasium.V1.Projects.RenameProjectRequest do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :id, 1, type: :string
+  field :name, 2, type: :string
+  field :slug, 3, type: :string
+end
+
 defmodule Proto.Gymnasium.V1.Projects.ListProjectsRequest do
   @moduledoc false
 
@@ -94,6 +104,12 @@ defmodule Proto.Gymnasium.V1.Projects.Projects.Service do
   rpc(
     :CreateProject,
     Proto.Gymnasium.V1.Projects.CreateProjectRequest,
+    Proto.Gymnasium.V1.Projects.Project
+  )
+
+  rpc(
+    :RenameProject,
+    Proto.Gymnasium.V1.Projects.RenameProjectRequest,
     Proto.Gymnasium.V1.Projects.Project
   )
 

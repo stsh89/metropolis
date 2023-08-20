@@ -30,6 +30,24 @@ defmodule Gymnasium.Projects do
   end
 
   @doc """
+  Updates a project.
+
+  ## Examples
+
+      iex> update_project(project, %{field: new_value})
+      {:ok, %Project{}}
+
+      iex> update_project(project, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_project(%Project{} = project, attrs) do
+    project
+    |> Project.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
   Returns the list of projects.
 
   ## Options
@@ -186,6 +204,7 @@ defmodule Gymnasium.Projects do
       %Ecto.Changeset{data: %Project{}}
 
   """
+  @spec change_project(Project.t()) :: Ecto.Changeset.t()
   def change_project(%Project{} = project, attrs \\ %{}) do
     Project.changeset(project, attrs)
   end
