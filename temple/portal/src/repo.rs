@@ -9,6 +9,10 @@ pub mod proto {
     pub mod dimensions {
         tonic::include_proto!("proto.gymnasium.v1.dimensions");
     }
+
+    pub mod models {
+        tonic::include_proto!("proto.gymnasium.v1.models");
+    }
 }
 
 pub struct Repo {
@@ -135,7 +139,7 @@ impl model::delete::DeleteModel for Repo {
         project_slug: &str,
         model_slug: &str,
     ) -> FoundationResult<datastore::model::Model> {
-        self.get_model(project_slug.to_owned(), model_slug.to_owned())
+        self.find_project_model(project_slug.to_owned(), model_slug.to_owned())
             .await
             .map_err(Into::into)
     }
@@ -152,7 +156,7 @@ impl model::create_attribute::CreateModelAttribute for Repo {
         project_slug: &str,
         model_slug: &str,
     ) -> FoundationResult<datastore::model::Model> {
-        self.get_model(project_slug.to_owned(), model_slug.to_owned())
+        self.find_project_model(project_slug.to_owned(), model_slug.to_owned())
             .await
             .map_err(Into::into)
     }
@@ -201,7 +205,7 @@ impl model::create_association::CreateModelAssociation for Repo {
         project_slug: &str,
         model_slug: &str,
     ) -> FoundationResult<datastore::model::Model> {
-        self.get_model(project_slug.to_owned(), model_slug.to_owned())
+        self.find_project_model(project_slug.to_owned(), model_slug.to_owned())
             .await
             .map_err(Into::into)
     }
@@ -327,6 +331,14 @@ impl Repo {
         &self,
     ) -> PortalResult<proto::projects_client::ProjectsClient<tonic::transport::Channel>> {
         proto::projects_client::ProjectsClient::connect(self.connection_string.clone())
+            .await
+            .map_err(|err| PortalError::internal(err.to_string()))
+    }
+
+    async fn models_client(
+        &self,
+    ) -> PortalResult<proto::models::models_client::ModelsClient<tonic::transport::Channel>> {
+        proto::models::models_client::ModelsClient::connect(self.connection_string.clone())
             .await
             .map_err(|err| PortalError::internal(err.to_string()))
     }
@@ -458,27 +470,22 @@ impl Repo {
         Ok(project)
     }
 
-    async fn get_model(
+    async fn find_project_model(
         &self,
         project_slug: String,
         model_slug: String,
     ) -> PortalResult<datastore::model::Model> {
-        let mut client = self.connect().await?;
+        let mut client = self.models_client().await?;
 
-        let response = client
-            .get_model_record(proto::GetModelRecordRequest {
+        let proto_model = client
+            .find_project_model(proto::models::FindProjectModelRequest {
                 project_slug,
                 model_slug,
-                ..proto::GetModelRecordRequest::default()
             })
             .await?
             .into_inner();
 
-        let proto_model = response
-            .model_record
-            .ok_or(PortalError::internal("empty model_record"))?;
-
-        let model = from_proto_model(proto_model)?;
+        let model = datastore_model(proto_model)?;
 
         Ok(model)
     }
@@ -528,17 +535,17 @@ impl Repo {
         &self,
         project_slug: String,
     ) -> PortalResult<Vec<datastore::model::Model>> {
-        let mut client = self.connect().await?;
+        let mut client = self.models_client().await?;
 
         let response = client
-            .list_model_records(proto::ListModelRecordsRequest { project_slug })
+            .list_project_models(proto::models::ListProjectModelsRequest { project_slug })
             .await?
             .into_inner();
 
         let models = response
-            .model_records
+            .models
             .into_iter()
-            .map(from_proto_model)
+            .map(datastore_model)
             .collect::<PortalResult<Vec<datastore::model::Model>>>()?;
 
         Ok(models)
@@ -549,10 +556,10 @@ impl Repo {
         project_record: datastore::project::Project,
         model: model::Model,
     ) -> PortalResult<datastore::model::Model> {
-        let mut client = self.connect().await?;
+        let mut client = self.models_client().await?;
 
-        let response = client
-            .create_model_record(proto::CreateModelRecordRequest {
+        let proto_model = client
+            .create_model(proto::models::CreateModelRequest {
                 project_id: project_record.id.to_string(),
                 description: model.description.unwrap_or_default(),
                 name: model.name,
@@ -561,20 +568,16 @@ impl Repo {
             .await?
             .into_inner();
 
-        let proto_model = response
-            .model_record
-            .ok_or(PortalError::internal("empty model_record"))?;
-
-        let model = from_proto_model(proto_model)?;
+        let model = datastore_model(proto_model)?;
 
         Ok(model)
     }
 
     async fn delete_model(&self, model: datastore::model::Model) -> PortalResult<()> {
-        let mut client = self.connect().await?;
+        let mut client = self.models_client().await?;
 
         client
-            .delete_model_record(proto::DeleteModelRecordRequest {
+            .delete_model(proto::models::DeleteModelRequest {
                 id: model.id.to_string(),
             })
             .await?;
@@ -758,6 +761,30 @@ fn datastore_project(proto_project: proto::Project) -> PortalResult<datastore::p
     };
 
     Ok(project)
+}
+
+fn datastore_model(
+    proto_model: proto::models::Model,
+) -> PortalResult<datastore::model::Model> {
+    let create_time = proto_model
+        .create_time
+        .ok_or(PortalError::internal("missing #create_time for Model"))?;
+
+    let update_time = proto_model
+        .update_time
+        .ok_or(PortalError::internal("missing #update_time for Model"))?;
+
+    let model = datastore::model::Model {
+        id: util::proto::uuid_from_proto_string(&proto_model.id, "id")?,
+        project_id: util::proto::uuid_from_proto_string(&proto_model.project_id, "project_id")?,
+        description: proto_model.description,
+        name: proto_model.name,
+        slug: proto_model.slug,
+        inserted_at: util::proto::from_proto_timestamp(create_time, "insert_time")?,
+        updated_at: util::proto::from_proto_timestamp(update_time, "update_time")?,
+    };
+
+    Ok(model)
 }
 
 fn from_proto_model(
