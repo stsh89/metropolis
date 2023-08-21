@@ -14,9 +14,6 @@ defmodule Mix.Tasks.Protobuf.Compile do
     IO.puts("Compiling proto definitions:")
 
     files = [
-      "dimensions.proto",
-      "dimensions/model.proto",
-      "dimensions/project.proto",
       "projects/projects.proto",
       "models/models.proto"
     ]

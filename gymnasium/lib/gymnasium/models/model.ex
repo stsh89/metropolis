@@ -1,4 +1,8 @@
-defmodule Gymnasium.Dimensions.Model do
+defmodule Gymnasium.Models.Model do
+  @moduledoc """
+  Model
+  """
+
   @type t() :: %__MODULE__{
           id: Ecto.UUID.t(),
           project_id: Ecto.UUID.t(),
@@ -9,17 +13,17 @@ defmodule Gymnasium.Dimensions.Model do
           updated_at: Calendar.datetime()
         }
 
-  alias Gymnasium.Dimensions.{Project, ModelAttribute, ModelAssociation}
+  alias Gymnasium.{Projects, Models}
 
   use Gymnasium.Schema
   import Ecto.Changeset
 
   schema "models" do
-    belongs_to :project, Project
+    belongs_to :project, Projects.Project
 
-    has_many :associations, ModelAssociation
+    has_many :associations, Models.Association
 
-    has_many :attributes, ModelAttribute
+    has_many :attributes, Models.Attribute
 
     field :description, :string
 

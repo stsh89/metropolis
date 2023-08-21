@@ -2,7 +2,8 @@ defmodule GymnasiumGrpc.ModelsServerTest do
   use Gymnasium.DataCase
 
   alias GymnasiumGrpc.ModelsServer
-  alias Gymnasium.Dimensions.{Model, Project, ModelAssociation, ModelAttribute}
+  alias Gymnasium.Models.{Model, Association, Attribute}
+  alias Gymnasium.Projects.Project
 
   alias Proto.Gymnasium.V1.Models.{
     CreateModelRequest,
@@ -317,7 +318,7 @@ defmodule GymnasiumGrpc.ModelsServerTest do
 
   describe "delete Model association by id" do
     test "delete_association/2 returns Google.Protobuf.Empty response" do
-      %ModelAssociation{id: id} = model_association_fixture()
+      %Association{id: id} = model_association_fixture()
 
       response =
         ModelsServer.delete_association(
@@ -373,7 +374,7 @@ defmodule GymnasiumGrpc.ModelsServerTest do
 
   describe "delete Model attribute by id" do
     test "delete_attribute/2 returns Google.Protobuf.Empty response" do
-      %ModelAttribute{id: id} = model_attribute_fixture()
+      %Attribute{id: id} = model_attribute_fixture()
 
       response =
         ModelsServer.delete_attribute(

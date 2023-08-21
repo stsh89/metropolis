@@ -1,4 +1,6 @@
 defmodule GymnasiumGrpc.ProjectService.CreateProjectAttributes do
+  @moduledoc false
+
   defstruct archived_at: nil,
             description: "",
             name: "",

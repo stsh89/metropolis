@@ -1,4 +1,8 @@
 defmodule GymnasiumGrpc.Util do
+  @moduledoc """
+  Helper functions for any actions around proto
+  """
+
   @doc """
   Convert datetime to Google timestamp.
 
@@ -12,7 +16,7 @@ defmodule GymnasiumGrpc.Util do
       }
 
   """
-  @spec to_proto_timestamp(Calendar.datetime()) :: %Google.Protobuf.Timestamp{}
+  @spec to_proto_timestamp(Calendar.datetime()) :: Google.Protobuf.Timestamp.t()
   def to_proto_timestamp(%DateTime{} = date_time) do
     nanos = DateTime.to_unix(date_time, :nanosecond)
     seconds = DateTime.to_unix(date_time, :second)
@@ -36,7 +40,7 @@ defmodule GymnasiumGrpc.Util do
       ~U[2023-08-18 13:18:39.803804Z]
 
   """
-  @spec from_proto_timestamp(%Google.Protobuf.Timestamp{}) :: Calendar.datetime()
+  @spec from_proto_timestamp(Google.Protobuf.Timestamp.t()) :: Calendar.datetime()
   def from_proto_timestamp(%Google.Protobuf.Timestamp{seconds: seconds, nanos: nanos}) do
     DateTime.from_unix!(seconds * 1_000_000_000 + nanos, :nanosecond)
   end

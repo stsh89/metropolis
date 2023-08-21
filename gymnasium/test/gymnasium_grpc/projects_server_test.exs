@@ -16,7 +16,7 @@ defmodule GymnasiumGrpc.ProjectsServerTest do
 
   alias Proto.Gymnasium.V1.Projects.Project, as: ProtoProject
 
-  alias Gymnasium.Dimensions.Project
+  alias Gymnasium.Projects.Project
 
   import Gymnasium.ProjectsFixtures
 

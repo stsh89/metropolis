@@ -1,6 +1,10 @@
 defmodule GymnasiumGrpc.ProjectService do
+  @moduledoc """
+  Entrypoint for all actions around projects.
+  """
+
   alias Gymnasium.Projects
-  alias Gymnasium.Dimensions.Project
+  alias Gymnasium.Projects.Project
   alias GymnasiumGrpc.ProjectService.{CreateProjectAttributes, RenameProjectAttributes}
 
   @type t :: Project

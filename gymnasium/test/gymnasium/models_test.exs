@@ -2,7 +2,8 @@ defmodule Gymnasium.ModelsTest do
   use Gymnasium.DataCase
 
   alias Gymnasium.{Model, Models, Models}
-  alias Gymnasium.Dimensions.{Project, Model, ModelAttribute, ModelAssociation}
+  alias Gymnasium.Projects.Project
+  alias Gymnasium.Models.{Model, Attribute, Association}
 
   import Gymnasium.ModelsFixtures
   import Gymnasium.ProjectsFixtures
@@ -165,7 +166,7 @@ defmodule Gymnasium.ModelsTest do
         name: "Title"
       }
 
-      assert {:ok, %ModelAttribute{} = attribute} = Models.create_attribute(attrs)
+      assert {:ok, %Attribute{} = attribute} = Models.create_attribute(attrs)
       assert false == Models.list_attributes() |> Enum.empty?()
 
       assert attribute.model_id == model_id
@@ -231,7 +232,7 @@ defmodule Gymnasium.ModelsTest do
 
     test "create_attribute/1 returns error on existing model id and name pair" do
       %Model{id: model_id} = model_fixture()
-      %ModelAttribute{name: name} = model_attribute_fixture(model_id: model_id)
+      %Attribute{name: name} = model_attribute_fixture(model_id: model_id)
 
       attrs = %{
         model_id: model_id,
@@ -254,13 +255,13 @@ defmodule Gymnasium.ModelsTest do
     test "delete_attribute/1 removes a Model attribute" do
       attribute = model_attribute_fixture()
 
-      assert {:ok, %ModelAttribute{}} = Models.delete_attribute(attribute)
+      assert {:ok, %Attribute{}} = Models.delete_attribute(attribute)
       assert Models.list_attributes() == []
     end
 
     test "delete_attribute/1 raises Ecto.StaleEntryError" do
       assert_raise Ecto.StaleEntryError, fn ->
-        Models.delete_attribute(%ModelAttribute{id: Ecto.UUID.generate()})
+        Models.delete_attribute(%Attribute{id: Ecto.UUID.generate()})
       end
     end
   end
@@ -278,7 +279,7 @@ defmodule Gymnasium.ModelsTest do
         name: "Author"
       }
 
-      assert {:ok, %ModelAssociation{} = association} = Models.create_association(attrs)
+      assert {:ok, %Association{} = association} = Models.create_association(attrs)
       assert false == Models.list_associations() |> Enum.empty?()
 
       assert association.model_id == model_id
@@ -362,7 +363,7 @@ defmodule Gymnasium.ModelsTest do
 
     test "create_association/1 returns error on existing model id and name pair" do
       %Model{id: model_id} = model_fixture()
-      %ModelAssociation{name: name} = model_association_fixture(model_id: model_id)
+      %Association{name: name} = model_association_fixture(model_id: model_id)
 
       attrs = %{
         associated_model_id: Ecto.UUID.generate(),
@@ -386,13 +387,13 @@ defmodule Gymnasium.ModelsTest do
     test "delete_association/1 removes a Model association" do
       association = model_association_fixture()
 
-      assert {:ok, %ModelAssociation{}} = Models.delete_association(association)
+      assert {:ok, %Association{}} = Models.delete_association(association)
       assert Models.list_associations() == []
     end
 
     test "delete_association/1 raises Ecto.StaleEntryError" do
       assert_raise Ecto.StaleEntryError, fn ->
-        Models.delete_association(%ModelAssociation{id: Ecto.UUID.generate()})
+        Models.delete_association(%Association{id: Ecto.UUID.generate()})
       end
     end
   end

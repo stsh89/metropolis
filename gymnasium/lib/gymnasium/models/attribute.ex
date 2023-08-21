@@ -1,4 +1,7 @@
-defmodule Gymnasium.Dimensions.ModelAttribute do
+defmodule Gymnasium.Models.Attribute do
+  @moduledoc """
+  Model attribute.
+  """
   @type t() :: %__MODULE__{
           id: Ecto.UUID.t(),
           model_id: Ecto.UUID.t(),
@@ -9,7 +12,7 @@ defmodule Gymnasium.Dimensions.ModelAttribute do
           updated_at: Calendar.datetime()
         }
 
-  alias Gymnasium.Dimensions.Model
+  alias Gymnasium.Models
 
   use Gymnasium.Schema
   import Ecto.Changeset
@@ -17,7 +20,7 @@ defmodule Gymnasium.Dimensions.ModelAttribute do
   @kinds ["string", "integer", "boolean"]
 
   schema "model_attributes" do
-    belongs_to :model, Model
+    belongs_to :model, Models.Model
 
     field :description, :string
 

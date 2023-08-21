@@ -1,4 +1,6 @@
 defmodule GymnasiumGrpc.ProjectService.RenameProjectAttributes do
+  @moduledoc false
+
   defstruct id: "",
             name: "",
             slug: ""

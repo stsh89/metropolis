@@ -1,33 +1,21 @@
 defmodule GymnasiumGrpc.ProjectsServer do
+  @moduledoc false
+
   use GRPC.Server, service: Proto.Gymnasium.V1.Projects.Projects.Service
 
-  alias Gymnasium.Dimensions.Project
+  alias Gymnasium.Projects.Project
   alias GymnasiumGrpc.Util
-
-  alias Proto.Gymnasium.V1.Projects.Project, as: ProtoProject
-
-  alias Proto.Gymnasium.V1.Projects.{
-    ArchiveProjectRequest,
-    CreateProjectRequest,
-    DeleteProjectRequest,
-    FindProjectRequest,
-    ListProjectsRequest,
-    ListProjectsResponse,
-    RestoreProjectRequest,
-    RenameProjectRequest
-  }
-
+  alias Proto.Gymnasium.V1.Projects, as: Proto
   alias GymnasiumGrpc.ProjectService
-  alias GymnasiumGrpc.ProjectService.{CreateProjectAttributes, RenameProjectAttributes}
 
-  def create_project(%CreateProjectRequest{} = request, _stream) do
-    %CreateProjectRequest{
+  def create_project(%Proto.CreateProjectRequest{} = request, _stream) do
+    %Proto.CreateProjectRequest{
       description: description,
       name: name,
       slug: slug
     } = request
 
-    attributes = %CreateProjectAttributes{
+    attributes = %ProjectService.CreateProjectAttributes{
       description: description,
       name: name,
       slug: slug
@@ -42,8 +30,8 @@ defmodule GymnasiumGrpc.ProjectsServer do
     end
   end
 
-  def find_project(%FindProjectRequest{} = request, _stream) do
-    %FindProjectRequest{
+  def find_project(%Proto.FindProjectRequest{} = request, _stream) do
+    %Proto.FindProjectRequest{
       slug: slug
     } = request
 
@@ -57,8 +45,8 @@ defmodule GymnasiumGrpc.ProjectsServer do
     end
   end
 
-  def list_projects(%ListProjectsRequest{} = request, _stream) do
-    %ListProjectsRequest{
+  def list_projects(%Proto.ListProjectsRequest{} = request, _stream) do
+    %Proto.ListProjectsRequest{
       archive_state: archive_state
     } = request
 
@@ -71,13 +59,13 @@ defmodule GymnasiumGrpc.ProjectsServer do
       |> ProjectService.list_projects()
       |> Enum.map(fn p -> to_proto_project(p) end)
 
-    %ListProjectsResponse{
+    %Proto.ListProjectsResponse{
       projects: projects
     }
   end
 
-  def delete_project(%DeleteProjectRequest{} = request, _stream) do
-    %DeleteProjectRequest{
+  def delete_project(%Proto.DeleteProjectRequest{} = request, _stream) do
+    %Proto.DeleteProjectRequest{
       id: id
     } = request
 
@@ -90,14 +78,14 @@ defmodule GymnasiumGrpc.ProjectsServer do
     end
   end
 
-  def rename_project(%RenameProjectRequest{} = request, _stream) do
-    %RenameProjectRequest{
+  def rename_project(%Proto.RenameProjectRequest{} = request, _stream) do
+    %Proto.RenameProjectRequest{
       id: id,
       name: name,
       slug: slug
     } = request
 
-    attributes = %RenameProjectAttributes{
+    attributes = %ProjectService.RenameProjectAttributes{
       id: id,
       name: name,
       slug: slug
@@ -112,8 +100,8 @@ defmodule GymnasiumGrpc.ProjectsServer do
     end
   end
 
-  def archive_project(%ArchiveProjectRequest{} = request, _stream) do
-    %ArchiveProjectRequest{
+  def archive_project(%Proto.ArchiveProjectRequest{} = request, _stream) do
+    %Proto.ArchiveProjectRequest{
       id: id
     } = request
 
@@ -126,8 +114,8 @@ defmodule GymnasiumGrpc.ProjectsServer do
     end
   end
 
-  def restore_project(%RestoreProjectRequest{} = request, _stream) do
-    %RestoreProjectRequest{
+  def restore_project(%Proto.RestoreProjectRequest{} = request, _stream) do
+    %Proto.RestoreProjectRequest{
       id: id
     } = request
 
@@ -150,7 +138,7 @@ defmodule GymnasiumGrpc.ProjectsServer do
   defp project_archive_time(_), do: nil
 
   defp to_proto_project(%Project{} = project) do
-    %ProtoProject{
+    %Proto.Project{
       id: project.id,
       archive_time: project_archive_time(project.archived_at),
       description: project.description,

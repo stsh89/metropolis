@@ -1,4 +1,6 @@
 defmodule GymnasiumGrpc.ModelService.FindProjectModelAttributes do
+  @moduledoc false
+
   defstruct project_slug: "",
             model_slug: ""
 

@@ -2,7 +2,7 @@ defmodule GymnasiumGrpc.ProjectServiceTest do
   use Gymnasium.DataCase
 
   alias GymnasiumGrpc.ProjectService
-  alias Gymnasium.Dimensions.Project
+  alias Gymnasium.Projects.Project
   alias Gymnasium.Projects
   alias GymnasiumGrpc.ProjectService.{CreateProjectAttributes, RenameProjectAttributes}
 

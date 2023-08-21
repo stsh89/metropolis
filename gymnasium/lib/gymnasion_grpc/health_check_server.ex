@@ -1,4 +1,6 @@
 defmodule GymnasiumGrpc.HealthCheckServer do
+  @moduledoc false
+
   use GRPC.Server, service: Proto.Gymnasium.V1.HealthCheck.Service
 
   alias Proto.Gymnasium.V1.{

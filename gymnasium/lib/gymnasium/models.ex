@@ -5,7 +5,7 @@ defmodule Gymnasium.Models do
 
   import Ecto.Query, warn: false
 
-  alias Gymnasium.Dimensions.{Model, ModelAttribute, ModelAssociation}
+  alias Gymnasium.Models.{Model, Attribute, Association}
   alias Gymnasium.Repo
 
   @doc """
@@ -33,14 +33,14 @@ defmodule Gymnasium.Models do
   ## Examples
 
       iex> get_association!("8e3b5275-bc1b-4490-a2d8-23c68d9b0fd5")
-      %ModelAssociation{}
+      %Association{}
 
       iex> get_association!("8844f7c8-1f83-4fdf-817f-41780c9e5d05")
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_association!(String.t()) :: ModelAssociation.t()
-  def get_association!(id), do: Repo.get!(ModelAssociation, id)
+  @spec get_association!(String.t()) :: Association.t()
+  def get_association!(id), do: Repo.get!(Association, id)
 
   @doc """
   Gets a single model attribute.
@@ -56,8 +56,8 @@ defmodule Gymnasium.Models do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_attribute!(String.t()) :: ModelAttribute.t()
-  def get_attribute!(id), do: Repo.get!(ModelAttribute, id)
+  @spec get_attribute!(String.t()) :: Attribute.t()
+  def get_attribute!(id), do: Repo.get!(Attribute, id)
 
   @doc """
   Creates a model.
@@ -71,7 +71,7 @@ defmodule Gymnasium.Models do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_model(map()) :: {:ok, Model.t()} | {:error, %Ecto.Changeset{}}
+  @spec create_model(map()) :: {:ok, Model.t()} | {:error, Ecto.Changeset.t()}
   def create_model(attrs \\ %{}) do
     %Model{}
     |> Model.changeset(attrs)
@@ -90,10 +90,10 @@ defmodule Gymnasium.Models do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_model(map()) :: {:ok, ModelAttribute.t()} | {:error, %Ecto.Changeset{}}
+  @spec create_model(map()) :: {:ok, Attribute.t()} | {:error, Ecto.Changeset.t()}
   def create_attribute(attrs \\ %{}) do
-    %ModelAttribute{}
-    |> ModelAttribute.changeset(attrs)
+    %Attribute{}
+    |> Attribute.changeset(attrs)
     |> Repo.insert()
   end
 
@@ -117,22 +117,22 @@ defmodule Gymnasium.Models do
       if model.id == nil do
         []
       else
-        Repo.all(from ma in ModelAssociation, where: ma.model_id == ^model.id, select: ma.id)
+        Repo.all(from ma in Association, where: ma.model_id == ^model.id, select: ma.id)
       end
 
     model_attribute_ids =
       if model.id == nil do
         []
       else
-        Repo.all(from ma in ModelAttribute, where: ma.model_id == ^model.id, select: ma.id)
+        Repo.all(from ma in Attribute, where: ma.model_id == ^model.id, select: ma.id)
       end
 
     Repo.transaction(fn ->
-      Repo.delete_all(from ma in ModelAssociation, where: ma.id in ^model_association_ids)
-      Repo.delete_all(from ma in ModelAttribute, where: ma.id in ^model_attribute_ids)
+      Repo.delete_all(from ma in Association, where: ma.id in ^model_association_ids)
+      Repo.delete_all(from ma in Attribute, where: ma.id in ^model_attribute_ids)
 
       if model.id != nil do
-        from(ma in ModelAssociation,
+        from(ma in Association,
           where: ma.associated_model_id == ^model.id,
           update: [set: [associated_model_id: nil]]
         )
@@ -149,15 +149,15 @@ defmodule Gymnasium.Models do
   ## Examples
 
       iex> delete_attribute(model)
-      {:ok, %ModelAttribute{}}
+      {:ok, %Attribute{}}
 
       iex> delete_attribute(model)
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_attribute(ModelAttribute.t()) ::
-          {:ok, ModelAttribute.t()} | {:error, Ecto.Changeset.t()}
-  def delete_attribute(%ModelAttribute{} = attribute) do
+  @spec delete_attribute(Attribute.t()) ::
+          {:ok, Attribute.t()} | {:error, Ecto.Changeset.t()}
+  def delete_attribute(%Attribute{} = attribute) do
     Repo.delete(attribute)
   end
 
@@ -167,15 +167,15 @@ defmodule Gymnasium.Models do
   ## Examples
 
       iex> delete_association(model)
-      {:ok, %ModelAssociation{}}
+      {:ok, %Association{}}
 
       iex> delete_association(model)
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_association(ModelAssociation.t()) ::
-          {:ok, ModelAssociation.t()} | {:error, Ecto.Changeset.t()}
-  def delete_association(%ModelAssociation{} = association) do
+  @spec delete_association(Association.t()) ::
+          {:ok, Association.t()} | {:error, Ecto.Changeset.t()}
+  def delete_association(%Association{} = association) do
     Repo.delete(association)
   end
 
@@ -201,12 +201,12 @@ defmodule Gymnasium.Models do
   ## Examples
 
       iex> list_attributes()
-      [%ModelAttribute{}, ...]
+      [%Attribute{}, ...]
 
   """
-  @spec list_attributes() :: [ModelAttribute.t()]
+  @spec list_attributes() :: [Attribute.t()]
   def list_attributes() do
-    query = from m in ModelAttribute, order_by: [asc: m.name]
+    query = from m in Attribute, order_by: [asc: m.name]
 
     Repo.all(query)
   end
@@ -217,12 +217,12 @@ defmodule Gymnasium.Models do
   ## Examples
 
       iex> list_associations()
-      [%ModelAssociation{}, ...]
+      [%Association{}, ...]
 
   """
-  @spec list_models() :: [ModelAssociation.t()]
+  @spec list_models() :: [Association.t()]
   def list_associations() do
-    query = from m in ModelAssociation, order_by: [asc: m.name]
+    query = from m in Association, order_by: [asc: m.name]
 
     Repo.all(query)
   end
@@ -240,8 +240,8 @@ defmodule Gymnasium.Models do
 
   """
   def create_association(attrs \\ %{}) do
-    %ModelAssociation{}
-    |> ModelAssociation.changeset(attrs)
+    %Association{}
+    |> Association.changeset(attrs)
     |> Repo.insert()
   end
 end

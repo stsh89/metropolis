@@ -1,4 +1,6 @@
 defmodule GymnasiumGrpc.ModelService.CreateAssociationAttributes do
+  @moduledoc false
+
   defstruct model_id: "",
             associated_model_id: "",
             description: "",

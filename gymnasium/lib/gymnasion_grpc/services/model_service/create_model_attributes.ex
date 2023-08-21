@@ -1,4 +1,6 @@
 defmodule GymnasiumGrpc.ModelService.CreateModelAttributes do
+  @moduledoc false
+
   defstruct project_id: "",
             description: "",
             name: "",

@@ -4,6 +4,8 @@ defmodule Gymnasium.ProjectsFixtures do
   entities via the `Gymnasium.Projects` context.
   """
 
+  alias Gymnasium.Projects
+
   @doc """
   Generate a project.
   """
@@ -16,7 +18,7 @@ defmodule Gymnasium.ProjectsFixtures do
         name: "Bookstore",
         slug: "bookstore"
       })
-      |> Gymnasium.Dimensions.create_project()
+      |> Projects.create_project()
 
     project
   end

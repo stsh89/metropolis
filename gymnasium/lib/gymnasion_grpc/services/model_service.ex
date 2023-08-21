@@ -1,6 +1,10 @@
 defmodule GymnasiumGrpc.ModelService do
+  @moduledoc """
+  Entrypoint for all actions around models.
+  """
+
   alias Gymnasium.{Models, ProjectModels}
-  alias Gymnasium.Dimensions.Model
+  alias Gymnasium.Models.Model
 
   alias GymnasiumGrpc.ModelService.{
     CreateAssociationAttributes,

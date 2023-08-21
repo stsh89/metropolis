@@ -1,56 +1,22 @@
 defmodule GymnasiumGrpc.ModelsServer do
+  @moduledoc false
+
   use GRPC.Server, service: Proto.Gymnasium.V1.Models.Models.Service
 
-  alias Gymnasium.Dimensions.{Model, ModelAssociation, ModelAttribute}
+  alias Gymnasium.Models.{Model, Association, Attribute}
   alias GymnasiumGrpc.Util
-
-  alias Proto.Gymnasium.V1.Models.Model, as: ProtoModel
-  alias Proto.Gymnasium.V1.Models.Association, as: ProtoAssociation
-  alias Proto.Gymnasium.V1.Models.Attribute, as: ProtoAttribute
-
-  alias Proto.Gymnasium.V1.Models.{
-    CreateModelRequest,
-    DeleteModelRequest,
-    ListProjectModelsRequest,
-    ListProjectModelsResponse,
-    FindProjectModelRequest,
-    FindProjectModelAssociationRequest,
-    FindProjectModelAttributeRequest,
-    CreateAssociationRequest,
-    CreateAttributeRequest,
-    DeleteAssociationRequest,
-    DeleteAttributeRequest,
-    ListProjectModelAssociationsRequest,
-    ListProjectModelAttributesRequest,
-    ListProjectModelAssociationsResponse,
-    ListProjectModelAttributesResponse,
-    FindProjectModelsOverviewRequest,
-    FindProjectModelsOverviewResponse,
-    ModelOverview
-  }
-
+  alias Proto.Gymnasium.V1.Models, as: Proto
   alias GymnasiumGrpc.ModelService
 
-  alias GymnasiumGrpc.ModelService.{
-    CreateModelAttributes,
-    FindProjectModelAttributes,
-    FindProjectModelAttributeAttributes,
-    FindProjectModelAssociationAttributes,
-    CreateAssociationAttributes,
-    CreateAttributeAttributes,
-    ListProjectModelAttributesAttributes,
-    ListProjectModelAssociationsAttributes
-  }
-
-  def create_model(%CreateModelRequest{} = request, _stream) do
-    %CreateModelRequest{
+  def create_model(%Proto.CreateModelRequest{} = request, _stream) do
+    %Proto.CreateModelRequest{
       project_id: project_id,
       description: description,
       name: name,
       slug: slug
     } = request
 
-    attributes = %CreateModelAttributes{
+    attributes = %ModelService.CreateModelAttributes{
       project_id: project_id,
       description: description,
       name: name,
@@ -66,13 +32,13 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def find_project_model(%FindProjectModelRequest{} = request, _stream) do
-    %FindProjectModelRequest{
+  def find_project_model(%Proto.FindProjectModelRequest{} = request, _stream) do
+    %Proto.FindProjectModelRequest{
       project_slug: project_slug,
       model_slug: model_slug
     } = request
 
-    case ModelService.find_project_model(%FindProjectModelAttributes{
+    case ModelService.find_project_model(%ModelService.FindProjectModelAttributes{
            project_slug: project_slug,
            model_slug: model_slug
          }) do
@@ -87,8 +53,8 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def find_project_models_overview(%FindProjectModelsOverviewRequest{} = request, _stream) do
-    %FindProjectModelsOverviewRequest{
+  def find_project_models_overview(%Proto.FindProjectModelsOverviewRequest{} = request, _stream) do
+    %Proto.FindProjectModelsOverviewRequest{
       project_slug: project_slug
     } = request
 
@@ -97,13 +63,13 @@ defmodule GymnasiumGrpc.ModelsServer do
       |> ModelService.find_project_models_overview()
       |> Enum.map(fn m -> to_proto_model_overview(m) end)
 
-    %FindProjectModelsOverviewResponse{
+    %Proto.FindProjectModelsOverviewResponse{
       model_overviews: model_overviews
     }
   end
 
-  def list_project_models(%ListProjectModelsRequest{} = request, _stream) do
-    %ListProjectModelsRequest{
+  def list_project_models(%Proto.ListProjectModelsRequest{} = request, _stream) do
+    %Proto.ListProjectModelsRequest{
       project_slug: project_slug
     } = request
 
@@ -112,13 +78,13 @@ defmodule GymnasiumGrpc.ModelsServer do
       |> ModelService.list_project_models()
       |> Enum.map(fn m -> to_proto_model(m) end)
 
-    %ListProjectModelsResponse{
+    %Proto.ListProjectModelsResponse{
       models: models
     }
   end
 
-  def delete_model(%DeleteModelRequest{} = request, _stream) do
-    %DeleteModelRequest{
+  def delete_model(%Proto.DeleteModelRequest{} = request, _stream) do
+    %Proto.DeleteModelRequest{
       id: id
     } = request
 
@@ -131,8 +97,8 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def create_association(%CreateAssociationRequest{} = request, _stream) do
-    %CreateAssociationRequest{
+  def create_association(%Proto.CreateAssociationRequest{} = request, _stream) do
+    %Proto.CreateAssociationRequest{
       model_id: model_id,
       associated_model_id: associated_model_id,
       description: description,
@@ -140,7 +106,7 @@ defmodule GymnasiumGrpc.ModelsServer do
       kind: kind
     } = request
 
-    attributes = %CreateAssociationAttributes{
+    attributes = %ModelService.CreateAssociationAttributes{
       model_id: model_id,
       associated_model_id: associated_model_id,
       description: description,
@@ -149,7 +115,7 @@ defmodule GymnasiumGrpc.ModelsServer do
     }
 
     case ModelService.create_association(attributes) do
-      %ModelAssociation{} = association ->
+      %Association{} = association ->
         to_proto_association(association)
 
       _ ->
@@ -157,13 +123,16 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def list_project_model_associations(%ListProjectModelAssociationsRequest{} = request, _stream) do
-    %ListProjectModelAssociationsRequest{
+  def list_project_model_associations(
+        %Proto.ListProjectModelAssociationsRequest{} = request,
+        _stream
+      ) do
+    %Proto.ListProjectModelAssociationsRequest{
       project_slug: project_slug,
       model_slug: model_slug
     } = request
 
-    attributes = %ListProjectModelAssociationsAttributes{
+    attributes = %ModelService.ListProjectModelAssociationsAttributes{
       project_slug: project_slug,
       model_slug: model_slug
     }
@@ -173,24 +142,29 @@ defmodule GymnasiumGrpc.ModelsServer do
       |> ModelService.list_project_model_associations()
       |> Enum.map(fn a -> to_proto_association(a) end)
 
-    %ListProjectModelAssociationsResponse{
+    %Proto.ListProjectModelAssociationsResponse{
       associations: associations
     }
   end
 
-  def find_project_model_association(%FindProjectModelAssociationRequest{} = request, _stream) do
-    %FindProjectModelAssociationRequest{
+  def find_project_model_association(
+        %Proto.FindProjectModelAssociationRequest{} = request,
+        _stream
+      ) do
+    %Proto.FindProjectModelAssociationRequest{
       project_slug: project_slug,
       model_slug: model_slug,
       association_name: association_name
     } = request
 
-    case ModelService.find_project_model_association(%FindProjectModelAssociationAttributes{
-           project_slug: project_slug,
-           model_slug: model_slug,
-           association_name: association_name
-         }) do
-      %ModelAssociation{} = association ->
+    case ModelService.find_project_model_association(
+           %ModelService.FindProjectModelAssociationAttributes{
+             project_slug: project_slug,
+             model_slug: model_slug,
+             association_name: association_name
+           }
+         ) do
+      %Association{} = association ->
         to_proto_association(association)
 
       _ ->
@@ -201,8 +175,8 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def delete_association(%DeleteAssociationRequest{} = request, _stream) do
-    %DeleteAssociationRequest{
+  def delete_association(%Proto.DeleteAssociationRequest{} = request, _stream) do
+    %Proto.DeleteAssociationRequest{
       id: id
     } = request
 
@@ -215,15 +189,15 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def create_attribute(%CreateAttributeRequest{} = request, _stream) do
-    %CreateAttributeRequest{
+  def create_attribute(%Proto.CreateAttributeRequest{} = request, _stream) do
+    %Proto.CreateAttributeRequest{
       model_id: model_id,
       description: description,
       name: name,
       kind: kind
     } = request
 
-    attributes = %CreateAttributeAttributes{
+    attributes = %ModelService.CreateAttributeAttributes{
       model_id: model_id,
       description: description,
       name: name,
@@ -231,7 +205,7 @@ defmodule GymnasiumGrpc.ModelsServer do
     }
 
     case ModelService.create_attribute(attributes) do
-      %ModelAttribute{} = attribute ->
+      %Attribute{} = attribute ->
         to_proto_attribute(attribute)
 
       _ ->
@@ -239,19 +213,21 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def find_project_model_attribute(%FindProjectModelAttributeRequest{} = request, _stream) do
-    %FindProjectModelAttributeRequest{
+  def find_project_model_attribute(%Proto.FindProjectModelAttributeRequest{} = request, _stream) do
+    %Proto.FindProjectModelAttributeRequest{
       project_slug: project_slug,
       model_slug: model_slug,
       attribute_name: attribute_name
     } = request
 
-    case ModelService.find_project_model_attribute(%FindProjectModelAttributeAttributes{
-           project_slug: project_slug,
-           model_slug: model_slug,
-           attribute_name: attribute_name
-         }) do
-      %ModelAttribute{} = attribute ->
+    case ModelService.find_project_model_attribute(
+           %ModelService.FindProjectModelAttributeAttributes{
+             project_slug: project_slug,
+             model_slug: model_slug,
+             attribute_name: attribute_name
+           }
+         ) do
+      %Attribute{} = attribute ->
         to_proto_attribute(attribute)
 
       _ ->
@@ -262,13 +238,13 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def list_project_model_attributes(%ListProjectModelAttributesRequest{} = request, _stream) do
-    %ListProjectModelAttributesRequest{
+  def list_project_model_attributes(%Proto.ListProjectModelAttributesRequest{} = request, _stream) do
+    %Proto.ListProjectModelAttributesRequest{
       project_slug: project_slug,
       model_slug: model_slug
     } = request
 
-    attributes = %ListProjectModelAttributesAttributes{
+    attributes = %ModelService.ListProjectModelAttributesAttributes{
       project_slug: project_slug,
       model_slug: model_slug
     }
@@ -278,13 +254,13 @@ defmodule GymnasiumGrpc.ModelsServer do
       |> ModelService.list_project_model_attributes()
       |> Enum.map(fn a -> to_proto_attribute(a) end)
 
-    %ListProjectModelAttributesResponse{
+    %Proto.ListProjectModelAttributesResponse{
       attributes: attributes
     }
   end
 
-  def delete_attribute(%DeleteAttributeRequest{} = request, _stream) do
-    %DeleteAttributeRequest{
+  def delete_attribute(%Proto.DeleteAttributeRequest{} = request, _stream) do
+    %Proto.DeleteAttributeRequest{
       id: id
     } = request
 
@@ -298,7 +274,7 @@ defmodule GymnasiumGrpc.ModelsServer do
   end
 
   defp to_proto_model(%Model{} = model) do
-    %ProtoModel{
+    %Proto.Model{
       id: model.id,
       project_id: model.project_id,
       description: model.description,
@@ -310,15 +286,15 @@ defmodule GymnasiumGrpc.ModelsServer do
   end
 
   defp to_proto_model_overview(%Model{} = model) do
-    %ModelOverview{
+    %Proto.ModelOverview{
       model: to_proto_model(model),
       associations: model.associations |> Enum.map(fn a -> to_proto_association(a) end),
       attributes: model.attributes |> Enum.map(fn a -> to_proto_attribute(a) end)
     }
   end
 
-  def to_proto_association(%ModelAssociation{} = association) do
-    %ProtoAssociation{
+  def to_proto_association(%Association{} = association) do
+    %Proto.Association{
       id: association.id,
       model_id: association.model_id,
       associated_model: to_proto_model(association.associated_model),
@@ -330,8 +306,8 @@ defmodule GymnasiumGrpc.ModelsServer do
     }
   end
 
-  def to_proto_attribute(%ModelAttribute{} = attribute) do
-    %ProtoAttribute{
+  def to_proto_attribute(%Attribute{} = attribute) do
+    %Proto.Attribute{
       id: attribute.id,
       model_id: attribute.model_id,
       description: attribute.description,

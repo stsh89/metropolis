@@ -5,7 +5,8 @@ defmodule Gymnasium.ProjectModels do
 
   import Ecto.Query, warn: false
 
-  alias Gymnasium.Dimensions.{Model, Project, ModelAttribute, ModelAssociation}
+  alias Gymnasium.Models.{Model, Attribute, Association}
+  alias Gymnasium.Projects.Project
   alias Gymnasium.Repo
 
   @doc """
@@ -75,16 +76,16 @@ defmodule Gymnasium.ProjectModels do
   ## Examples
 
       iex> find_project_model_attribute!("book-store", "book", "title")
-      %ModelAttribute{}
+      %Attribute{}
 
       iex> find_project_model_attribute!("", "")
       ** (Ecto.NoResultsError)
 
   """
-  @spec find_project_model_attribute!(String.t(), String.t(), String.t()) :: ModelAttribute.t()
+  @spec find_project_model_attribute!(String.t(), String.t(), String.t()) :: Attribute.t()
   def find_project_model_attribute!(project_slug, model_slug, attribute_name) do
     query =
-      from ma in ModelAttribute,
+      from ma in Attribute,
         join: m in Model,
         on: ma.model_id == m.id,
         join: p in Project,
@@ -101,13 +102,13 @@ defmodule Gymnasium.ProjectModels do
   ## Examples
 
       iex> list_project_model_attributes("book-store", "book")
-      %ModelAttribute{}
+      %Attribute{}
 
   """
-  @spec list_project_model_attributes(String.t(), String.t()) :: [ModelAttribute.t()]
+  @spec list_project_model_attributes(String.t(), String.t()) :: [Attribute.t()]
   def list_project_model_attributes(project_slug, model_slug) do
     query =
-      from ma in ModelAttribute,
+      from ma in Attribute,
         join: m in Model,
         on: ma.model_id == m.id,
         join: p in Project,
@@ -126,17 +127,17 @@ defmodule Gymnasium.ProjectModels do
   ## Examples
 
       iex> find_project_model_association!("book-store", "book", "title")
-      %ModelAssociation{}
+      %Association{}
 
       iex> find_project_model_association!("", "")
       ** (Ecto.NoResultsError)
 
   """
   @spec find_project_model_association!(String.t(), String.t(), String.t()) ::
-          ModelAssociation.t()
+          Association.t()
   def find_project_model_association!(project_slug, model_slug, association_name) do
     query =
-      from ma in ModelAssociation,
+      from ma in Association,
         join: m in Model,
         on: ma.model_id == m.id,
         join: p in Project,
@@ -154,13 +155,13 @@ defmodule Gymnasium.ProjectModels do
   ## Examples
 
       iex> list_project_model_associations("book-store", "book")
-      %ModelAssociation{}
+      %Association{}
 
   """
-  @spec list_project_model_associations(String.t(), String.t()) :: [ModelAssociation.t()]
+  @spec list_project_model_associations(String.t(), String.t()) :: [Association.t()]
   def list_project_model_associations(project_slug, model_slug) do
     query =
-      from ma in ModelAssociation,
+      from ma in Association,
         join: m in Model,
         on: ma.model_id == m.id,
         join: p in Project,

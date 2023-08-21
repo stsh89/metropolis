@@ -1,7 +1,8 @@
 defmodule Gymnasium.ProjectModelsTest do
   use Gymnasium.DataCase
 
-  alias Gymnasium.Dimensions.{Project, Model}
+  alias Gymnasium.Projects.Project
+  alias Gymnasium.Models.Model
   alias Gymnasium.ProjectModels
 
   import Gymnasium.ModelsFixtures

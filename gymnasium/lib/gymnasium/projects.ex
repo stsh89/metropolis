@@ -4,11 +4,10 @@ defmodule Gymnasium.Projects do
   """
 
   import Ecto.Query, warn: false
+
   alias Gymnasium.Repo
-
-  alias Gymnasium.Dimensions.{Project, Model, ModelAttribute, ModelAssociation}
-
-  @type t :: %Project{}
+  alias Gymnasium.Projects.Project
+  alias Gymnasium.Models.{Model, Association, Attribute}
 
   @doc """
   Creates a project.
@@ -22,7 +21,7 @@ defmodule Gymnasium.Projects do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_project(map()) :: {:ok, t} | {:error, %Ecto.Changeset{}}
+  @spec create_project(map()) :: {:ok, Project.t()} | {:error, Ecto.Changeset.t()}
   def create_project(attrs \\ %{}) do
     %Project{}
     |> Project.changeset(attrs)
@@ -63,7 +62,7 @@ defmodule Gymnasium.Projects do
       [%Project{}, ...]
 
   """
-  @spec list_projects(Keyword.t()) :: [t]
+  @spec list_projects(Keyword.t()) :: [Project.t()]
   def list_projects(attrs \\ []) do
     query = from p in Project, order_by: [desc: p.inserted_at]
 
@@ -98,7 +97,7 @@ defmodule Gymnasium.Projects do
       ** (Ecto.NoResultsError)
 
   """
-  @spec find_project!(String.t()) :: t
+  @spec find_project!(String.t()) :: Project.t()
   def find_project!(slug), do: Repo.get_by!(Project, slug: slug)
 
   @doc """
@@ -141,15 +140,15 @@ defmodule Gymnasium.Projects do
       end
 
     model_association_ids =
-      Repo.all(from ma in ModelAssociation, where: ma.model_id in ^model_ids, select: ma.id)
+      Repo.all(from ma in Association, where: ma.model_id in ^model_ids, select: ma.id)
 
     model_attribute_ids =
-      Repo.all(from ma in ModelAttribute, where: ma.model_id in ^model_ids, select: ma.id)
+      Repo.all(from ma in Attribute, where: ma.model_id in ^model_ids, select: ma.id)
 
     Repo.transaction(fn ->
       Repo.delete_all(from m in Model, where: m.id in ^model_ids)
-      Repo.delete_all(from ma in ModelAssociation, where: ma.id in ^model_association_ids)
-      Repo.delete_all(from ma in ModelAttribute, where: ma.id in ^model_attribute_ids)
+      Repo.delete_all(from ma in Association, where: ma.id in ^model_association_ids)
+      Repo.delete_all(from ma in Attribute, where: ma.id in ^model_attribute_ids)
 
       Repo.delete!(project)
     end)
@@ -168,7 +167,7 @@ defmodule Gymnasium.Projects do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec archive_project(Project.t()) :: {:ok, Project.t()} | {:error, %Ecto.Changeset{}}
+  @spec archive_project(Project.t()) :: {:ok, Project.t()} | {:error, Ecto.Changeset.t()}
   def archive_project(%Project{} = project) do
     project
     |> change_project(%{archived_at: DateTime.utc_now()})
@@ -188,7 +187,7 @@ defmodule Gymnasium.Projects do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec restore_project(Project.t()) :: {:ok, Project.t()} | {:error, %Ecto.Changeset{}}
+  @spec restore_project(Project.t()) :: {:ok, Project.t()} | {:error, Ecto.Changeset.t()}
   def restore_project(%Project{} = project) do
     project
     |> change_project(%{archived_at: nil})

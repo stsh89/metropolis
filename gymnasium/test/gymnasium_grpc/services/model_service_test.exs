@@ -2,8 +2,10 @@ defmodule GymnasiumGrpc.ModelServiceTest do
   use Gymnasium.DataCase
 
   alias GymnasiumGrpc.ModelService
-  alias Gymnasium.Dimensions.{Project, Model, ModelAssociation, ModelAttribute}
-  alias Gymnasium.{Projects, Models}
+  alias Gymnasium.Projects.Project
+  alias Gymnasium.Models.{Model, Association, Attribute}
+  alias Gymnasium.Projects
+  alias Gymnasium.Models
 
   alias GymnasiumGrpc.ModelService.{
     CreateModelAttributes,
@@ -140,7 +142,7 @@ defmodule GymnasiumGrpc.ModelServiceTest do
         name: "Author"
       }
 
-      assert %ModelAssociation{} = ModelService.create_association(attributes)
+      assert %Association{} = ModelService.create_association(attributes)
       assert false == Models.list_associations() |> Enum.empty?()
     end
 
@@ -154,7 +156,7 @@ defmodule GymnasiumGrpc.ModelServiceTest do
 
   describe "delete Model association" do
     test "delete_association/1 returns :ok on successfull deletion" do
-      %ModelAssociation{id: id} = model_association_fixture()
+      %Association{id: id} = model_association_fixture()
 
       assert ModelService.delete_association(id) == :ok
       assert true == Models.list_associations() |> Enum.empty?()
@@ -175,7 +177,7 @@ defmodule GymnasiumGrpc.ModelServiceTest do
         name: "title"
       }
 
-      assert %ModelAttribute{} = ModelService.create_attribute(attributes)
+      assert %Attribute{} = ModelService.create_attribute(attributes)
       assert false == Models.list_attributes() |> Enum.empty?()
     end
 
@@ -189,7 +191,7 @@ defmodule GymnasiumGrpc.ModelServiceTest do
 
   describe "delete Model attribute" do
     test "delete_attribute/1 returns :ok on successfull deletion" do
-      %ModelAttribute{id: id} = model_attribute_fixture()
+      %Attribute{id: id} = model_attribute_fixture()
 
       assert ModelService.delete_attribute(id) == :ok
       assert true == Models.list_attributes() |> Enum.empty?()

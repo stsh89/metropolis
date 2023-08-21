@@ -1,4 +1,6 @@
 defmodule Gymnasium.Config do
+  @moduledoc false
+
   @config :gymnasium
           |> Application.compile_env(:project_root_path)
           |> Path.join("config.json")

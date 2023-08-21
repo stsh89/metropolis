@@ -4,6 +4,8 @@ defmodule Gymnasium.ModelsFixtures do
   entities via the `Gymnasium.Models` context.
   """
 
+  alias Gymnasium.Models
+
   @doc """
   Generate a model.
   """
@@ -16,7 +18,7 @@ defmodule Gymnasium.ModelsFixtures do
         name: "Book",
         slug: "book"
       })
-      |> Gymnasium.Dimensions.create_model()
+      |> Models.create_model()
 
     model
   end
@@ -33,7 +35,7 @@ defmodule Gymnasium.ModelsFixtures do
         kind: "string",
         name: "title"
       })
-      |> Gymnasium.Dimensions.create_model_attribute()
+      |> Models.create_attribute()
 
     model_attribute
   end
