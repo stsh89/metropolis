@@ -1,4 +1,15 @@
 defmodule Gymnasium.Dimensions.ModelAssociation do
+  @type t() :: %__MODULE__{
+          id: Ecto.UUID.t(),
+          model_id: Ecto.UUID.t(),
+          associated_model_id: Ecto.UUID.t(),
+          description: String.t(),
+          name: String.t(),
+          kind: String.t(),
+          inserted_at: Calendar.datetime(),
+          updated_at: Calendar.datetime()
+        }
+
   alias Gymnasium.Dimensions.Model
 
   use Gymnasium.Schema

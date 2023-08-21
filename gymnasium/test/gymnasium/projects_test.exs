@@ -271,7 +271,7 @@ defmodule Gymnasium.ProjectsTest do
       assert Projects.list_projects() == []
       assert Models.list_models() == []
       assert Models.list_model_attributes() == []
-      assert Models.list_model_associations() == []
+      assert Models.list_associations() == []
     end
 
     test "delete_project/1 raises Ecto.NoPrimaryKeyValueError" do

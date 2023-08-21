@@ -78,6 +78,14 @@ defmodule Gymnasium.Models do
       Repo.delete_all(from ma in ModelAssociation, where: ma.id in ^model_association_ids)
       Repo.delete_all(from ma in ModelAttribute, where: ma.id in ^model_attribute_ids)
 
+      if model.id != nil do
+        from(ma in ModelAssociation,
+          where: ma.associated_model_id == ^model.id,
+          update: [set: [associated_model_id: nil]]
+        )
+        |> Repo.update_all([])
+      end
+
       Repo.delete!(model)
     end)
   end
@@ -91,6 +99,7 @@ defmodule Gymnasium.Models do
       [%Model{}, ...]
 
   """
+  @spec list_models() :: [Model.t()]
   def list_models() do
     query = from m in Model, order_by: [asc: m.name]
 
@@ -106,6 +115,7 @@ defmodule Gymnasium.Models do
       [%ModelAttribute{}, ...]
 
   """
+  @spec list_models() :: [ModelAttribute.t()]
   def list_model_attributes() do
     query = from m in ModelAttribute, order_by: [asc: m.name]
 
@@ -117,11 +127,12 @@ defmodule Gymnasium.Models do
 
   ## Examples
 
-      iex> list_model_associations()
+      iex> list_associations()
       [%ModelAssociation{}, ...]
 
   """
-  def list_model_associations() do
+  @spec list_models() :: [ModelAssociation.t()]
+  def list_associations() do
     query = from m in ModelAssociation, order_by: [asc: m.name]
 
     Repo.all(query)
