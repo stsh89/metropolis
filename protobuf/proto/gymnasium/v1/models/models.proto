@@ -19,6 +19,18 @@ service Models {
     // Delete a Model.
     rpc DeleteModel(DeleteModelRequest) returns (google.protobuf.Empty);
 
+    // Create Model association.
+    rpc CreateAssociation(CreateAssociationRequest) returns (Association);
+
+    // Find Project's Model's association.
+    rpc FindProjectModelAssociation(FindProjectModelAssociationRequest) returns (Association);
+
+    // List Project's Model's associations.
+    rpc ListProjectModelAssociations(ListProjectModelAssociationsRequest) returns (ListProjectModelAssociationsResponse);
+
+    // Delete Models association.
+    rpc DeleteAssociation(DeleteAssociationRequest) returns (google.protobuf.Empty);
+
     // Create Model attribute.
     rpc CreateAttribute(CreateAttributeRequest) returns (Attribute);
 
@@ -54,6 +66,33 @@ message Model {
 
     // The timestamp of the last Model's update.
     google.protobuf.Timestamp update_time = 7;
+}
+
+// Representation of the Models association.
+message Association {
+    // Unique identifier for the Association. Text representation of the UUID.
+    string id = 1;
+
+    // Unique identifier for the Model to which Association belongs. Text representation of the UUID.
+    string model_id = 2;
+
+    // Associated model.
+    Model associated_model = 3;
+
+    // The description of the Association.
+    string description = 4;
+
+    // The kind of the Association.
+    AssociationKind kind = 5;
+
+    // The name of the Association.
+    string name = 6;
+
+    // The creation time of the Association.
+    google.protobuf.Timestamp create_time = 7;
+
+    // The timestamp of the last Association's update.
+    google.protobuf.Timestamp update_time = 8;
 }
 
 // Representation of the Model's attribute.
@@ -137,6 +176,25 @@ message CreateAttributeRequest {
     string name = 4;
 }
 
+// Request definition for Model association creation.
+message CreateAssociationRequest {
+    // Model id. UUID in a string form.
+    string model_id = 1;
+
+    // Associated model id. UUID in a string form.
+    string associated_model_id = 2;
+
+    // The description of the Model's association.
+    string description = 3;
+
+    // Kind of the Model's association;
+    AttributeKind kind = 4;
+
+    // The name of the Model's association.
+    string name = 5;
+}
+
+
 // Request definition for Model attribute finding.
 message FindProjectModelAttributeRequest {
     // Project unique web identifier.
@@ -149,8 +207,30 @@ message FindProjectModelAttributeRequest {
     string attribute_name = 3;
 }
 
+// Request definition for Model association finding.
+message FindProjectModelAssociationRequest {
+    // Project unique web identifier.
+    string project_slug = 1;
+
+    // Model unique web identifier.
+    string model_slug = 2;
+
+    // Association's name.
+    string association_name = 3;
+}
+
+
 // Request definition for Model attributes listing.
 message ListProjectModelAttributesRequest {
+    // Project unique web identifier.
+    string project_slug = 1;
+
+    // Model unique web identifier.
+    string model_slug = 2;
+}
+
+// Request definition for Model associations listing.
+message ListProjectModelAssociationsRequest {
     // Project unique web identifier.
     string project_slug = 1;
 
@@ -164,9 +244,21 @@ message ListProjectModelAttributesResponse {
     repeated Attribute attributes = 1;
 }
 
+// Response definition for Model associations listing.
+message ListProjectModelAssociationsResponse {
+    // List of Model's associations.
+    repeated Association associations = 1;
+}
+
 // Request definition for Model attribute deletion.
 message DeleteAttributeRequest {
     // Unique attribute identifier. UUID in a string form.
+    string id = 1;
+}
+
+// Request definition for Model association deletion.
+message DeleteAssociationRequest {
+    // Unique association identifier. UUID in a string form.
     string id = 1;
 }
 
@@ -183,4 +275,19 @@ enum AttributeKind {
 
     // Bool
     ATTRIBUTE_KIND_BOOL = 3;
+}
+
+// All possible kinds of Model associations.
+enum AssociationKind {
+    // Unspecified
+    ASSOCIATION_KIND_UNSPECIFIED = 0;
+
+    // Belongs to
+    ASSOCIATION_KIND_BELONGS_TO = 1;
+
+    // Has one
+    ASSOCIATION_KIND_HAS_ONE = 2;
+
+    // Has many
+    ASSOCIATION_KIND_HAS_MANY = 3;
 }

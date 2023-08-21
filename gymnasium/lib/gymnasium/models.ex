@@ -112,8 +112,6 @@ defmodule Gymnasium.Models do
   @doc """
   Deletes a Model attribute.
 
-  Returns the struct or raises some Ecto error.
-
   ## Examples
 
       iex> delete_attribute(model)
@@ -127,6 +125,24 @@ defmodule Gymnasium.Models do
           {:ok, ModelAttribute.t()} | {:error, Ecto.Changeset.t()}
   def delete_attribute(%ModelAttribute{} = attribute) do
     Repo.delete(attribute)
+  end
+
+  @doc """
+  Deletes a Model association.
+
+  ## Examples
+
+      iex> delete_association(model)
+      {:ok, %ModelAssociation{}}
+
+      iex> delete_association(model)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec delete_association(ModelAssociation.t()) ::
+          {:ok, ModelAssociation.t()} | {:error, Ecto.Changeset.t()}
+  def delete_association(%ModelAssociation{} = association) do
+    Repo.delete(association)
   end
 
   @doc """
@@ -180,33 +196,18 @@ defmodule Gymnasium.Models do
   @doc """
   Creates a model association.
 
-  ## Options
-
-      * `:preload_associated_model` - return Model association with preloaded
-      associated Model.
-
   ## Examples
 
-      iex> create_model_association(%{field: value})
+      iex> create_association(%{field: value})
       {:ok, %model{}}
 
-      iex> create_model_association(%{field: bad_value})
+      iex> create_association(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_model_association(attrs \\ %{}) do
-    {:ok, model_association} =
-      %ModelAssociation{}
-      |> ModelAssociation.changeset(attrs)
-      |> Repo.insert()
-
-    model_association =
-      if attrs[:preload_associated_model] do
-        Repo.preload(model_association, :associated_model)
-      else
-        model_association
-      end
-
-    {:ok, model_association}
+  def create_association(attrs \\ %{}) do
+    %ModelAssociation{}
+    |> ModelAssociation.changeset(attrs)
+    |> Repo.insert()
   end
 end

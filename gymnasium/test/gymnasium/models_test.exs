@@ -2,7 +2,7 @@ defmodule Gymnasium.ModelsTest do
   use Gymnasium.DataCase
 
   alias Gymnasium.{Model, Models, Models}
-  alias Gymnasium.Dimensions.{Project, Model, ModelAttribute}
+  alias Gymnasium.Dimensions.{Project, Model, ModelAttribute, ModelAssociation}
 
   import Gymnasium.ModelsFixtures
   import Gymnasium.ProjectsFixtures
@@ -108,7 +108,53 @@ defmodule Gymnasium.ModelsTest do
     end
   end
 
-  describe "create a model attribute" do
+  describe "delete model" do
+    test "delete_model/1 removes a Model" do
+      model = model_fixture()
+
+      assert {:ok, %Model{}} = Models.delete_model!(model)
+      assert Models.list_models() == []
+    end
+
+    test "delete_model/1 removes a Model with all associations" do
+      model = model_fixture()
+      associated_model = model_fixture(name: "Author", slug: "author")
+      model_attribute_fixture(model_id: model.id)
+      model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
+
+      assert {:ok, %Model{}} = Models.delete_model!(model)
+      assert Models.list_models() == [associated_model]
+      assert Models.list_attributes() == []
+      assert Models.list_associations() == []
+    end
+
+    test "delete_model/1 sets nil for associated models" do
+      model = model_fixture()
+      associated_model = model_fixture(name: "Author", slug: "author")
+      model_attribute_fixture(model_id: model.id)
+
+      association =
+        model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
+
+      assert {:ok, %Model{}} = Models.delete_model!(associated_model)
+      assert Models.list_models() == [model]
+      assert Models.list_associations() == [Map.put(association, :associated_model_id, nil)]
+    end
+
+    test "delete_model/1 raises Ecto.NoPrimaryKeyValueError" do
+      assert_raise Ecto.NoPrimaryKeyValueError, fn ->
+        Models.delete_model!(%Model{})
+      end
+    end
+
+    test "delete_model/1 raises Ecto.StaleEntryError" do
+      assert_raise Ecto.StaleEntryError, fn ->
+        Models.delete_model!(%Model{id: Ecto.UUID.generate()})
+      end
+    end
+  end
+
+  describe "create model attribute" do
     test "create_attribute/1 saves Model's attribute" do
       %Model{id: model_id} = model_fixture()
 
@@ -204,52 +250,6 @@ defmodule Gymnasium.ModelsTest do
     end
   end
 
-  describe "delete model" do
-    test "delete_model/1 removes a Model" do
-      model = model_fixture()
-
-      assert {:ok, %Model{}} = Models.delete_model!(model)
-      assert Models.list_models() == []
-    end
-
-    test "delete_model/1 removes a Model with all associations" do
-      model = model_fixture()
-      associated_model = model_fixture(name: "Author", slug: "author")
-      model_attribute_fixture(model_id: model.id)
-      model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
-
-      assert {:ok, %Model{}} = Models.delete_model!(model)
-      assert Models.list_models() == [associated_model]
-      assert Models.list_attributes() == []
-      assert Models.list_associations() == []
-    end
-
-    test "delete_model/1 sets nil for associated models" do
-      model = model_fixture()
-      associated_model = model_fixture(name: "Author", slug: "author")
-      model_attribute_fixture(model_id: model.id)
-
-      association =
-        model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
-
-      assert {:ok, %Model{}} = Models.delete_model!(associated_model)
-      assert Models.list_models() == [model]
-      assert Models.list_associations() == [Map.put(association, :associated_model_id, nil)]
-    end
-
-    test "delete_model/1 raises Ecto.NoPrimaryKeyValueError" do
-      assert_raise Ecto.NoPrimaryKeyValueError, fn ->
-        Models.delete_model!(%Model{})
-      end
-    end
-
-    test "delete_model/1 raises Ecto.StaleEntryError" do
-      assert_raise Ecto.StaleEntryError, fn ->
-        Models.delete_model!(%Model{id: Ecto.UUID.generate()})
-      end
-    end
-  end
-
   describe "delete model attribute" do
     test "delete_attribute/1 removes a Model attribute" do
       attribute = model_attribute_fixture()
@@ -258,9 +258,141 @@ defmodule Gymnasium.ModelsTest do
       assert Models.list_attributes() == []
     end
 
-    test "delete_model/1 raises Ecto.StaleEntryError" do
+    test "delete_attribute/1 raises Ecto.StaleEntryError" do
       assert_raise Ecto.StaleEntryError, fn ->
         Models.delete_attribute(%ModelAttribute{id: Ecto.UUID.generate()})
+      end
+    end
+  end
+
+  describe "create model association" do
+    test "create_association/1 saves Model's association" do
+      %Model{id: model_id} = model_fixture()
+      %Model{id: associated_model_id} = model_fixture(name: "Author", slug: "author")
+
+      attrs = %{
+        model_id: model_id,
+        associated_model_id: associated_model_id,
+        kind: "belongs_to",
+        description: "The author of the book",
+        name: "Author"
+      }
+
+      assert {:ok, %ModelAssociation{} = association} = Models.create_association(attrs)
+      assert false == Models.list_associations() |> Enum.empty?()
+
+      assert association.model_id == model_id
+      assert association.associated_model_id == associated_model_id
+      assert association.description == "The author of the book"
+      assert association.name == "Author"
+      assert association.kind == "belongs_to"
+    end
+
+    test "create_association/1 returns error on invalid attrs" do
+      assert {:error, %Ecto.Changeset{}} = Models.create_association(%{})
+      assert true == Models.list_associations() |> Enum.empty?()
+    end
+
+    test "create_association/1 returns error on missing name" do
+      attrs = %{
+        model_id: Ecto.UUID.generate(),
+        associated_model_id: Ecto.UUID.generate(),
+        kind: "belongs_to",
+        description: "The title of the book.",
+        name: ""
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_association(attrs)
+      assert errors == [name: {"can't be blank", [validation: :required]}]
+    end
+
+    test "create_association/1 returns error on missing kind" do
+      attrs = %{
+        model_id: Ecto.UUID.generate(),
+        associated_model_id: Ecto.UUID.generate(),
+        description: "The title of the book.",
+        name: "Author"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_association(attrs)
+      assert errors == [kind: {"can't be blank", [validation: :required]}]
+    end
+
+    test "create_association/1 returns error on invalid kind" do
+      attrs = %{
+        model_id: Ecto.UUID.generate(),
+        associated_model_id: Ecto.UUID.generate(),
+        description: "The title of the book.",
+        name: "Author",
+        kind: "many_to_many"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_association(attrs)
+
+      assert errors == [
+               kind:
+                 {"is invalid",
+                  [{:validation, :inclusion}, {:enum, ["belongs_to", "has_one", "has_many"]}]}
+             ]
+    end
+
+    test "create_association/1 returns error on missing model_id" do
+      attrs = %{
+        associated_model_id: Ecto.UUID.generate(),
+        description: "The title of the book.",
+        name: "Author",
+        kind: "belongs_to"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_association(attrs)
+      assert errors == [model_id: {"can't be blank", [validation: :required]}]
+    end
+
+    test "create_association/1 returns error on missing associated_model_id" do
+      attrs = %{
+        model_id: Ecto.UUID.generate(),
+        description: "The title of the book.",
+        name: "Author",
+        kind: "belongs_to"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_association(attrs)
+      assert errors == [associated_model_id: {"can't be blank", [validation: :required]}]
+    end
+
+    test "create_association/1 returns error on existing model id and name pair" do
+      %Model{id: model_id} = model_fixture()
+      %ModelAssociation{name: name} = model_association_fixture(model_id: model_id)
+
+      attrs = %{
+        associated_model_id: Ecto.UUID.generate(),
+        model_id: model_id,
+        description: "The title of the book.",
+        name: name,
+        kind: "belongs_to"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_association(attrs)
+
+      assert errors == [
+               model_id:
+                 {"has already been taken",
+                  [constraint: :unique, constraint_name: "model_associations_model_id_name_index"]}
+             ]
+    end
+  end
+
+  describe "delete model association" do
+    test "delete_association/1 removes a Model association" do
+      association = model_association_fixture()
+
+      assert {:ok, %ModelAssociation{}} = Models.delete_association(association)
+      assert Models.list_associations() == []
+    end
+
+    test "delete_association/1 raises Ecto.StaleEntryError" do
+      assert_raise Ecto.StaleEntryError, fn ->
+        Models.delete_association(%ModelAssociation{id: Ecto.UUID.generate()})
       end
     end
   end

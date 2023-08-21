@@ -45,13 +45,13 @@ defmodule Gymnasium.ModelsFixtures do
     {:ok, model_association} =
       attrs
       |> Enum.into(%{
-        model_id: nil,
-        associated_model_id: nil,
+        model_id: Ecto.UUID.generate(),
+        associated_model_id: Ecto.UUID.generate(),
         description: "The Author of the BOok",
         kind: "belongs_to",
         name: "author"
       })
-      |> Gymnasium.Models.create_model_association()
+      |> Gymnasium.Models.create_association()
 
     model_association
   end
