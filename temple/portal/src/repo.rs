@@ -1,17 +1,13 @@
 use crate::{util, PortalError, PortalErrorCode, PortalResult};
 use foundation::{datastore, model, project, FoundationError, FoundationResult};
 
-pub mod proto {
-    tonic::include_proto!("proto.gymnasium.v1.projects");
-
-    tonic::include_proto!("proto.gymnasium.v1");
-
-    pub mod dimensions {
-        tonic::include_proto!("proto.gymnasium.v1.dimensions");
-    }
-
+mod proto {
     pub mod models {
         tonic::include_proto!("proto.gymnasium.v1.models");
+    }
+
+    pub mod projects {
+        tonic::include_proto!("proto.gymnasium.v1.projects");
     }
 }
 
@@ -296,21 +292,15 @@ impl model::get_project_class_diagram::ListModels for Repo {
         &self,
         project_slug: &str,
     ) -> FoundationResult<model::get_project_class_diagram::ListModelsResponse> {
-        let model_records = self.list_models(project_slug.to_owned()).await?;
+        let project_overview = self.find_project_models_overview(project_slug.to_owned()).await?;
 
-        let mut models = Vec::with_capacity(model_records.len());
-
-        for model_record in model_records {
-            let (model, associations, attributes) = self
-                .get_model_full(project_slug.to_owned(), model_record.slug)
-                .await?;
-
-            models.push(model::get_project_class_diagram::ModelData {
+        let models = project_overview.into_iter().map(|(model, attributes, associations)| {
+            model::get_project_class_diagram::ModelData {
                 model,
-                associations,
                 attributes,
-            })
-        }
+                associations,
+            }
+        }).collect();
 
         let response = model::get_project_class_diagram::ListModelsResponse { models };
 
@@ -319,18 +309,11 @@ impl model::get_project_class_diagram::ListModels for Repo {
 }
 
 impl Repo {
-    async fn connect(
-        &self,
-    ) -> PortalResult<proto::dimensions_client::DimensionsClient<tonic::transport::Channel>> {
-        proto::dimensions_client::DimensionsClient::connect(self.connection_string.clone())
-            .await
-            .map_err(|err| PortalError::internal(err.to_string()))
-    }
-
     async fn projects_client(
         &self,
-    ) -> PortalResult<proto::projects_client::ProjectsClient<tonic::transport::Channel>> {
-        proto::projects_client::ProjectsClient::connect(self.connection_string.clone())
+    ) -> PortalResult<proto::projects::projects_client::ProjectsClient<tonic::transport::Channel>>
+    {
+        proto::projects::projects_client::ProjectsClient::connect(self.connection_string.clone())
             .await
             .map_err(|err| PortalError::internal(err.to_string()))
     }
@@ -347,8 +330,8 @@ impl Repo {
         let mut client = self.projects_client().await?;
 
         let response = client
-            .list_projects(proto::ListProjectsRequest {
-                archive_state: proto::ProjectArchiveState::NotArchived.into(),
+            .list_projects(proto::projects::ListProjectsRequest {
+                archive_state: proto::projects::ProjectArchiveState::NotArchived.into(),
             })
             .await?
             .into_inner();
@@ -366,8 +349,8 @@ impl Repo {
         let mut client = self.projects_client().await?;
 
         let response = client
-            .list_projects(proto::ListProjectsRequest {
-                archive_state: proto::ProjectArchiveState::Archived.into(),
+            .list_projects(proto::projects::ListProjectsRequest {
+                archive_state: proto::projects::ProjectArchiveState::Archived.into(),
             })
             .await?
             .into_inner();
@@ -385,7 +368,7 @@ impl Repo {
         let mut client = self.projects_client().await?;
 
         let proto_project = client
-            .find_project(proto::FindProjectRequest { slug })
+            .find_project(proto::projects::FindProjectRequest { slug })
             .await?
             .into_inner();
 
@@ -401,7 +384,7 @@ impl Repo {
         let mut client = self.projects_client().await?;
 
         let proto_project = client
-            .create_project(proto::CreateProjectRequest {
+            .create_project(proto::projects::CreateProjectRequest {
                 description: project.description.unwrap_or_default(),
                 name: project.name,
                 slug: project.slug,
@@ -418,7 +401,7 @@ impl Repo {
         let mut client = self.projects_client().await?;
 
         client
-            .archive_project(proto::ArchiveProjectRequest {
+            .archive_project(proto::projects::ArchiveProjectRequest {
                 id: project.id.to_string(),
             })
             .await?;
@@ -430,7 +413,7 @@ impl Repo {
         let mut client = self.projects_client().await?;
 
         client
-            .restore_project(proto::RestoreProjectRequest {
+            .restore_project(proto::projects::RestoreProjectRequest {
                 id: project.id.to_string(),
             })
             .await?;
@@ -442,7 +425,7 @@ impl Repo {
         let mut client = self.projects_client().await?;
 
         client
-            .delete_project(proto::DeleteProjectRequest {
+            .delete_project(proto::projects::DeleteProjectRequest {
                 id: project.id.to_string(),
             })
             .await?;
@@ -457,7 +440,7 @@ impl Repo {
         let mut client = self.projects_client().await?;
 
         let proto_project = client
-            .rename_project(proto::RenameProjectRequest {
+            .rename_project(proto::projects::RenameProjectRequest {
                 id: project.id.to_string(),
                 name: project.name,
                 slug: project.slug,
@@ -499,36 +482,91 @@ impl Repo {
         Vec<datastore::model::Association>,
         Vec<datastore::model::Attribute>,
     )> {
-        let mut client = self.connect().await?;
+        let mut client = self.models_client().await?;
 
-        let response = client
-            .get_model_record(proto::GetModelRecordRequest {
-                project_slug,
-                model_slug,
-                preload_attributes: true,
-                preload_associations: true,
+        let proto_model = client
+            .find_project_model(proto::models::FindProjectModelRequest {
+                project_slug: project_slug.clone(),
+                model_slug: model_slug.clone(),
             })
             .await?
             .into_inner();
 
-        let proto_model = response
-            .model_record
-            .ok_or(PortalError::internal("empty model_record"))?;
+        let model = datastore_model(proto_model)?;
 
-        let model = from_proto_model(proto_model)?;
+        let response = client
+            .list_project_model_associations(proto::models::ListProjectModelAssociationsRequest {
+                project_slug: project_slug.clone(),
+                model_slug: model_slug.clone(),
+            })
+            .await?
+            .into_inner();
+
         let associations = response
-            .model_association_records
+            .associations
             .into_iter()
-            .map(from_proto_model_association)
+            .map(datastore_model_association)
             .collect::<PortalResult<Vec<datastore::model::Association>>>()?;
 
+        let response = client
+            .list_project_model_attributes(proto::models::ListProjectModelAttributesRequest {
+                project_slug,
+                model_slug,
+            })
+            .await?
+            .into_inner();
+
         let attributes = response
-            .model_attribute_records
+            .attributes
             .into_iter()
-            .map(from_proto_model_attribute)
+            .map(datastore_model_attribute)
             .collect::<PortalResult<Vec<datastore::model::Attribute>>>()?;
 
         Ok((model, associations, attributes))
+    }
+
+    async fn find_project_models_overview(
+        &self,
+        project_slug: String,
+    ) -> PortalResult<
+        Vec<(
+            datastore::model::Model,
+            Vec<datastore::model::Attribute>,
+            Vec<datastore::model::Association>,
+        )>,
+    > {
+        let mut client = self.models_client().await?;
+
+        let response = client
+            .find_project_models_overview(proto::models::FindProjectModelsOverviewRequest {
+                project_slug,
+            })
+            .await?
+            .into_inner();
+
+        let mut model_overviews = Vec::with_capacity(response.model_overviews.len());
+
+        for model_overview in response.model_overviews {
+            if model_overview.model.is_none() {
+                return Err(PortalError::internal("missing model"));
+            }
+
+            model_overviews.push((
+                datastore_model(model_overview.model.unwrap())?,
+                model_overview
+                    .attributes
+                    .into_iter()
+                    .map(datastore_model_attribute)
+                    .collect::<PortalResult<Vec<datastore::model::Attribute>>>()?,
+                model_overview
+                    .associations
+                    .into_iter()
+                    .map(datastore_model_association)
+                    .collect::<PortalResult<Vec<datastore::model::Association>>>()?,
+            ))
+        }
+
+        Ok(model_overviews)
     }
 
     async fn list_models(
@@ -590,30 +628,26 @@ impl Repo {
         model_record: datastore::model::Model,
         model_attribute: model::Attribute,
     ) -> PortalResult<datastore::model::Attribute> {
-        let mut client = self.connect().await?;
+        let mut client = self.models_client().await?;
 
-        let response = client
-            .create_model_attribute_record(proto::CreateModelAttributeRecordRequest {
+        let proto_attribute = client
+            .create_attribute(proto::models::CreateAttributeRequest {
                 model_id: model_record.id.to_string(),
                 description: model_attribute.description.unwrap_or_default(),
                 name: model_attribute.name,
                 kind: match model_attribute.kind {
-                    model::AttributeKind::String => proto::dimensions::ModelAttributeKind::String,
-                    model::AttributeKind::Int64 => proto::dimensions::ModelAttributeKind::Int64,
-                    model::AttributeKind::Bool => proto::dimensions::ModelAttributeKind::Bool,
+                    model::AttributeKind::String => proto::models::AttributeKind::String,
+                    model::AttributeKind::Int64 => proto::models::AttributeKind::Integer,
+                    model::AttributeKind::Bool => proto::models::AttributeKind::Boolean,
                 }
                 .into(),
             })
             .await?
             .into_inner();
 
-        let proto_model_attribute = response
-            .model_attribute_record
-            .ok_or(PortalError::internal("empty model_attribute_record"))?;
+        let attribute = datastore_model_attribute(proto_attribute)?;
 
-        let model = from_proto_model_attribute(proto_model_attribute)?;
-
-        Ok(model)
+        Ok(attribute)
     }
 
     async fn get_model_attribute(
@@ -622,10 +656,10 @@ impl Repo {
         model_slug: String,
         attribute_name: String,
     ) -> PortalResult<datastore::model::Attribute> {
-        let mut client = self.connect().await?;
+        let mut client = self.models_client().await?;
 
-        let response = client
-            .get_model_attribute_record(proto::GetModelAttributeRecordRequest {
+        let proto_model_attribute = client
+            .find_project_model_attribute(proto::models::FindProjectModelAttributeRequest {
                 project_slug,
                 model_slug,
                 attribute_name,
@@ -633,23 +667,19 @@ impl Repo {
             .await?
             .into_inner();
 
-        let proto_model_attribute = response
-            .model_attribute_record
-            .ok_or(PortalError::internal("empty model_record"))?;
+        let attribute = datastore_model_attribute(proto_model_attribute)?;
 
-        let model_attribute = from_proto_model_attribute(proto_model_attribute)?;
-
-        Ok(model_attribute)
+        Ok(attribute)
     }
 
     async fn delete_model_attribute(
         &self,
         model_attribute: datastore::model::Attribute,
     ) -> PortalResult<()> {
-        let mut client = self.connect().await?;
+        let mut client = self.models_client().await?;
 
         client
-            .delete_model_attribute_record(proto::DeleteModelAttributeRecordRequest {
+            .delete_attribute(proto::models::DeleteAttributeRequest {
                 id: model_attribute.id.to_string(),
             })
             .await?;
@@ -663,37 +693,27 @@ impl Repo {
         associated_model_record: datastore::model::Model,
         model_association: model::Association,
     ) -> PortalResult<datastore::model::Association> {
-        let mut client = self.connect().await?;
+        let mut client = self.models_client().await?;
 
-        let response = client
-            .create_model_association_record(proto::CreateModelAssociationRecordRequest {
+        let proto_model_association = client
+            .create_association(proto::models::CreateAssociationRequest {
                 model_id: model_record.id.to_string(),
                 associated_model_id: associated_model_record.id.to_string(),
                 description: model_association.description.unwrap_or_default(),
                 name: model_association.name,
                 kind: match model_association.kind {
-                    model::AssociationKind::HasMany => {
-                        proto::dimensions::ModelAssociationKind::HasMany
-                    }
-                    model::AssociationKind::HasOne => {
-                        proto::dimensions::ModelAssociationKind::HasOne
-                    }
-                    model::AssociationKind::BelongsTo => {
-                        proto::dimensions::ModelAssociationKind::BelongsTo
-                    }
+                    model::AssociationKind::HasMany => proto::models::AssociationKind::HasMany,
+                    model::AssociationKind::HasOne => proto::models::AssociationKind::HasOne,
+                    model::AssociationKind::BelongsTo => proto::models::AssociationKind::BelongsTo,
                 }
                 .into(),
             })
             .await?
             .into_inner();
 
-        let proto_model_association = response
-            .model_association_record
-            .ok_or(PortalError::internal("empty model_association_record"))?;
+        let association = datastore_model_association(proto_model_association)?;
 
-        let model_association = from_proto_model_association(proto_model_association)?;
-
-        Ok(model_association)
+        Ok(association)
     }
 
     async fn get_model_association(
@@ -702,10 +722,10 @@ impl Repo {
         model_slug: String,
         association_name: String,
     ) -> PortalResult<datastore::model::Association> {
-        let mut client = self.connect().await?;
+        let mut client = self.models_client().await?;
 
-        let response = client
-            .get_model_association_record(proto::GetModelAssociationRecordRequest {
+        let proto_model_association = client
+            .find_project_model_association(proto::models::FindProjectModelAssociationRequest {
                 project_slug,
                 model_slug,
                 association_name,
@@ -713,23 +733,19 @@ impl Repo {
             .await?
             .into_inner();
 
-        let proto_model_association = response
-            .model_association_record
-            .ok_or(PortalError::internal("empty model_record"))?;
+        let association = datastore_model_association(proto_model_association)?;
 
-        let model_attribute = from_proto_model_association(proto_model_association)?;
-
-        Ok(model_attribute)
+        Ok(association)
     }
 
     async fn delete_model_association(
         &self,
         model_association: datastore::model::Association,
     ) -> PortalResult<()> {
-        let mut client = self.connect().await?;
+        let mut client = self.models_client().await?;
 
         client
-            .delete_model_association_record(proto::DeleteModelAssociationRecordRequest {
+            .delete_association(proto::models::DeleteAssociationRequest {
                 id: model_association.id.to_string(),
             })
             .await?;
@@ -738,7 +754,9 @@ impl Repo {
     }
 }
 
-fn datastore_project(proto_project: proto::Project) -> PortalResult<datastore::project::Project> {
+fn datastore_project(
+    proto_project: proto::projects::Project,
+) -> PortalResult<datastore::project::Project> {
     let create_time = proto_project
         .create_time
         .ok_or(PortalError::internal("missing #create_time for Project"))?;
@@ -763,9 +781,7 @@ fn datastore_project(proto_project: proto::Project) -> PortalResult<datastore::p
     Ok(project)
 }
 
-fn datastore_model(
-    proto_model: proto::models::Model,
-) -> PortalResult<datastore::model::Model> {
+fn datastore_model(proto_model: proto::models::Model) -> PortalResult<datastore::model::Model> {
     let create_time = proto_model
         .create_time
         .ok_or(PortalError::internal("missing #create_time for Model"))?;
@@ -787,34 +803,10 @@ fn datastore_model(
     Ok(model)
 }
 
-fn from_proto_model(
-    proto_model: proto::dimensions::Model,
-) -> PortalResult<datastore::model::Model> {
-    let create_time = proto_model
-        .create_time
-        .ok_or(PortalError::internal("missing #create_time for Model"))?;
-
-    let update_time = proto_model
-        .update_time
-        .ok_or(PortalError::internal("missing #update_time for Model"))?;
-
-    let model = datastore::model::Model {
-        id: util::proto::uuid_from_proto_string(&proto_model.id, "id")?,
-        project_id: util::proto::uuid_from_proto_string(&proto_model.project_id, "project_id")?,
-        description: proto_model.description,
-        name: proto_model.name,
-        slug: proto_model.slug,
-        inserted_at: util::proto::from_proto_timestamp(create_time, "insert_time")?,
-        updated_at: util::proto::from_proto_timestamp(update_time, "update_time")?,
-    };
-
-    Ok(model)
-}
-
-fn from_proto_model_attribute(
-    proto_model_attribute: proto::dimensions::ModelAttribute,
+fn datastore_model_attribute(
+    proto_model_attribute: proto::models::Attribute,
 ) -> PortalResult<datastore::model::Attribute> {
-    use proto::dimensions::ModelAttributeKind::*;
+    use proto::models::AttributeKind;
 
     let create_time = proto_model_attribute
         .create_time
@@ -825,7 +817,7 @@ fn from_proto_model_attribute(
         .ok_or(PortalError::internal("missing #update_time for Model"))?;
 
     let proto_model_attribute_kind =
-        proto::dimensions::ModelAttributeKind::from_i32(proto_model_attribute.kind)
+        proto::models::AttributeKind::from_i32(proto_model_attribute.kind)
             .ok_or(PortalError::internal("missing #kind for ModelAttribute"))?;
 
     let model_attribute = datastore::model::Attribute {
@@ -833,12 +825,12 @@ fn from_proto_model_attribute(
         model_id: util::proto::uuid_from_proto_string(&proto_model_attribute.model_id, "model_id")?,
         description: proto_model_attribute.description,
         kind: match proto_model_attribute_kind {
-            UnspecifiedAttributeKind => {
+            AttributeKind::Unspecified => {
                 return Err(PortalError::internal("UnspecifiedAttributeKind"))
             }
-            String => datastore::model::AttributeKind::String,
-            Int64 => datastore::model::AttributeKind::Int64,
-            Bool => datastore::model::AttributeKind::Bool,
+            AttributeKind::String => datastore::model::AttributeKind::String,
+            AttributeKind::Integer => datastore::model::AttributeKind::Int64,
+            AttributeKind::Boolean => datastore::model::AttributeKind::Bool,
         },
         name: proto_model_attribute.name,
         inserted_at: util::proto::from_proto_timestamp(create_time, "insert_time")?,
@@ -848,10 +840,10 @@ fn from_proto_model_attribute(
     Ok(model_attribute)
 }
 
-fn from_proto_model_association(
-    proto_model_association: proto::dimensions::ModelAssociation,
+fn datastore_model_association(
+    proto_model_association: proto::models::Association,
 ) -> PortalResult<datastore::model::Association> {
-    use proto::dimensions::ModelAssociationKind::*;
+    use proto::models::AssociationKind::*;
 
     let create_time = proto_model_association
         .create_time
@@ -862,7 +854,7 @@ fn from_proto_model_association(
         .ok_or(PortalError::internal("missing #update_time for Model"))?;
 
     let proto_model_association_kind =
-        proto::dimensions::ModelAssociationKind::from_i32(proto_model_association.kind)
+        proto::models::AssociationKind::from_i32(proto_model_association.kind)
             .ok_or(PortalError::internal("missing #kind for ModelAttribute"))?;
 
     let associated_model =
@@ -878,12 +870,10 @@ fn from_proto_model_association(
             &proto_model_association.model_id,
             "model_id",
         )?,
-        associated_model: from_proto_model(associated_model)?,
+        associated_model: datastore_model(associated_model)?,
         description: proto_model_association.description,
         kind: match proto_model_association_kind {
-            UnspecifiedAssociationKind => {
-                return Err(PortalError::internal("UnspecifiedAttributeKind"))
-            }
+            Unspecified => return Err(PortalError::internal("UnspecifiedAttributeKind")),
             BelongsTo => datastore::model::AssociationKind::BelongsTo,
             HasOne => datastore::model::AssociationKind::HasOne,
             HasMany => datastore::model::AssociationKind::HasMany,
