@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package proto.gymnasium.v1.health_check;
+
+service HealthCheck {
+    rpc GetHealthCheck(GetHealthCheckRequest) returns (GetHealthCheckResponse);
+}
+
+message GetHealthCheckRequest {}
+
+enum HealthCheckStatus {
+    HEALTH_CHECK_STATUS_UNSPECIFIED = 0;
+    HEALTH_CHECK_STATUS_HEALTHY = 1;
+    HEALTH_CHECK_STATUS_UNHEALTHY = 2;
+}
+
+message GetHealthCheckResponse {
+    HealthCheckStatus status = 1;
+}

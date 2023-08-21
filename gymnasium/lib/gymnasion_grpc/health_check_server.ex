@@ -1,47 +1,21 @@
 defmodule GymnasiumGrpc.HealthCheckServer do
   @moduledoc false
 
-  use GRPC.Server, service: Proto.Gymnasium.V1.HealthCheck.Service
+  use GRPC.Server, service: Proto.Gymnasium.V1.HealthCheck.HealthCheck.Service
 
-  alias Proto.Gymnasium.V1.{
-    GetHealthCheckRequest,
-    GetHealthCheckResponse
-  }
+  alias Proto.Gymnasium.V1.HealthCheck, as: Proto
 
-  @valid_health_check_statuses [
-    :HealthCheckStatusHealthy,
-    :HealthCheckStatusUnhealthy,
-    :HealthCheckStatusUnspecified
-  ]
-
-  def get_health_check(%GetHealthCheckRequest{} = _request, _stream) do
+  def get_health_check(%Proto.GetHealthCheckRequest{} = _request, _stream) do
     try do
       Gymnasium.HealthCheck.query_database()
 
-      healthy()
+      %Proto.GetHealthCheckResponse{status: :HEALTH_CHECK_STATUS_HEALTHY}
     rescue
-      DBConnection.ConnectionError -> unhealthy()
-      _ -> unspecified()
+      DBConnection.ConnectionError ->
+        %Proto.GetHealthCheckResponse{status: :HEALTH_CHECK_STATUS_UNHEALTHY}
+
+      _ ->
+        %Proto.GetHealthCheckResponse{status: :HEALTH_CHECK_STATUS_UNSPECIFIED}
     end
-  end
-
-  defp healthy() do
-    get_health_check_response(:HealthCheckStatusHealthy)
-  end
-
-  defp unhealthy() do
-    get_health_check_response(:HealthCheckStatusUnhealthy)
-  end
-
-  defp unspecified() do
-    get_health_check_response(:HealthCheckStatusUnspecified)
-  end
-
-  defp get_health_check_response(status) when status in @valid_health_check_statuses do
-    %GetHealthCheckResponse{status: status}
-  end
-
-  defp get_health_check_response(_) do
-    get_health_check_response(:HealthCheckStatusUnspecified)
   end
 end
