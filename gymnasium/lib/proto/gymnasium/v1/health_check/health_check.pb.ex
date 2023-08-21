@@ -29,11 +29,9 @@ defmodule Proto.Gymnasium.V1.HealthCheck.HealthCheck.Service do
     name: "proto.gymnasium.v1.health_check.HealthCheck",
     protoc_gen_elixir_version: "0.12.0"
 
-  rpc(
-    :GetHealthCheck,
-    Proto.Gymnasium.V1.HealthCheck.GetHealthCheckRequest,
-    Proto.Gymnasium.V1.HealthCheck.GetHealthCheckResponse
-  )
+  rpc :GetHealthCheck,
+      Proto.Gymnasium.V1.HealthCheck.GetHealthCheckRequest,
+      Proto.Gymnasium.V1.HealthCheck.GetHealthCheckResponse
 end
 
 defmodule Proto.Gymnasium.V1.HealthCheck.HealthCheck.Stub do

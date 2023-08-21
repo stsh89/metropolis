@@ -101,35 +101,27 @@ defmodule Proto.Gymnasium.V1.Projects.Projects.Service do
     name: "proto.gymnasium.v1.projects.Projects",
     protoc_gen_elixir_version: "0.12.0"
 
-  rpc(
-    :CreateProject,
-    Proto.Gymnasium.V1.Projects.CreateProjectRequest,
-    Proto.Gymnasium.V1.Projects.Project
-  )
+  rpc :CreateProject,
+      Proto.Gymnasium.V1.Projects.CreateProjectRequest,
+      Proto.Gymnasium.V1.Projects.Project
 
-  rpc(
-    :RenameProject,
-    Proto.Gymnasium.V1.Projects.RenameProjectRequest,
-    Proto.Gymnasium.V1.Projects.Project
-  )
+  rpc :RenameProject,
+      Proto.Gymnasium.V1.Projects.RenameProjectRequest,
+      Proto.Gymnasium.V1.Projects.Project
 
-  rpc(
-    :ListProjects,
-    Proto.Gymnasium.V1.Projects.ListProjectsRequest,
-    Proto.Gymnasium.V1.Projects.ListProjectsResponse
-  )
+  rpc :ListProjects,
+      Proto.Gymnasium.V1.Projects.ListProjectsRequest,
+      Proto.Gymnasium.V1.Projects.ListProjectsResponse
 
-  rpc(
-    :FindProject,
-    Proto.Gymnasium.V1.Projects.FindProjectRequest,
-    Proto.Gymnasium.V1.Projects.Project
-  )
+  rpc :FindProject,
+      Proto.Gymnasium.V1.Projects.FindProjectRequest,
+      Proto.Gymnasium.V1.Projects.Project
 
-  rpc(:DeleteProject, Proto.Gymnasium.V1.Projects.DeleteProjectRequest, Google.Protobuf.Empty)
+  rpc :DeleteProject, Proto.Gymnasium.V1.Projects.DeleteProjectRequest, Google.Protobuf.Empty
 
-  rpc(:ArchiveProject, Proto.Gymnasium.V1.Projects.ArchiveProjectRequest, Google.Protobuf.Empty)
+  rpc :ArchiveProject, Proto.Gymnasium.V1.Projects.ArchiveProjectRequest, Google.Protobuf.Empty
 
-  rpc(:RestoreProject, Proto.Gymnasium.V1.Projects.RestoreProjectRequest, Google.Protobuf.Empty)
+  rpc :RestoreProject, Proto.Gymnasium.V1.Projects.RestoreProjectRequest, Google.Protobuf.Empty
 end
 
 defmodule Proto.Gymnasium.V1.Projects.Projects.Stub do

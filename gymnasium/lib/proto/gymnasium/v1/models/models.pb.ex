@@ -234,71 +234,51 @@ defmodule Proto.Gymnasium.V1.Models.Models.Service do
 
   use GRPC.Service, name: "proto.gymnasium.v1.models.Models", protoc_gen_elixir_version: "0.12.0"
 
-  rpc(:CreateModel, Proto.Gymnasium.V1.Models.CreateModelRequest, Proto.Gymnasium.V1.Models.Model)
+  rpc :CreateModel, Proto.Gymnasium.V1.Models.CreateModelRequest, Proto.Gymnasium.V1.Models.Model
 
-  rpc(
-    :FindProjectModel,
-    Proto.Gymnasium.V1.Models.FindProjectModelRequest,
-    Proto.Gymnasium.V1.Models.Model
-  )
+  rpc :FindProjectModel,
+      Proto.Gymnasium.V1.Models.FindProjectModelRequest,
+      Proto.Gymnasium.V1.Models.Model
 
-  rpc(
-    :FindProjectModelsOverview,
-    Proto.Gymnasium.V1.Models.FindProjectModelsOverviewRequest,
-    Proto.Gymnasium.V1.Models.FindProjectModelsOverviewResponse
-  )
+  rpc :FindProjectModelsOverview,
+      Proto.Gymnasium.V1.Models.FindProjectModelsOverviewRequest,
+      Proto.Gymnasium.V1.Models.FindProjectModelsOverviewResponse
 
-  rpc(
-    :ListProjectModels,
-    Proto.Gymnasium.V1.Models.ListProjectModelsRequest,
-    Proto.Gymnasium.V1.Models.ListProjectModelsResponse
-  )
+  rpc :ListProjectModels,
+      Proto.Gymnasium.V1.Models.ListProjectModelsRequest,
+      Proto.Gymnasium.V1.Models.ListProjectModelsResponse
 
-  rpc(:DeleteModel, Proto.Gymnasium.V1.Models.DeleteModelRequest, Google.Protobuf.Empty)
+  rpc :DeleteModel, Proto.Gymnasium.V1.Models.DeleteModelRequest, Google.Protobuf.Empty
 
-  rpc(
-    :CreateAssociation,
-    Proto.Gymnasium.V1.Models.CreateAssociationRequest,
-    Proto.Gymnasium.V1.Models.Association
-  )
+  rpc :CreateAssociation,
+      Proto.Gymnasium.V1.Models.CreateAssociationRequest,
+      Proto.Gymnasium.V1.Models.Association
 
-  rpc(
-    :FindProjectModelAssociation,
-    Proto.Gymnasium.V1.Models.FindProjectModelAssociationRequest,
-    Proto.Gymnasium.V1.Models.Association
-  )
+  rpc :FindProjectModelAssociation,
+      Proto.Gymnasium.V1.Models.FindProjectModelAssociationRequest,
+      Proto.Gymnasium.V1.Models.Association
 
-  rpc(
-    :ListProjectModelAssociations,
-    Proto.Gymnasium.V1.Models.ListProjectModelAssociationsRequest,
-    Proto.Gymnasium.V1.Models.ListProjectModelAssociationsResponse
-  )
+  rpc :ListProjectModelAssociations,
+      Proto.Gymnasium.V1.Models.ListProjectModelAssociationsRequest,
+      Proto.Gymnasium.V1.Models.ListProjectModelAssociationsResponse
 
-  rpc(
-    :DeleteAssociation,
-    Proto.Gymnasium.V1.Models.DeleteAssociationRequest,
-    Google.Protobuf.Empty
-  )
+  rpc :DeleteAssociation,
+      Proto.Gymnasium.V1.Models.DeleteAssociationRequest,
+      Google.Protobuf.Empty
 
-  rpc(
-    :CreateAttribute,
-    Proto.Gymnasium.V1.Models.CreateAttributeRequest,
-    Proto.Gymnasium.V1.Models.Attribute
-  )
+  rpc :CreateAttribute,
+      Proto.Gymnasium.V1.Models.CreateAttributeRequest,
+      Proto.Gymnasium.V1.Models.Attribute
 
-  rpc(
-    :FindProjectModelAttribute,
-    Proto.Gymnasium.V1.Models.FindProjectModelAttributeRequest,
-    Proto.Gymnasium.V1.Models.Attribute
-  )
+  rpc :FindProjectModelAttribute,
+      Proto.Gymnasium.V1.Models.FindProjectModelAttributeRequest,
+      Proto.Gymnasium.V1.Models.Attribute
 
-  rpc(
-    :ListProjectModelAttributes,
-    Proto.Gymnasium.V1.Models.ListProjectModelAttributesRequest,
-    Proto.Gymnasium.V1.Models.ListProjectModelAttributesResponse
-  )
+  rpc :ListProjectModelAttributes,
+      Proto.Gymnasium.V1.Models.ListProjectModelAttributesRequest,
+      Proto.Gymnasium.V1.Models.ListProjectModelAttributesResponse
 
-  rpc(:DeleteAttribute, Proto.Gymnasium.V1.Models.DeleteAttributeRequest, Google.Protobuf.Empty)
+  rpc :DeleteAttribute, Proto.Gymnasium.V1.Models.DeleteAttributeRequest, Google.Protobuf.Empty
 end
 
 defmodule Proto.Gymnasium.V1.Models.Models.Stub do
