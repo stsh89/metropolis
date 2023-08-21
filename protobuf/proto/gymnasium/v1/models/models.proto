@@ -128,7 +128,7 @@ message ModelOverview {
     Model model = 1;
 
     // Model's associations.
-    repeated Association association = 2;
+    repeated Association associations = 2;
 
     // Model's attributes.
     repeated Attribute attributes = 3;

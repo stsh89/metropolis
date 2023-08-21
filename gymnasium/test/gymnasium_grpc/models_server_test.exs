@@ -15,7 +15,13 @@ defmodule GymnasiumGrpc.ModelsServerTest do
     DeleteAssociationRequest,
     DeleteAttributeRequest,
     CreateAssociationRequest,
-    CreateAttributeRequest
+    CreateAttributeRequest,
+    ListProjectModelAssociationsRequest,
+    ListProjectModelAttributesRequest,
+    ListProjectModelAssociationsResponse,
+    ListProjectModelAttributesResponse,
+    FindProjectModelsOverviewRequest,
+    FindProjectModelsOverviewResponse
   }
 
   import Gymnasium.{ModelsFixtures, ProjectsFixtures}
@@ -70,6 +76,78 @@ defmodule GymnasiumGrpc.ModelsServerTest do
 
     defp assert_models(list, expected_list) do
       assert Enum.map(list, fn m -> m.slug end) == Enum.map(expected_list, fn m -> m.slug end)
+    end
+  end
+
+  describe "Project models overview" do
+    test "find_project_models_overview/2 returns all models for given project slug" do
+      %Project{id: project_id, slug: project_slug} = project_fixture()
+      project_model = model_fixture(project_id: project_id)
+      model_fixture(title: "Author", slug: "author")
+
+      %FindProjectModelsOverviewResponse{model_overviews: list} =
+        ModelsServer.find_project_models_overview(
+          %FindProjectModelsOverviewRequest{
+            project_slug: project_slug
+          },
+          nil
+        )
+
+      assert_model_overviews(list, [project_model])
+    end
+
+    defp assert_model_overviews(list, expected_list) do
+      assert Enum.map(list, fn m -> m.model.slug end) ==
+               Enum.map(expected_list, fn m -> m.slug end)
+    end
+  end
+
+  describe "Project models associations listing" do
+    test "list_project_model_associations/2 returns all models for given project slug" do
+      %Project{id: project_id, slug: project_slug} = project_fixture()
+      model = model_fixture(project_id: project_id)
+      associated_model = model_fixture(project_id: project_id, name: "Author", slug: "author")
+
+      association =
+        model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
+
+      %ListProjectModelAssociationsResponse{associations: list} =
+        ModelsServer.list_project_model_associations(
+          %ListProjectModelAssociationsRequest{
+            project_slug: project_slug,
+            model_slug: model.slug
+          },
+          nil
+        )
+
+      assert_associations(list, [association])
+    end
+
+    defp assert_associations(list, expected_list) do
+      assert Enum.map(list, fn m -> m.name end) == Enum.map(expected_list, fn m -> m.name end)
+    end
+  end
+
+  describe "Project models attributes listing" do
+    test "list_project_model_attributes/2 returns all models for given project slug" do
+      %Project{id: project_id, slug: project_slug} = project_fixture()
+      model = model_fixture(project_id: project_id)
+      attribute = model_attribute_fixture(model_id: model.id)
+
+      %ListProjectModelAttributesResponse{attributes: list} =
+        ModelsServer.list_project_model_attributes(
+          %ListProjectModelAttributesRequest{
+            project_slug: project_slug,
+            model_slug: model.slug
+          },
+          nil
+        )
+
+      assert_attributes(list, [attribute])
+    end
+
+    defp assert_attributes(list, expected_list) do
+      assert Enum.map(list, fn m -> m.name end) == Enum.map(expected_list, fn m -> m.name end)
     end
   end
 

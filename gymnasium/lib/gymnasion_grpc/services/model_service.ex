@@ -8,7 +8,9 @@ defmodule GymnasiumGrpc.ModelService do
     CreateModelAttributes,
     FindProjectModelAssociationAttributes,
     FindProjectModelAttributeAttributes,
-    FindProjectModelAttributes
+    FindProjectModelAttributes,
+    ListProjectModelAssociationsAttributes,
+    ListProjectModelAttributesAttributes
   }
 
   @doc """
@@ -55,6 +57,68 @@ defmodule GymnasiumGrpc.ModelService do
   @spec list_project_models(String.t()) :: [Model.t()]
   def list_project_models(project_slug) do
     ProjectModels.list_project_models(project_slug)
+  end
+
+  @doc """
+  Returns a list of Models for specific Project with attributes and associations.
+
+  ## Examples
+
+      iex> find_project_models_overview("book-store")
+      [%Model{}, ...]
+
+  """
+  @spec find_project_models_overview(String.t()) :: [Model.t()]
+  def find_project_models_overview(project_slug) do
+    ProjectModels.list_project_models(project_slug,
+      preloads: [:attributes, [associations: :associated_model]]
+    )
+  end
+
+  @doc """
+  Returns a list of model associations.
+
+  ## Examples
+
+      iex> list_project_model_associations(%ListProjectModelAssociationsAttributes{
+      ...>   project_slug: "book-store",
+      ...>   model_slug: "book"
+      ...> })
+      [%ModelAssociation{}, ...]
+
+  """
+  @spec list_project_model_associations(ListProjectModelAssociations.t()) :: [
+          ModelAssociation.t()
+        ]
+  def list_project_model_associations(%ListProjectModelAssociationsAttributes{} = attributes) do
+    %ListProjectModelAssociationsAttributes{
+      project_slug: project_slug,
+      model_slug: model_slug
+    } = attributes
+
+    ProjectModels.list_project_model_associations(project_slug, model_slug)
+  end
+
+  @doc """
+  Returns a list of model attributes.
+
+  ## Examples
+
+      iex> list_project_model_attributes(%ListProjectModelAttributesAttributes{
+      ...>   project_slug: "book-store",
+      ...>   model_slug: "book"
+      ...> })
+      [%ModelAttribute{}, ...]
+
+  """
+  @spec list_project_model_attributes(ListProjectModelAttributes.t()) :: [ModelAttribute.t()]
+  def list_project_model_attributes(%ListProjectModelAttributesAttributes{} = attributes) do
+    %ListProjectModelAttributesAttributes{
+      project_slug: project_slug,
+      model_slug: model_slug
+    } = attributes
+
+    ProjectModels.list_project_model_attributes(project_slug, model_slug)
   end
 
   @doc """

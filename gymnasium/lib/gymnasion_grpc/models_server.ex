@@ -19,7 +19,14 @@ defmodule GymnasiumGrpc.ModelsServer do
     CreateAssociationRequest,
     CreateAttributeRequest,
     DeleteAssociationRequest,
-    DeleteAttributeRequest
+    DeleteAttributeRequest,
+    ListProjectModelAssociationsRequest,
+    ListProjectModelAttributesRequest,
+    ListProjectModelAssociationsResponse,
+    ListProjectModelAttributesResponse,
+    FindProjectModelsOverviewRequest,
+    FindProjectModelsOverviewResponse,
+    ModelOverview
   }
 
   alias GymnasiumGrpc.ModelService
@@ -30,7 +37,9 @@ defmodule GymnasiumGrpc.ModelsServer do
     FindProjectModelAttributeAttributes,
     FindProjectModelAssociationAttributes,
     CreateAssociationAttributes,
-    CreateAttributeAttributes
+    CreateAttributeAttributes,
+    ListProjectModelAttributesAttributes,
+    ListProjectModelAssociationsAttributes
   }
 
   def create_model(%CreateModelRequest{} = request, _stream) do
@@ -57,21 +66,6 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def list_project_models(%ListProjectModelsRequest{} = request, _stream) do
-    %ListProjectModelsRequest{
-      project_slug: project_slug
-    } = request
-
-    models =
-      project_slug
-      |> ModelService.list_project_models()
-      |> Enum.map(fn m -> to_proto_model(m) end)
-
-    %ListProjectModelsResponse{
-      models: models
-    }
-  end
-
   def find_project_model(%FindProjectModelRequest{} = request, _stream) do
     %FindProjectModelRequest{
       project_slug: project_slug,
@@ -91,6 +85,36 @@ defmodule GymnasiumGrpc.ModelsServer do
 
         raise GRPC.RPCError, status: :not_found, message: message
     end
+  end
+
+  def find_project_models_overview(%FindProjectModelsOverviewRequest{} = request, _stream) do
+    %FindProjectModelsOverviewRequest{
+      project_slug: project_slug
+    } = request
+
+    model_overviews =
+      project_slug
+      |> ModelService.find_project_models_overview()
+      |> Enum.map(fn m -> to_proto_model_overview(m) end)
+
+    %FindProjectModelsOverviewResponse{
+      model_overviews: model_overviews
+    }
+  end
+
+  def list_project_models(%ListProjectModelsRequest{} = request, _stream) do
+    %ListProjectModelsRequest{
+      project_slug: project_slug
+    } = request
+
+    models =
+      project_slug
+      |> ModelService.list_project_models()
+      |> Enum.map(fn m -> to_proto_model(m) end)
+
+    %ListProjectModelsResponse{
+      models: models
+    }
   end
 
   def delete_model(%DeleteModelRequest{} = request, _stream) do
@@ -133,6 +157,27 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
+  def list_project_model_associations(%ListProjectModelAssociationsRequest{} = request, _stream) do
+    %ListProjectModelAssociationsRequest{
+      project_slug: project_slug,
+      model_slug: model_slug
+    } = request
+
+    attributes = %ListProjectModelAssociationsAttributes{
+      project_slug: project_slug,
+      model_slug: model_slug
+    }
+
+    associations =
+      attributes
+      |> ModelService.list_project_model_associations()
+      |> Enum.map(fn a -> to_proto_association(a) end)
+
+    %ListProjectModelAssociationsResponse{
+      associations: associations
+    }
+  end
+
   def find_project_model_association(%FindProjectModelAssociationRequest{} = request, _stream) do
     %FindProjectModelAssociationRequest{
       project_slug: project_slug,
@@ -151,29 +196,6 @@ defmodule GymnasiumGrpc.ModelsServer do
       _ ->
         message =
           "Association \"#{association_name}\" not found for Project \"#{project_slug}\" and Model \"#{model_slug}\"."
-
-        raise GRPC.RPCError, status: :not_found, message: message
-    end
-  end
-
-  def find_project_model_attribute(%FindProjectModelAttributeRequest{} = request, _stream) do
-    %FindProjectModelAttributeRequest{
-      project_slug: project_slug,
-      model_slug: model_slug,
-      attribute_name: attribute_name
-    } = request
-
-    case ModelService.find_project_model_attribute(%FindProjectModelAttributeAttributes{
-           project_slug: project_slug,
-           model_slug: model_slug,
-           attribute_name: attribute_name
-         }) do
-      %ModelAttribute{} = attribute ->
-        to_proto_attribute(attribute)
-
-      _ ->
-        message =
-          "Attribute \"#{attribute_name}\" not found for Project \"#{project_slug}\" and Model \"#{model_slug}\"."
 
         raise GRPC.RPCError, status: :not_found, message: message
     end
@@ -217,6 +239,50 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
+  def find_project_model_attribute(%FindProjectModelAttributeRequest{} = request, _stream) do
+    %FindProjectModelAttributeRequest{
+      project_slug: project_slug,
+      model_slug: model_slug,
+      attribute_name: attribute_name
+    } = request
+
+    case ModelService.find_project_model_attribute(%FindProjectModelAttributeAttributes{
+           project_slug: project_slug,
+           model_slug: model_slug,
+           attribute_name: attribute_name
+         }) do
+      %ModelAttribute{} = attribute ->
+        to_proto_attribute(attribute)
+
+      _ ->
+        message =
+          "Attribute \"#{attribute_name}\" not found for Project \"#{project_slug}\" and Model \"#{model_slug}\"."
+
+        raise GRPC.RPCError, status: :not_found, message: message
+    end
+  end
+
+  def list_project_model_attributes(%ListProjectModelAttributesRequest{} = request, _stream) do
+    %ListProjectModelAttributesRequest{
+      project_slug: project_slug,
+      model_slug: model_slug
+    } = request
+
+    attributes = %ListProjectModelAttributesAttributes{
+      project_slug: project_slug,
+      model_slug: model_slug
+    }
+
+    attributes =
+      attributes
+      |> ModelService.list_project_model_attributes()
+      |> Enum.map(fn a -> to_proto_attribute(a) end)
+
+    %ListProjectModelAttributesResponse{
+      attributes: attributes
+    }
+  end
+
   def delete_attribute(%DeleteAttributeRequest{} = request, _stream) do
     %DeleteAttributeRequest{
       id: id
@@ -240,6 +306,14 @@ defmodule GymnasiumGrpc.ModelsServer do
       slug: model.slug,
       create_time: Util.to_proto_timestamp(model.inserted_at),
       update_time: Util.to_proto_timestamp(model.updated_at)
+    }
+  end
+
+  defp to_proto_model_overview(%Model{} = model) do
+    %ModelOverview{
+      model: to_proto_model(model),
+      associations: model.associations |> Enum.map(fn a -> to_proto_association(a) end),
+      attributes: model.attributes |> Enum.map(fn a -> to_proto_attribute(a) end)
     }
   end
 

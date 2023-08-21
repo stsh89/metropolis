@@ -6,7 +6,7 @@ defmodule Proto.Gymnasium.V1.Models.AttributeKind do
   field :ATTRIBUTE_KIND_UNSPECIFIED, 0
   field :ATTRIBUTE_KIND_STRING, 1
   field :ATTRIBUTE_KIND_INTEGER, 2
-  field :ATTRIBUTE_KIND_BOOL, 3
+  field :ATTRIBUTE_KIND_BOOLEAN, 3
 end
 
 defmodule Proto.Gymnasium.V1.Models.AssociationKind do
@@ -69,7 +69,7 @@ defmodule Proto.Gymnasium.V1.Models.ModelOverview do
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   field :model, 1, type: Proto.Gymnasium.V1.Models.Model
-  field :association, 2, repeated: true, type: Proto.Gymnasium.V1.Models.Association
+  field :associations, 2, repeated: true, type: Proto.Gymnasium.V1.Models.Association
   field :attributes, 3, repeated: true, type: Proto.Gymnasium.V1.Models.Attribute
 end
 
