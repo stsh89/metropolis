@@ -1,4 +1,4 @@
-defmodule Gymnasium.ModelsTest do
+defmodule Gymnasium.ProjectModelsTest do
   use Gymnasium.DataCase
 
   alias Gymnasium.Dimensions.{Project}
