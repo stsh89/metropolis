@@ -292,15 +292,20 @@ impl model::get_project_class_diagram::ListModels for Repo {
         &self,
         project_slug: &str,
     ) -> FoundationResult<model::get_project_class_diagram::ListModelsResponse> {
-        let project_overview = self.find_project_models_overview(project_slug.to_owned()).await?;
+        let project_overview = self
+            .find_project_models_overview(project_slug.to_owned())
+            .await?;
 
-        let models = project_overview.into_iter().map(|(model, attributes, associations)| {
-            model::get_project_class_diagram::ModelData {
-                model,
-                attributes,
-                associations,
-            }
-        }).collect();
+        let models = project_overview
+            .into_iter()
+            .map(
+                |(model, attributes, associations)| model::get_project_class_diagram::ModelData {
+                    model,
+                    attributes,
+                    associations,
+                },
+            )
+            .collect();
 
         let response = model::get_project_class_diagram::ListModelsResponse { models };
 
