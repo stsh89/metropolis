@@ -1,6 +1,7 @@
 [
   {
     "disabled_rules": [
+      "core::0122::name-suffix",
       "core::0123::resource-annotation",
       "core::0127::http-annotation",
       "core::0131::method-signature",
@@ -8,6 +9,7 @@
       "core::0131::request-unknown-fields",
       "core::0132::request-parent-required",
       "core::0132::request-unknown-fields",
+      "core::0132::response-unknown-fields",
       "core::0133::http-uri-parent",
       "core::0133::method-signature",
       "core::0133::request-id-field",

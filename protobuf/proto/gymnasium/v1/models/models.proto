@@ -18,6 +18,18 @@ service Models {
 
     // Delete a Model.
     rpc DeleteModel(DeleteModelRequest) returns (google.protobuf.Empty);
+
+    // Create Model attribute.
+    rpc CreateAttribute(CreateAttributeRequest) returns (Attribute);
+
+    // Find Project's Model's attribute.
+    rpc FindProjectModelAttribute(FindProjectModelAttributeRequest) returns (Attribute);
+
+    // List Project's Model's attributes.
+    rpc ListProjectModelAttributes(ListProjectModelAttributesRequest) returns (ListProjectModelAttributesResponse);
+
+    // Delete Models attribute.
+    rpc DeleteAttribute(DeleteAttributeRequest) returns (google.protobuf.Empty);
 }
 
 // Representation of the Model.
@@ -41,6 +53,30 @@ message Model {
     google.protobuf.Timestamp create_time = 6;
 
     // The timestamp of the last Model's update.
+    google.protobuf.Timestamp update_time = 7;
+}
+
+// Representation of the Model's attribute.
+message Attribute {
+    // Unique identifier for the attribute. Text representation of the UUID.
+    string id = 1;
+
+    // Unique identifier for the Model to which attribute belongs. Text representation of the UUID.
+    string model_id = 2;
+
+    // The description of the attribute.
+    string description = 3;
+
+    // The kind of the Attribute.
+    AttributeKind kind = 4;
+
+    // The name of the attribute.
+    string name = 5;
+
+    // The creation time of the attribute.
+    google.protobuf.Timestamp create_time = 6;
+
+    // The timestamp of the last attribute's update.
     google.protobuf.Timestamp update_time = 7;
 }
 
@@ -84,4 +120,67 @@ message ListProjectModelsResponse {
 message DeleteModelRequest {
     // Unique Model identifier. UUID in a string form.
     string id = 1;
+}
+
+// Request definition for Model attribute creation.
+message CreateAttributeRequest {
+    // Model id. UUID in a string form.
+    string model_id = 1;
+
+    // The description of the Model's attribute.
+    string description = 2;
+
+    // Kind of the Model's attribute;
+    AttributeKind kind = 3;
+
+    // The name of the Model's attribute.
+    string name = 4;
+}
+
+// Request definition for Model attribute finding.
+message FindProjectModelAttributeRequest {
+    // Project unique web identifier.
+    string project_slug = 1;
+
+    // Model unique web identifier.
+    string model_slug = 2;
+
+    // Attribute's name.
+    string attribute_name = 3;
+}
+
+// Request definition for Model attributes listing.
+message ListProjectModelAttributesRequest {
+    // Project unique web identifier.
+    string project_slug = 1;
+
+    // Model unique web identifier.
+    string model_slug = 2;
+}
+
+// Response definition for Model attributes listing.
+message ListProjectModelAttributesResponse {
+    // List of Model's attributes.
+    repeated Attribute attributes = 1;
+}
+
+// Request definition for Model attribute deletion.
+message DeleteAttributeRequest {
+    // Unique attribute identifier. UUID in a string form.
+    string id = 1;
+}
+
+// All possible kinds of Model attributes.
+enum AttributeKind {
+    // Unspecified
+    ATTRIBUTE_KIND_UNSPECIFIED = 0;
+
+    // String
+    ATTRIBUTE_KIND_STRING = 1;
+
+    // Integer
+    ATTRIBUTE_KIND_INTEGER = 2;
+
+    // Bool
+    ATTRIBUTE_KIND_BOOL = 3;
 }

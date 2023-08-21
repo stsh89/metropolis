@@ -2,7 +2,7 @@ defmodule Gymnasium.ModelsTest do
   use Gymnasium.DataCase
 
   alias Gymnasium.{Model, Models, Models}
-  alias Gymnasium.Dimensions.{Project, Model}
+  alias Gymnasium.Dimensions.{Project, Model, ModelAttribute}
 
   import Gymnasium.ModelsFixtures
   import Gymnasium.ProjectsFixtures
@@ -108,6 +108,102 @@ defmodule Gymnasium.ModelsTest do
     end
   end
 
+  describe "create a model attribute" do
+    test "create_attribute/1 saves Model's attribute" do
+      %Model{id: model_id} = model_fixture()
+
+      attrs = %{
+        model_id: model_id,
+        kind: "string",
+        description: "The title of the Book.",
+        name: "Title"
+      }
+
+      assert {:ok, %ModelAttribute{} = attribute} = Models.create_attribute(attrs)
+      assert false == Models.list_attributes() |> Enum.empty?()
+
+      assert attribute.model_id == model_id
+      assert attribute.description == "The title of the Book."
+      assert attribute.name == "Title"
+    end
+
+    test "create_attribute/1 returns error on invalid attrs" do
+      assert {:error, %Ecto.Changeset{}} = Models.create_attribute(%{})
+      assert true == Models.list_attributes() |> Enum.empty?()
+    end
+
+    test "create_attribute/1 returns error on missing name" do
+      valid_attrs = %{
+        model_id: Ecto.UUID.generate(),
+        kind: "string",
+        description: "The title of the book.",
+        name: ""
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_attribute(valid_attrs)
+      assert errors == [name: {"can't be blank", [validation: :required]}]
+    end
+
+    test "create_attribute/1 returns error on missing kind" do
+      valid_attrs = %{
+        model_id: Ecto.UUID.generate(),
+        description: "The title of the book.",
+        name: "Title"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_attribute(valid_attrs)
+      assert errors == [kind: {"can't be blank", [validation: :required]}]
+    end
+
+    test "create_attribute/1 returns error on invalid kind" do
+      valid_attrs = %{
+        model_id: Ecto.UUID.generate(),
+        description: "The title of the book.",
+        name: "Title",
+        kind: "color"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_attribute(valid_attrs)
+
+      assert errors == [
+               kind:
+                 {"is invalid",
+                  [{:validation, :inclusion}, {:enum, ["string", "integer", "bool"]}]}
+             ]
+    end
+
+    test "create_model/1 returns error on missing model_id" do
+      attrs = %{
+        description: "The title of the book.",
+        name: "Title",
+        kind: "string"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_attribute(attrs)
+      assert errors == [model_id: {"can't be blank", [validation: :required]}]
+    end
+
+    test "create_attribute/1 returns error on existing model id and name pair" do
+      %Model{id: model_id} = model_fixture()
+      %ModelAttribute{name: name} = model_attribute_fixture(model_id: model_id)
+
+      attrs = %{
+        model_id: model_id,
+        description: "Books model",
+        name: name,
+        kind: "string"
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_attribute(attrs)
+
+      assert errors == [
+               model_id:
+                 {"has already been taken",
+                  [constraint: :unique, constraint_name: "model_attributes_model_id_name_index"]}
+             ]
+    end
+  end
+
   describe "delete model" do
     test "delete_model/1 removes a Model" do
       model = model_fixture()
@@ -124,7 +220,7 @@ defmodule Gymnasium.ModelsTest do
 
       assert {:ok, %Model{}} = Models.delete_model!(model)
       assert Models.list_models() == [associated_model]
-      assert Models.list_model_attributes() == []
+      assert Models.list_attributes() == []
       assert Models.list_associations() == []
     end
 
@@ -150,6 +246,21 @@ defmodule Gymnasium.ModelsTest do
     test "delete_model/1 raises Ecto.StaleEntryError" do
       assert_raise Ecto.StaleEntryError, fn ->
         Models.delete_model!(%Model{id: Ecto.UUID.generate()})
+      end
+    end
+  end
+
+  describe "delete model attribute" do
+    test "delete_attribute/1 removes a Model attribute" do
+      attribute = model_attribute_fixture()
+
+      assert {:ok, %ModelAttribute{}} = Models.delete_attribute(attribute)
+      assert Models.list_attributes() == []
+    end
+
+    test "delete_model/1 raises Ecto.StaleEntryError" do
+      assert_raise Ecto.StaleEntryError, fn ->
+        Models.delete_attribute(%ModelAttribute{id: Ecto.UUID.generate()})
       end
     end
   end

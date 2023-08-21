@@ -28,7 +28,7 @@ defmodule Gymnasium.ModelsFixtures do
     {:ok, model_attribute} =
       attrs
       |> Enum.into(%{
-        model_id: nil,
+        model_id: Ecto.UUID.generate(),
         description: "The title of the Book",
         kind: "string",
         name: "title"

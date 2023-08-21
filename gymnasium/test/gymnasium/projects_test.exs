@@ -270,7 +270,7 @@ defmodule Gymnasium.ProjectsTest do
       assert {:ok, %Project{}} = Projects.delete_project!(project)
       assert Projects.list_projects() == []
       assert Models.list_models() == []
-      assert Models.list_model_attributes() == []
+      assert Models.list_attributes() == []
       assert Models.list_associations() == []
     end
 

@@ -165,7 +165,7 @@ defmodule Gymnasium.DimensionsTest do
         description: "Number of pages in the Book",
         name: "number_of_pages",
         model_id: model.id,
-        kind: "int64"
+        kind: "integer"
       }
 
       assert {:ok, %ModelAttribute{} = model_attribute} =
@@ -173,7 +173,7 @@ defmodule Gymnasium.DimensionsTest do
 
       assert model_attribute.description == "Number of pages in the Book"
       assert model_attribute.name == "number_of_pages"
-      assert model_attribute.kind == "int64"
+      assert model_attribute.kind == "integer"
     end
 
     test "update_project/2 with invalid data returns error changeset" do

@@ -5,7 +5,7 @@ defmodule Gymnasium.ProjectModels do
 
   import Ecto.Query, warn: false
 
-  alias Gymnasium.Dimensions.{Model, Project}
+  alias Gymnasium.Dimensions.{Model, Project, ModelAttribute}
   alias Gymnasium.Repo
 
   @doc """
@@ -53,5 +53,56 @@ defmodule Gymnasium.ProjectModels do
         order_by: [asc: m.name]
 
     Repo.one!(query)
+  end
+
+  @doc """
+  Find a specific Model attribute within the context of some Project.
+
+  Raises Ecto.NoResultsError when no model attribute is found.
+
+  ## Examples
+
+      iex> find_project_model_attribute!("book-store", "book", "title")
+      %ModelAttribute{}
+
+      iex> find_project_model_attribute!("", "")
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec find_project_model_attribute!(String.t(), String.t(), String.t()) :: ModelAttribute.t()
+  def find_project_model_attribute!(project_slug, model_slug, attribute_name) do
+    query =
+      from ma in ModelAttribute,
+        join: m in Model,
+        on: ma.model_id == m.id,
+        join: p in Project,
+        on: p.id == m.project_id,
+        where: p.slug == ^project_slug and m.slug == ^model_slug and ma.name == ^attribute_name,
+        order_by: [asc: ma.name]
+
+    Repo.one!(query)
+  end
+
+  @doc """
+  List all Model attributes within the context of some Project.
+
+  ## Examples
+
+      iex> list_project_model_attributes("book-store", "book")
+      %ModelAttribute{}
+
+  """
+  @spec list_project_model_attributes(String.t(), String.t()) :: [ModelAttribute.t()]
+  def list_project_model_attributes(project_slug, model_slug) do
+    query =
+      from ma in ModelAttribute,
+        join: m in Model,
+        on: ma.model_id == m.id,
+        join: p in Project,
+        on: p.id == m.project_id,
+        where: p.slug == ^project_slug and m.slug == ^model_slug,
+        order_by: [asc: ma.name]
+
+    Repo.all(query)
   end
 end

@@ -45,6 +45,25 @@ defmodule Gymnasium.Models do
   end
 
   @doc """
+  Creates a model attribute.
+
+  ## Examples
+
+      iex> create_attribute(%{field: value})
+      {:ok, %model{}}
+
+      iex> create_attribute(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec create_model(map()) :: {:ok, ModelAttribute.t()} | {:error, %Ecto.Changeset{}}
+  def create_attribute(attrs \\ %{}) do
+    %ModelAttribute{}
+    |> ModelAttribute.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
   Deletes a Model.
 
   Returns the struct or raises some Ecto error.
@@ -91,6 +110,26 @@ defmodule Gymnasium.Models do
   end
 
   @doc """
+  Deletes a Model attribute.
+
+  Returns the struct or raises some Ecto error.
+
+  ## Examples
+
+      iex> delete_attribute(model)
+      {:ok, %ModelAttribute{}}
+
+      iex> delete_attribute(model)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec delete_attribute(ModelAttribute.t()) ::
+          {:ok, ModelAttribute.t()} | {:error, Ecto.Changeset.t()}
+  def delete_attribute(%ModelAttribute{} = attribute) do
+    Repo.delete(attribute)
+  end
+
+  @doc """
   Returns the list of models.
 
   ## Examples
@@ -111,12 +150,12 @@ defmodule Gymnasium.Models do
 
   ## Examples
 
-      iex> list_model_attributes()
+      iex> list_attributes()
       [%ModelAttribute{}, ...]
 
   """
-  @spec list_models() :: [ModelAttribute.t()]
-  def list_model_attributes() do
+  @spec list_attributes() :: [ModelAttribute.t()]
+  def list_attributes() do
     query = from m in ModelAttribute, order_by: [asc: m.name]
 
     Repo.all(query)

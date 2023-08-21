@@ -43,12 +43,12 @@ defmodule GymnasiumGrpc.Dimensions.ModelAttribute do
   end
 
   defp kind_from_proto(:Bool), do: "bool"
-  defp kind_from_proto(:Int64), do: "int64"
+  defp kind_from_proto(:Int64), do: "integer"
   defp kind_from_proto(:String), do: "string"
   defp kind_from_proto(_), do: "unspecified"
 
   defp kind_to_proto("bool"), do: :Bool
-  defp kind_to_proto("int64"), do: :Int64
+  defp kind_to_proto("integer"), do: :Int64
   defp kind_to_proto("string"), do: :String
   defp kind_to_proto(_), do: :UnspecifiedAttributeKind
 
