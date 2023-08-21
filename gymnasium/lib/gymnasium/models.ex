@@ -26,6 +26,40 @@ defmodule Gymnasium.Models do
   def get_model!(id), do: Repo.get!(Model, id)
 
   @doc """
+  Gets a single model association.
+
+  Raises `Ecto.NoResultsError` if the model association does not exist.
+
+  ## Examples
+
+      iex> get_association!("8e3b5275-bc1b-4490-a2d8-23c68d9b0fd5")
+      %ModelAssociation{}
+
+      iex> get_association!("8844f7c8-1f83-4fdf-817f-41780c9e5d05")
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec get_association!(String.t()) :: ModelAssociation.t()
+  def get_association!(id), do: Repo.get!(ModelAssociation, id)
+
+  @doc """
+  Gets a single model attribute.
+
+  Raises `Ecto.NoResultsError` if the Model attribute does not exist.
+
+  ## Examples
+
+      iex> get_attribute!("8e3b5275-bc1b-4490-a2d8-23c68d9b0fd5")
+      %Model_Attribute{}
+
+      iex> get_attribute!("8844f7c8-1f83-4fdf-817f-41780c9e5d05")
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec get_attribute!(String.t()) :: ModelAttribute.t()
+  def get_attribute!(id), do: Repo.get!(ModelAttribute, id)
+
+  @doc """
   Creates a model.
 
   ## Examples

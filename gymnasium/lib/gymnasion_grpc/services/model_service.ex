@@ -1,7 +1,15 @@
 defmodule GymnasiumGrpc.ModelService do
   alias Gymnasium.{Models, ProjectModels}
   alias Gymnasium.Dimensions.Model
-  alias GymnasiumGrpc.ModelService.{CreateModelAttributes, FindProjectModelAttributes}
+
+  alias GymnasiumGrpc.ModelService.{
+    CreateAssociationAttributes,
+    CreateAttributeAttributes,
+    CreateModelAttributes,
+    FindProjectModelAssociationAttributes,
+    FindProjectModelAttributeAttributes,
+    FindProjectModelAttributes
+  }
 
   @doc """
   Create a Model.
@@ -78,6 +86,65 @@ defmodule GymnasiumGrpc.ModelService do
   end
 
   @doc """
+  Find Project model association.
+
+  Returns nil if the Project with the given slug does not exist.
+
+  ## Examples
+
+      iex> find_project_model_association("bookstore")
+      %Project{}
+
+      iex> find_project_model_association("filestore")
+      nil
+
+  """
+  @spec find_project_model_association(FindProjectModelAssociationAttributes.t()) ::
+          Model.t() | nil
+  def find_project_model_association(%FindProjectModelAssociationAttributes{} = attributes) do
+    %FindProjectModelAssociationAttributes{
+      project_slug: project_slug,
+      model_slug: model_slug,
+      association_name: association_name
+    } = attributes
+
+    try do
+      ProjectModels.find_project_model_association!(project_slug, model_slug, association_name)
+    rescue
+      Ecto.NoResultsError -> nil
+    end
+  end
+
+  @doc """
+  Find Project model attribute.
+
+  Returns nil if the Project with the given slug does not exist.
+
+  ## Examples
+
+      iex> find_project_model_attribute("bookstore")
+      %Project{}
+
+      iex> find_project_model_attribute("filestore")
+      nil
+
+  """
+  @spec find_project_model_attribute(FindProjectModelAttributeAttributes.t()) :: Model.t() | nil
+  def find_project_model_attribute(%FindProjectModelAttributeAttributes{} = attributes) do
+    %FindProjectModelAttributeAttributes{
+      project_slug: project_slug,
+      model_slug: model_slug,
+      attribute_name: attribute_name
+    } = attributes
+
+    try do
+      ProjectModels.find_project_model_attribute!(project_slug, model_slug, attribute_name)
+    rescue
+      Ecto.NoResultsError -> nil
+    end
+  end
+
+  @doc """
   Delete Model by it's ID.
 
   Returns :ok if the Model deleted, returns :error otherwise.
@@ -99,6 +166,147 @@ defmodule GymnasiumGrpc.ModelService do
       |> Models.delete_model!()
 
       :ok
+    rescue
+      Ecto.NoResultsError -> :error
+      Ecto.StaleEntryError -> :error
+      Ecto.NoPrimaryKeyValueError -> :error
+      Ecto.Query.CastError -> :error
+    end
+  end
+
+  @doc """
+  Create a Model association.
+
+  ## Examples
+
+      iex> create_association(%CreateAssociationAttributes{
+      ...>   model_id: "c8e47fc7-dee3-4c57-8955-9b49317f2af2",
+      ...>   associated_model_id: "62858931-87e9-4033-ab1a-823cb24de4fc",
+      ...>   description: "Book can be written by some author.",
+      ...>   name: "author",
+      ...>   kind: "belongs_to"
+      ...>  })
+      %Model{}
+
+      iex> create_association(%CreateAssociationAttributes{})
+      :error
+
+  """
+  @spec create_association(CreateAssociationAttributes.t()) :: ModelAssociation.t() | :error
+  def create_association(%CreateAssociationAttributes{} = attributes) do
+    result =
+      attributes
+      |> Map.from_struct()
+      |> Models.create_association()
+
+    case result do
+      {:ok, association} ->
+        association |> Gymnasium.Repo.preload(:associated_model)
+
+      {:error, _changset} ->
+        :error
+    end
+  end
+
+  @doc """
+  Delete Model association by it's ID.
+
+  Returns :ok if the Model association deleted, returns :error otherwise.
+
+  ## Examples
+
+      iex> delete_association("55d6e7cf-2de0-428c-bb19-9555d237e160")
+      :ok
+
+      iex> delete_association("55d6e7cf-2de0-428c-bb19-9555d237e161")
+      :error
+
+  """
+  @spec delete_association(String.t()) :: :ok | :error
+  def delete_association(id) do
+    try do
+      result =
+        id
+        |> Models.get_association!()
+        |> Models.delete_association()
+
+      case result do
+        {:ok, _} ->
+          :ok
+
+        {:error, _} ->
+          :error
+      end
+    rescue
+      Ecto.NoResultsError -> :error
+      Ecto.StaleEntryError -> :error
+      Ecto.NoPrimaryKeyValueError -> :error
+      Ecto.Query.CastError -> :error
+    end
+  end
+
+  @doc """
+  Create a Model attribute.
+
+  ## Examples
+
+      iex> create_attribute(%CreateAttributeAttributes{
+      ...>   model_id: "c8e47fc7-dee3-4c57-8955-9b49317f2af2",
+      ...>   description: "The title of the book.",
+      ...>   name: "title",
+      ...>   kind: "string"
+      ...>  })
+      %Model{}
+
+      iex> create_attribute(%CreateAttributeAttributes{})
+      :error
+
+  """
+  @spec create_attribute(CreateAttributeAttributes.t()) :: ModelAttribute.t() | :error
+  def create_attribute(%CreateAttributeAttributes{} = attributes) do
+    result =
+      attributes
+      |> Map.from_struct()
+      |> Models.create_attribute()
+
+    case result do
+      {:ok, attribute} ->
+        attribute
+
+      {:error, _changset} ->
+        :error
+    end
+  end
+
+  @doc """
+  Delete Model attribute by it's ID.
+
+  Returns :ok if the Model attribute deleted, returns :error otherwise.
+
+  ## Examples
+
+      iex> delete_attribute("55d6e7cf-2de0-428c-bb19-9555d237e160")
+      :ok
+
+      iex> delete_attribute("55d6e7cf-2de0-428c-bb19-9555d237e161")
+      :error
+
+  """
+  @spec delete_attribute(String.t()) :: :ok | :error
+  def delete_attribute(id) do
+    try do
+      result =
+        id
+        |> Models.get_attribute!()
+        |> Models.delete_attribute()
+
+      case result do
+        {:ok, _} ->
+          :ok
+
+        {:error, _changset} ->
+          :error
+      end
     rescue
       Ecto.NoResultsError -> :error
       Ecto.StaleEntryError -> :error

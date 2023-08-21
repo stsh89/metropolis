@@ -214,7 +214,7 @@ defmodule Gymnasium.ModelsTest do
       assert errors == [
                kind:
                  {"is invalid",
-                  [{:validation, :inclusion}, {:enum, ["string", "integer", "bool"]}]}
+                  [{:validation, :inclusion}, {:enum, ["string", "integer", "boolean"]}]}
              ]
     end
 

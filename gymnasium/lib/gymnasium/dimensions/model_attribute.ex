@@ -14,7 +14,7 @@ defmodule Gymnasium.Dimensions.ModelAttribute do
   use Gymnasium.Schema
   import Ecto.Changeset
 
-  @kinds ["string", "integer", "bool"]
+  @kinds ["string", "integer", "boolean"]
 
   schema "model_attributes" do
     belongs_to :model, Model

@@ -13,6 +13,9 @@ service Models {
     // Find a model associated with some Project.
     rpc FindProjectModel(FindProjectModelRequest) returns (Model);
 
+    // Get Project's models with all attributes and associations.
+    rpc FindProjectModelsOverview(FindProjectModelsOverviewRequest) returns (FindProjectModelsOverviewResponse);
+
     // List models associated to some particular Project.
     rpc ListProjectModels(ListProjectModelsRequest) returns (ListProjectModelsResponse);
 
@@ -119,6 +122,18 @@ message Attribute {
     google.protobuf.Timestamp update_time = 7;
 }
 
+// Model with attributes and associations.
+message ModelOverview {
+    // Model
+    Model model = 1;
+
+    // Model's associations.
+    repeated Association association = 2;
+
+    // Model's attributes.
+    repeated Attribute attributes = 3;
+}
+
 // Request to create the Model.
 message CreateModelRequest {
     // Projects ID. UUID in a string form.
@@ -143,6 +158,18 @@ message FindProjectModelRequest {
     string model_slug = 2;
 }
 
+// Request definition for Project Models overview.
+message FindProjectModelsOverviewRequest {
+    // Project's unique web identifier.
+    string project_slug = 1;
+}
+
+// Response definition for Project Models listing.
+message FindProjectModelsOverviewResponse {
+    // List of Project's models with all their attributes and associations.
+    repeated ModelOverview model_overviews = 1;
+}
+
 // Request definition for Project Models listing.
 message ListProjectModelsRequest {
     // Project's unique web identifier associated with Models.
@@ -151,7 +178,7 @@ message ListProjectModelsRequest {
 
 // Response definition for Project Models listing.
 message ListProjectModelsResponse {
-    // List of Models associated with the give Project slug.bool
+    // List of Models associated with the give Project slug.
     repeated Model models = 1;
 }
 
@@ -274,7 +301,7 @@ enum AttributeKind {
     ATTRIBUTE_KIND_INTEGER = 2;
 
     // Bool
-    ATTRIBUTE_KIND_BOOL = 3;
+    ATTRIBUTE_KIND_BOOLEAN = 3;
 }
 
 // All possible kinds of Model associations.

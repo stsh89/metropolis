@@ -2,19 +2,27 @@ defmodule GymnasiumGrpc.ModelsServerTest do
   use Gymnasium.DataCase
 
   alias GymnasiumGrpc.ModelsServer
-  alias Gymnasium.Dimensions.{Model, Project}
+  alias Gymnasium.Dimensions.{Model, Project, ModelAssociation, ModelAttribute}
 
   alias Proto.Gymnasium.V1.Models.{
     CreateModelRequest,
     DeleteModelRequest,
     ListProjectModelsResponse,
     ListProjectModelsRequest,
-    FindProjectModelRequest
+    FindProjectModelRequest,
+    FindProjectModelAssociationRequest,
+    FindProjectModelAttributeRequest,
+    DeleteAssociationRequest,
+    DeleteAttributeRequest,
+    CreateAssociationRequest,
+    CreateAttributeRequest
   }
 
   import Gymnasium.{ModelsFixtures, ProjectsFixtures}
 
   alias Proto.Gymnasium.V1.Models.Model, as: ProtoModel
+  alias Proto.Gymnasium.V1.Models.Association, as: ProtoAssociation
+  alias Proto.Gymnasium.V1.Models.Attribute, as: ProtoAttribute
 
   describe "create the Model" do
     test "create_model/2 saves Model" do
@@ -98,6 +106,79 @@ defmodule GymnasiumGrpc.ModelsServerTest do
     end
   end
 
+  describe "find Project's Model association" do
+    test "find_project_model_association/2 returns found association" do
+      %Project{id: project_id, slug: project_slug} = project_fixture()
+      model = model_fixture(project_id: project_id)
+      associated_model = model_fixture(name: "Author", slug: "author", project_id: project_id)
+
+      association =
+        model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
+
+      proto_association =
+        ModelsServer.find_project_model_association(
+          %FindProjectModelAssociationRequest{
+            project_slug: project_slug,
+            model_slug: model.slug,
+            association_name: association.name
+          },
+          nil
+        )
+
+      assert association.name == proto_association.name
+    end
+
+    test "find_project_model_association/2 raises NotFound error" do
+      assert_raise GRPC.RPCError,
+                   "Association \"\" not found for Project \"\" and Model \"\".",
+                   fn ->
+                     ModelsServer.find_project_model_association(
+                       %FindProjectModelAssociationRequest{
+                         project_slug: "",
+                         model_slug: "",
+                         association_name: ""
+                       },
+                       nil
+                     )
+                   end
+    end
+  end
+
+  describe "find Project's Model attribute" do
+    test "find_project_model_attribute/2 returns found Model" do
+      %Project{id: project_id, slug: project_slug} = project_fixture()
+      model = model_fixture(project_id: project_id)
+      attribute = model_attribute_fixture(model_id: model.id)
+
+      proto_attribute =
+        ModelsServer.find_project_model_attribute(
+          %FindProjectModelAttributeRequest{
+            project_slug: project_slug,
+            model_slug: model.slug,
+            attribute_name: attribute.name
+          },
+          nil
+        )
+
+      assert attribute.name == proto_attribute.name
+    end
+
+    test "find_project_model_attribute/2 raises NotFound error" do
+      assert_raise GRPC.RPCError,
+                   "Attribute \"\" not found for Project \"\" and Model \"\".",
+                   fn ->
+                     ModelsServer.find_project_model_attribute(
+                       %FindProjectModelAttributeRequest{
+                         project_slug: "",
+                         model_slug: "",
+                         attribute_name: ""
+                       },
+                       nil
+                     )
+                   end
+    end
+  end
+
   describe "delete Model by id" do
     test "delete_model/2 returns Google.Protobuf.Empty response" do
       %Model{id: id} = model_fixture()
@@ -117,6 +198,120 @@ defmodule GymnasiumGrpc.ModelsServerTest do
       assert_raise GRPC.RPCError, "Internal errors", fn ->
         ModelsServer.delete_model(
           %DeleteModelRequest{
+            id: Ecto.UUID.generate()
+          },
+          nil
+        )
+      end
+    end
+  end
+
+  describe "create the Model association" do
+    test "create_association/2 saves Model association" do
+      model = model_fixture()
+      associated_model = model_fixture(name: "Author", slug: "author")
+
+      proto_association =
+        ModelsServer.create_association(
+          %CreateAssociationRequest{
+            model_id: model.id,
+            associated_model_id: associated_model.id,
+            name: "Author",
+            kind: :ASSOCIATION_KIND_BELONGS_TO,
+            description: ""
+          },
+          nil
+        )
+
+      assert %ProtoAssociation{name: name} = proto_association
+      assert name == "Author"
+    end
+
+    test "create_association/2 returns error when request values are malformed" do
+      assert_raise GRPC.RPCError, "Internal errors", fn ->
+        ModelsServer.create_association(
+          %CreateAssociationRequest{},
+          nil
+        )
+      end
+    end
+  end
+
+  describe "delete Model association by id" do
+    test "delete_association/2 returns Google.Protobuf.Empty response" do
+      %ModelAssociation{id: id} = model_association_fixture()
+
+      response =
+        ModelsServer.delete_association(
+          %DeleteAssociationRequest{
+            id: id
+          },
+          nil
+        )
+
+      assert %Google.Protobuf.Empty{} == response
+    end
+
+    test "delete_association/2 raises internal error" do
+      assert_raise GRPC.RPCError, "Internal errors", fn ->
+        ModelsServer.delete_association(
+          %DeleteAssociationRequest{
+            id: Ecto.UUID.generate()
+          },
+          nil
+        )
+      end
+    end
+  end
+
+  describe "create the Model attribute" do
+    test "create_attribute/2 saves Model attribute" do
+      model = model_fixture()
+
+      proto_attribute =
+        ModelsServer.create_attribute(
+          %CreateAttributeRequest{
+            model_id: model.id,
+            name: "Title",
+            kind: :ATTRIBUTE_KIND_STRING,
+            description: ""
+          },
+          nil
+        )
+
+      assert %ProtoAttribute{name: name} = proto_attribute
+      assert name == "Title"
+    end
+
+    test "create_attribute/2 returns error when request values are malformed" do
+      assert_raise GRPC.RPCError, "Internal errors", fn ->
+        ModelsServer.create_attribute(
+          %CreateAttributeRequest{},
+          nil
+        )
+      end
+    end
+  end
+
+  describe "delete Model attribute by id" do
+    test "delete_attribute/2 returns Google.Protobuf.Empty response" do
+      %ModelAttribute{id: id} = model_attribute_fixture()
+
+      response =
+        ModelsServer.delete_attribute(
+          %DeleteAttributeRequest{
+            id: id
+          },
+          nil
+        )
+
+      assert %Google.Protobuf.Empty{} == response
+    end
+
+    test "delete_attribute/2 raises internal error" do
+      assert_raise GRPC.RPCError, "Internal errors", fn ->
+        ModelsServer.delete_attribute(
+          %DeleteAttributeRequest{
             id: Ecto.UUID.generate()
           },
           nil

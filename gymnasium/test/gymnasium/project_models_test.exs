@@ -28,6 +28,19 @@ defmodule Gymnasium.ProjectModelsTest do
 
       assert ProjectModels.list_project_models(project_slug) == [model]
     end
+
+    test "list_project_models/2 returns Project's models with preloads" do
+      %Project{id: project_id, slug: project_slug} = project_fixture()
+      model = model_fixture(project_id: project_id)
+      model_attribute_fixture(model_id: model.id)
+      model_association_fixture(model_id: model.id)
+
+      model = Repo.preload(model, [:attributes, [associations: :associated_model]])
+
+      assert ProjectModels.list_project_models(project_slug,
+               preloads: [:attributes, [associations: :associated_model]]
+             ) == [model]
+    end
   end
 
   describe "find Project's Model attribute" do

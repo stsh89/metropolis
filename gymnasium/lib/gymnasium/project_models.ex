@@ -37,20 +37,32 @@ defmodule Gymnasium.ProjectModels do
   @doc """
   Lists all models for given Project slug.
 
+  ## Options
+
+      * `preloads` - list of available preloads for Project.
+
   ## Examples
 
       iex> list_project_models("book-store")
       [%Model{}]
 
   """
-  @spec list_project_models(String.t()) :: [Model.t()]
-  def list_project_models(project_slug) do
+  @spec list_project_models(String.t(), Keyword.t()) :: [Model.t()]
+  def list_project_models(project_slug, opts \\ []) do
     query =
       from m in Model,
         join: p in Project,
         on: p.id == m.project_id,
         where: p.slug == ^project_slug,
         order_by: [asc: m.name]
+
+    query =
+      if opts[:preloads] do
+        from p in query,
+          preload: ^opts[:preloads]
+      else
+        query
+      end
 
     Repo.all(query)
   end
