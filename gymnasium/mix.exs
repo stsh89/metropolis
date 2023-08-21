@@ -61,7 +61,10 @@ defmodule Gymnasium.MixProject do
       {:ex_doc, "~> 0.27", only: :dev, runtime: false},
 
       # A static code analysis tool for the Elixir language.
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+
+      # Mix tasks to simplify use of Dialyzer in Elixir projects.
+      {:dialyxir, "~> 1.3", only: [:dev], runtime: false}
     ]
   end
 

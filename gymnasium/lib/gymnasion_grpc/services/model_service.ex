@@ -4,7 +4,7 @@ defmodule GymnasiumGrpc.ModelService do
   """
 
   alias Gymnasium.{Models, ProjectModels}
-  alias Gymnasium.Models.Model
+  alias Gymnasium.Models.{Model, Attribute, Association}
 
   alias GymnasiumGrpc.ModelService.{
     CreateAssociationAttributes,
@@ -91,8 +91,8 @@ defmodule GymnasiumGrpc.ModelService do
       [%ModelAssociation{}, ...]
 
   """
-  @spec list_project_model_associations(ListProjectModelAssociations.t()) :: [
-          ModelAssociation.t()
+  @spec list_project_model_associations(ListProjectModelAssociationsAttributes.t()) :: [
+          Association.t()
         ]
   def list_project_model_associations(%ListProjectModelAssociationsAttributes{} = attributes) do
     %ListProjectModelAssociationsAttributes{
@@ -115,7 +115,7 @@ defmodule GymnasiumGrpc.ModelService do
       [%ModelAttribute{}, ...]
 
   """
-  @spec list_project_model_attributes(ListProjectModelAttributes.t()) :: [ModelAttribute.t()]
+  @spec list_project_model_attributes(ListProjectModelAttributesAttributes.t()) :: [Attribute.t()]
   def list_project_model_attributes(%ListProjectModelAttributesAttributes{} = attributes) do
     %ListProjectModelAttributesAttributes{
       project_slug: project_slug,
@@ -260,7 +260,7 @@ defmodule GymnasiumGrpc.ModelService do
       :error
 
   """
-  @spec create_association(CreateAssociationAttributes.t()) :: ModelAssociation.t() | :error
+  @spec create_association(CreateAssociationAttributes.t()) :: Association.t() | :error
   def create_association(%CreateAssociationAttributes{} = attributes) do
     result =
       attributes
@@ -330,7 +330,7 @@ defmodule GymnasiumGrpc.ModelService do
       :error
 
   """
-  @spec create_attribute(CreateAttributeAttributes.t()) :: ModelAttribute.t() | :error
+  @spec create_attribute(CreateAttributeAttributes.t()) :: Attribute.t() | :error
   def create_attribute(%CreateAttributeAttributes{} = attributes) do
     result =
       attributes

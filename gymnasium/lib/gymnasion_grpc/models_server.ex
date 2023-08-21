@@ -157,22 +157,23 @@ defmodule GymnasiumGrpc.ModelsServer do
       association_name: association_name
     } = request
 
-    case ModelService.find_project_model_association(
-           %ModelService.FindProjectModelAssociationAttributes{
-             project_slug: project_slug,
-             model_slug: model_slug,
-             association_name: association_name
-           }
-         ) do
-      %Association{} = association ->
-        to_proto_association(association)
+    association =
+      ModelService.find_project_model_association(
+        %ModelService.FindProjectModelAssociationAttributes{
+          project_slug: project_slug,
+          model_slug: model_slug,
+          association_name: association_name
+        }
+      )
 
-      _ ->
-        message =
-          "Association \"#{association_name}\" not found for Project \"#{project_slug}\" and Model \"#{model_slug}\"."
+    if association == nil do
+      message =
+        "Association \"#{association_name}\" not found for Project \"#{project_slug}\" and Model \"#{model_slug}\"."
 
-        raise GRPC.RPCError, status: :not_found, message: message
+      raise GRPC.RPCError, status: :not_found, message: message
     end
+
+    to_proto_association(association)
   end
 
   def delete_association(%Proto.DeleteAssociationRequest{} = request, _stream) do
@@ -220,22 +221,21 @@ defmodule GymnasiumGrpc.ModelsServer do
       attribute_name: attribute_name
     } = request
 
-    case ModelService.find_project_model_attribute(
-           %ModelService.FindProjectModelAttributeAttributes{
-             project_slug: project_slug,
-             model_slug: model_slug,
-             attribute_name: attribute_name
-           }
-         ) do
-      %Attribute{} = attribute ->
-        to_proto_attribute(attribute)
+    attribute =
+      ModelService.find_project_model_attribute(%ModelService.FindProjectModelAttributeAttributes{
+        project_slug: project_slug,
+        model_slug: model_slug,
+        attribute_name: attribute_name
+      })
 
-      _ ->
-        message =
-          "Attribute \"#{attribute_name}\" not found for Project \"#{project_slug}\" and Model \"#{model_slug}\"."
+    if attribute == nil do
+      message =
+        "Attribute \"#{attribute_name}\" not found for Project \"#{project_slug}\" and Model \"#{model_slug}\"."
 
-        raise GRPC.RPCError, status: :not_found, message: message
+      raise GRPC.RPCError, status: :not_found, message: message
     end
+
+    to_proto_attribute(attribute)
   end
 
   def list_project_model_attributes(%Proto.ListProjectModelAttributesRequest{} = request, _stream) do

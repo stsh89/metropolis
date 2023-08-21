@@ -21,9 +21,11 @@ defmodule GymnasiumGrpc.ProjectsServer do
       slug: slug
     }
 
-    case ProjectService.create_project(attributes) do
-      %Project{} = project ->
-        to_proto_project(project)
+    result = ProjectService.create_project(attributes)
+
+    case result do
+      %Project{} ->
+        to_proto_project(result)
 
       _ ->
         raise GRPC.RPCError, status: :internal
@@ -35,9 +37,11 @@ defmodule GymnasiumGrpc.ProjectsServer do
       slug: slug
     } = request
 
-    case ProjectService.find_project(slug) do
-      %Project{} = project ->
-        to_proto_project(project)
+    result = ProjectService.find_project(slug)
+
+    case result do
+      %Project{} ->
+        to_proto_project(result)
 
       _ ->
         message = "Project with the slug \"#{slug}\" was not found."

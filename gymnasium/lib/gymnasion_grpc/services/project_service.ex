@@ -7,8 +7,6 @@ defmodule GymnasiumGrpc.ProjectService do
   alias Gymnasium.Projects.Project
   alias GymnasiumGrpc.ProjectService.{CreateProjectAttributes, RenameProjectAttributes}
 
-  @type t :: Project
-
   @archive_states [:any, :archived_only, :not_archived_only]
 
   @doc """
@@ -23,7 +21,7 @@ defmodule GymnasiumGrpc.ProjectService do
       :error
 
   """
-  @spec create_project(CreateProjectAttributes.t()) :: t | :error
+  @spec create_project(CreateProjectAttributes.t()) :: Project.t() | :error
   def create_project(%CreateProjectAttributes{} = attributes) do
     result =
       attributes
@@ -55,7 +53,7 @@ defmodule GymnasiumGrpc.ProjectService do
       :error
 
   """
-  @spec rename_project(RenameProjectAttributes.t()) :: t | :error
+  @spec rename_project(RenameProjectAttributes.t()) :: Project.t() | :error
   def rename_project(%RenameProjectAttributes{} = attributes) do
     try do
       %RenameProjectAttributes{
@@ -94,7 +92,7 @@ defmodule GymnasiumGrpc.ProjectService do
       [%Project{}, ...]
 
   """
-  @spec list_projects(Keyword.t()) :: [t]
+  @spec list_projects(Keyword.t()) :: [Project.t()]
   def list_projects(params \\ []) do
     attrs = archive_state_to_project_list_attrs(params[:archive_state])
 
@@ -115,7 +113,7 @@ defmodule GymnasiumGrpc.ProjectService do
       nil
 
   """
-  @spec find_project(String.t()) :: t | nil
+  @spec find_project(String.t()) :: Project.t() | nil
   def find_project(slug) do
     try do
       Projects.find_project!(slug)
