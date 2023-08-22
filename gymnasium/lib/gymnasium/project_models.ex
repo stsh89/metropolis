@@ -36,6 +36,33 @@ defmodule Gymnasium.ProjectModels do
   end
 
   @doc """
+  Find a model with preloaded attributes and associations.
+
+  Raises Ecto.NoResultsError when no model is found.
+
+  ## Examples
+
+      iex> find_project_model_overview!("book-store", "book")
+      %Model{}
+
+      iex> find_project_model_overview!("", "")
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec find_project_model_overview!(String.t(), String.t()) :: Model.t()
+  def find_project_model_overview!(project_slug, model_slug) do
+    query =
+      from m in Model,
+        join: p in Project,
+        on: p.id == m.project_id,
+        where: p.slug == ^project_slug and m.slug == ^model_slug,
+        order_by: [asc: m.name],
+        preload: [:attributes, [associations: :associated_model]]
+
+    Repo.one!(query)
+  end
+
+  @doc """
   Lists all models for given Project slug.
 
   ## Options

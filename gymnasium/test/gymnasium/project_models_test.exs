@@ -9,15 +9,33 @@ defmodule Gymnasium.ProjectModelsTest do
   import Gymnasium.ProjectsFixtures
 
   describe "find Project's Model" do
-    test "find_project_model/2 returns Project's model" do
+    test "find_project_model!/2 returns Project's model" do
       %Project{id: project_id, slug: project_slug} = project_fixture()
       model = model_fixture(project_id: project_id)
 
       assert ProjectModels.find_project_model!(project_slug, model.slug) == model
     end
 
-    test "find_project_model/2 raises Ecto.NotFound error" do
+    test "find_project_model!/2 raises Ecto.NotFound error" do
       assert_raise Ecto.NoResultsError, fn -> ProjectModels.find_project_model!("", "") end
+    end
+  end
+
+  describe "find project model overview" do
+    test "find_project_model_overview!/2 returns Project's model" do
+      %Project{id: project_id, slug: project_slug} = project_fixture()
+
+      model =
+        model_fixture(project_id: project_id)
+        |> Repo.preload([:attributes, :associations])
+
+      assert ProjectModels.find_project_model_overview!(project_slug, model.slug) == model
+    end
+
+    test "find_project_model_overview!/2 raises Ecto.NotFound error" do
+      assert_raise Ecto.NoResultsError, fn ->
+        ProjectModels.find_project_model_overview!("", "")
+      end
     end
   end
 

@@ -13,7 +13,8 @@ defmodule GymnasiumGrpc.ModelServiceTest do
     FindProjectModelAssociationAttributes,
     FindProjectModelAttributeAttributes,
     CreateAssociationAttributes,
-    CreateAttributeAttributes
+    CreateAttributeAttributes,
+    FindProjectModelOverviewAttributes
   }
 
   import Gymnasium.{ProjectsFixtures, ModelsFixtures}
@@ -50,6 +51,32 @@ defmodule GymnasiumGrpc.ModelServiceTest do
       model_fixture(name: "Food service", slug: "food-service")
 
       assert ModelService.list_project_models(project_slug) == [model]
+    end
+  end
+
+  describe "find project model overview" do
+    test "find_project_model_overview!/1 returns found Model" do
+      %Project{id: project_id, slug: project_slug} = project_fixture()
+
+      model =
+        model_fixture(project_id: project_id)
+        |> Repo.preload([:attributes, :associations])
+
+      attributes = %FindProjectModelOverviewAttributes{
+        project_slug: project_slug,
+        model_slug: model.slug
+      }
+
+      assert ModelService.find_project_model_overview!(attributes) == model
+    end
+
+    test "find_project_model_overview!/1 raises Ecto.NotFound error" do
+      assert_raise Ecto.NoResultsError, fn ->
+        ModelService.find_project_model_overview!(%FindProjectModelOverviewAttributes{
+          project_slug: "book-store",
+          model_slug: "book"
+        })
+      end
     end
   end
 

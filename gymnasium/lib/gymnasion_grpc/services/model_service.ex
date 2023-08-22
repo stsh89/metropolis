@@ -14,7 +14,8 @@ defmodule GymnasiumGrpc.ModelService do
     FindProjectModelAttributeAttributes,
     FindProjectModelAttributes,
     ListProjectModelAssociationsAttributes,
-    ListProjectModelAttributesAttributes
+    ListProjectModelAttributesAttributes,
+    FindProjectModelOverviewAttributes
   }
 
   @doc """
@@ -61,6 +62,36 @@ defmodule GymnasiumGrpc.ModelService do
   @spec list_project_models(String.t()) :: [Model.t()]
   def list_project_models(project_slug) do
     ProjectModels.list_project_models(project_slug)
+  end
+
+  @doc """
+  Find project model overview.
+
+  Returns nil if the model overview was not found.
+
+  ## Examples
+
+      iex> find_project_model_overview!(%FindProjectModelOverviewAttributes{
+      ...>   project_slug: "book-store",
+      ...>   model_slug: "book"
+      ...> })
+      %Model{}
+
+      iex> find_project_model_overview!(%FindProjectModelOverviewAttributes{
+      ...>   project_slug: "food-service",
+      ...>   model_slug: "juice"
+      ...> })
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec find_project_model_overview!(FindProjectModelOverviewAttributes.t()) :: Model.t()
+  def find_project_model_overview!(%FindProjectModelOverviewAttributes{} = attributes) do
+    %FindProjectModelOverviewAttributes{
+      project_slug: project_slug,
+      model_slug: model_slug
+    } = attributes
+
+    ProjectModels.find_project_model_overview!(project_slug, model_slug)
   end
 
   @doc """

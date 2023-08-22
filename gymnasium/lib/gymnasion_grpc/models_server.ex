@@ -5,11 +5,11 @@ defmodule GymnasiumGrpc.ModelsServer do
 
   alias Gymnasium.Models.{Model, Association, Attribute}
   alias GymnasiumGrpc.Util
-  alias Proto.Gymnasium.V1.Models, as: Proto
+  alias Proto.Gymnasium.V1.Models, as: Rpc
   alias GymnasiumGrpc.ModelService
 
-  def create_model(%Proto.CreateModelRequest{} = request, _stream) do
-    %Proto.CreateModelRequest{
+  def create_model(%Rpc.CreateModelRequest{} = request, _stream) do
+    %Rpc.CreateModelRequest{
       project_id: project_id,
       description: description,
       name: name,
@@ -32,8 +32,8 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def find_project_model(%Proto.FindProjectModelRequest{} = request, _stream) do
-    %Proto.FindProjectModelRequest{
+  def find_project_model(%Rpc.FindProjectModelRequest{} = request, _stream) do
+    %Rpc.FindProjectModelRequest{
       project_slug: project_slug,
       model_slug: model_slug
     } = request
@@ -53,8 +53,32 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def list_project_model_overviews(%Proto.ListProjectModelOverviewsRequest{} = request, _stream) do
-    %Proto.ListProjectModelOverviewsRequest{
+  def find_project_model_overview(%Rpc.FindProjectModelOverviewRequest{} = request, _stream) do
+    %Rpc.FindProjectModelOverviewRequest{
+      project_slug: project_slug,
+      model_slug: model_slug
+    } = request
+
+    attributes = %ModelService.FindProjectModelOverviewAttributes{
+      project_slug: project_slug,
+      model_slug: model_slug
+    }
+
+    try do
+      attributes
+      |> ModelService.find_project_model_overview!()
+      |> to_proto_model_overview
+    rescue
+      Ecto.NoResultsError ->
+        message =
+          "Model overview not found for Project \"#{project_slug}\" and Model \"#{model_slug}\"."
+
+        raise GRPC.RPCError, status: :not_found, message: message
+    end
+  end
+
+  def list_project_model_overviews(%Rpc.ListProjectModelOverviewsRequest{} = request, _stream) do
+    %Rpc.ListProjectModelOverviewsRequest{
       project_slug: project_slug
     } = request
 
@@ -63,28 +87,13 @@ defmodule GymnasiumGrpc.ModelsServer do
       |> ModelService.list_project_model_overviews()
       |> Enum.map(fn m -> to_proto_model_overview(m) end)
 
-    %Proto.ListProjectModelOverviewsResponse{
+    %Rpc.ListProjectModelOverviewsResponse{
       model_overviews: model_overviews
     }
   end
 
-  def find_project_models_overview(%Proto.FindProjectModelsOverviewRequest{} = request, _stream) do
-    %Proto.FindProjectModelsOverviewRequest{
-      project_slug: project_slug
-    } = request
-
-    model_overviews =
-      project_slug
-      |> ModelService.list_project_model_overviews()
-      |> Enum.map(fn m -> to_proto_model_overview(m) end)
-
-    %Proto.FindProjectModelsOverviewResponse{
-      model_overviews: model_overviews
-    }
-  end
-
-  def list_project_models(%Proto.ListProjectModelsRequest{} = request, _stream) do
-    %Proto.ListProjectModelsRequest{
+  def list_project_models(%Rpc.ListProjectModelsRequest{} = request, _stream) do
+    %Rpc.ListProjectModelsRequest{
       project_slug: project_slug
     } = request
 
@@ -93,13 +102,13 @@ defmodule GymnasiumGrpc.ModelsServer do
       |> ModelService.list_project_models()
       |> Enum.map(fn m -> to_proto_model(m) end)
 
-    %Proto.ListProjectModelsResponse{
+    %Rpc.ListProjectModelsResponse{
       models: models
     }
   end
 
-  def delete_model(%Proto.DeleteModelRequest{} = request, _stream) do
-    %Proto.DeleteModelRequest{
+  def delete_model(%Rpc.DeleteModelRequest{} = request, _stream) do
+    %Rpc.DeleteModelRequest{
       id: id
     } = request
 
@@ -112,8 +121,8 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def create_association(%Proto.CreateAssociationRequest{} = request, _stream) do
-    %Proto.CreateAssociationRequest{
+  def create_association(%Rpc.CreateAssociationRequest{} = request, _stream) do
+    %Rpc.CreateAssociationRequest{
       model_id: model_id,
       associated_model_id: associated_model_id,
       description: description,
@@ -139,10 +148,10 @@ defmodule GymnasiumGrpc.ModelsServer do
   end
 
   def list_project_model_associations(
-        %Proto.ListProjectModelAssociationsRequest{} = request,
+        %Rpc.ListProjectModelAssociationsRequest{} = request,
         _stream
       ) do
-    %Proto.ListProjectModelAssociationsRequest{
+    %Rpc.ListProjectModelAssociationsRequest{
       project_slug: project_slug,
       model_slug: model_slug
     } = request
@@ -157,16 +166,16 @@ defmodule GymnasiumGrpc.ModelsServer do
       |> ModelService.list_project_model_associations()
       |> Enum.map(fn a -> to_proto_association(a) end)
 
-    %Proto.ListProjectModelAssociationsResponse{
+    %Rpc.ListProjectModelAssociationsResponse{
       associations: associations
     }
   end
 
   def find_project_model_association(
-        %Proto.FindProjectModelAssociationRequest{} = request,
+        %Rpc.FindProjectModelAssociationRequest{} = request,
         _stream
       ) do
-    %Proto.FindProjectModelAssociationRequest{
+    %Rpc.FindProjectModelAssociationRequest{
       project_slug: project_slug,
       model_slug: model_slug,
       association_name: association_name
@@ -191,8 +200,8 @@ defmodule GymnasiumGrpc.ModelsServer do
     to_proto_association(association)
   end
 
-  def delete_association(%Proto.DeleteAssociationRequest{} = request, _stream) do
-    %Proto.DeleteAssociationRequest{
+  def delete_association(%Rpc.DeleteAssociationRequest{} = request, _stream) do
+    %Rpc.DeleteAssociationRequest{
       id: id
     } = request
 
@@ -205,8 +214,8 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def create_attribute(%Proto.CreateAttributeRequest{} = request, _stream) do
-    %Proto.CreateAttributeRequest{
+  def create_attribute(%Rpc.CreateAttributeRequest{} = request, _stream) do
+    %Rpc.CreateAttributeRequest{
       model_id: model_id,
       description: description,
       name: name,
@@ -229,8 +238,8 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
-  def find_project_model_attribute(%Proto.FindProjectModelAttributeRequest{} = request, _stream) do
-    %Proto.FindProjectModelAttributeRequest{
+  def find_project_model_attribute(%Rpc.FindProjectModelAttributeRequest{} = request, _stream) do
+    %Rpc.FindProjectModelAttributeRequest{
       project_slug: project_slug,
       model_slug: model_slug,
       attribute_name: attribute_name
@@ -253,8 +262,8 @@ defmodule GymnasiumGrpc.ModelsServer do
     to_proto_attribute(attribute)
   end
 
-  def list_project_model_attributes(%Proto.ListProjectModelAttributesRequest{} = request, _stream) do
-    %Proto.ListProjectModelAttributesRequest{
+  def list_project_model_attributes(%Rpc.ListProjectModelAttributesRequest{} = request, _stream) do
+    %Rpc.ListProjectModelAttributesRequest{
       project_slug: project_slug,
       model_slug: model_slug
     } = request
@@ -269,13 +278,13 @@ defmodule GymnasiumGrpc.ModelsServer do
       |> ModelService.list_project_model_attributes()
       |> Enum.map(fn a -> to_proto_attribute(a) end)
 
-    %Proto.ListProjectModelAttributesResponse{
+    %Rpc.ListProjectModelAttributesResponse{
       attributes: attributes
     }
   end
 
-  def delete_attribute(%Proto.DeleteAttributeRequest{} = request, _stream) do
-    %Proto.DeleteAttributeRequest{
+  def delete_attribute(%Rpc.DeleteAttributeRequest{} = request, _stream) do
+    %Rpc.DeleteAttributeRequest{
       id: id
     } = request
 
@@ -289,7 +298,7 @@ defmodule GymnasiumGrpc.ModelsServer do
   end
 
   defp to_proto_model(%Model{} = model) do
-    %Proto.Model{
+    %Rpc.Model{
       id: model.id,
       project_id: model.project_id,
       description: model.description,
@@ -301,7 +310,7 @@ defmodule GymnasiumGrpc.ModelsServer do
   end
 
   defp to_proto_model_overview(%Model{} = model) do
-    %Proto.ModelOverview{
+    %Rpc.ModelOverview{
       model: to_proto_model(model),
       associations: model.associations |> Enum.map(fn a -> to_proto_association(a) end),
       attributes: model.attributes |> Enum.map(fn a -> to_proto_attribute(a) end)
@@ -309,7 +318,7 @@ defmodule GymnasiumGrpc.ModelsServer do
   end
 
   def to_proto_association(%Association{} = association) do
-    %Proto.Association{
+    %Rpc.Association{
       id: association.id,
       model_id: association.model_id,
       associated_model: to_proto_model(association.associated_model),
@@ -322,7 +331,7 @@ defmodule GymnasiumGrpc.ModelsServer do
   end
 
   def to_proto_attribute(%Attribute{} = attribute) do
-    %Proto.Attribute{
+    %Rpc.Attribute{
       id: attribute.id,
       model_id: attribute.model_id,
       description: attribute.description,

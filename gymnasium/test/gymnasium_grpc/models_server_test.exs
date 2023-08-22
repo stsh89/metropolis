@@ -22,9 +22,7 @@ defmodule GymnasiumGrpc.ModelsServerTest do
     ListProjectModelAssociationsRequest,
     ListProjectModelAttributesRequest,
     ListProjectModelAssociationsResponse,
-    ListProjectModelAttributesResponse,
-    FindProjectModelsOverviewRequest,
-    FindProjectModelsOverviewResponse
+    ListProjectModelAttributesResponse
   }
 
   import Gymnasium.{ModelsFixtures, ProjectsFixtures}
@@ -82,6 +80,53 @@ defmodule GymnasiumGrpc.ModelsServerTest do
     end
   end
 
+  describe "find project model overview" do
+    test "find_project_model_overview/2 returns model with attributes and associations for given project slug" do
+      %Project{id: project_id, slug: project_slug} = project_fixture()
+      model = model_fixture(project_id: project_id)
+      associated_model = model_fixture(project_id: project_id, name: "Author", slug: "author")
+      attribute = model_attribute_fixture(model_id: model.id)
+
+      association =
+        model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
+
+      assert %Rpc.ModelOverview{} =
+               model_overview =
+               ModelsServer.find_project_model_overview(
+                 %Rpc.FindProjectModelOverviewRequest{
+                   project_slug: project_slug,
+                   model_slug: model.slug
+                 },
+                 nil
+               )
+
+      assert %{
+               model: model_overview.model.name,
+               attributes: model_overview.attributes |> Enum.map(fn a -> a.name end),
+               associations: model_overview.associations |> Enum.map(fn a -> a.name end)
+             } ==
+               %{
+                 model: model.name,
+                 attributes: [attribute.name],
+                 associations: [association.name]
+               }
+    end
+
+    test "find_project_model_overview/2 raises NotFound error" do
+      assert_raise GRPC.RPCError,
+                   "Model overview not found for Project \"book-store\" and Model \"book\".",
+                   fn ->
+                     ModelsServer.find_project_model_overview(
+                       %Rpc.FindProjectModelOverviewRequest{
+                         project_slug: "book-store",
+                         model_slug: "book"
+                       },
+                       nil
+                     )
+                   end
+    end
+  end
+
   describe "Project model overviews listing" do
     test "list_project_model_overviews/2 returns models with attributes and associations for given project slug" do
       %Project{id: project_id, slug: project_slug} = project_fixture()
@@ -121,29 +166,6 @@ defmodule GymnasiumGrpc.ModelsServerTest do
                  associations: [association.name]
                }
              ]
-    end
-  end
-
-  describe "Project models overview" do
-    test "find_project_models_overview/2 returns all models for given project slug" do
-      %Project{id: project_id, slug: project_slug} = project_fixture()
-      project_model = model_fixture(project_id: project_id)
-      model_fixture(title: "Author", slug: "author")
-
-      %FindProjectModelsOverviewResponse{model_overviews: list} =
-        ModelsServer.find_project_models_overview(
-          %FindProjectModelsOverviewRequest{
-            project_slug: project_slug
-          },
-          nil
-        )
-
-      assert_model_overviews(list, [project_model])
-    end
-
-    defp assert_model_overviews(list, expected_list) do
-      assert Enum.map(list, fn m -> m.model.slug end) ==
-               Enum.map(expected_list, fn m -> m.slug end)
     end
   end
 
