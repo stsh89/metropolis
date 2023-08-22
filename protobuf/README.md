@@ -1,8 +1,10 @@
-# Proto
+# Protobuf
+Home folder for proto definitions and grpcurl examples.
+
+## Lint specific files
+
 ```
-api-linter --proto-path ./protobuf --config ./protobuf/api_linter_config.json \
-    proto/gymnasium/v1/dimensions.proto \
-    proto/gymnasium/v1/dimensions/project.proto \
-    proto/temple/v1/temple.proto \
-    proto/temple/v1/projects.proto
+api-linter --config api_linter_config.json proto/gymnasium/v1/health/health.proto
+api-linter --config api_linter_config.json proto/gymnasium/v1/models/models.proto
+api-linter --config api_linter_config.json proto/gymnasium/v1/projects/projects.proto
 ```
