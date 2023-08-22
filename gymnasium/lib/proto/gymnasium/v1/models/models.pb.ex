@@ -112,6 +112,25 @@ defmodule Proto.Gymnasium.V1.Models.FindProjectModelsOverviewResponse do
     json_name: "modelOverviews"
 end
 
+defmodule Proto.Gymnasium.V1.Models.ListProjectModelOverviewsRequest do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :project_slug, 1, type: :string, json_name: "projectSlug"
+end
+
+defmodule Proto.Gymnasium.V1.Models.ListProjectModelOverviewsResponse do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :model_overviews, 1,
+    repeated: true,
+    type: Proto.Gymnasium.V1.Models.ModelOverview,
+    json_name: "modelOverviews"
+end
+
 defmodule Proto.Gymnasium.V1.Models.ListProjectModelsRequest do
   @moduledoc false
 
@@ -243,6 +262,10 @@ defmodule Proto.Gymnasium.V1.Models.Models.Service do
   rpc :FindProjectModelsOverview,
       Proto.Gymnasium.V1.Models.FindProjectModelsOverviewRequest,
       Proto.Gymnasium.V1.Models.FindProjectModelsOverviewResponse
+
+  rpc :ListProjectModelOverviews,
+      Proto.Gymnasium.V1.Models.ListProjectModelOverviewsRequest,
+      Proto.Gymnasium.V1.Models.ListProjectModelOverviewsResponse
 
   rpc :ListProjectModels,
       Proto.Gymnasium.V1.Models.ListProjectModelsRequest,
