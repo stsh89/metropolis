@@ -543,7 +543,7 @@ impl Repo {
         let mut client = self.models_client().await?;
 
         let response = client
-            .find_project_models_overview(proto::models::FindProjectModelsOverviewRequest {
+            .list_project_model_overviews(proto::models::ListProjectModelOverviewsRequest {
                 project_slug,
             })
             .await?
