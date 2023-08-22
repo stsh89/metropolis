@@ -4,7 +4,7 @@ defmodule GymnasiumGrpc.Endpoint do
   intercept GRPC.Server.Interceptors.Logger
 
   run([
-    GymnasiumGrpc.HealthCheckServer,
+    GymnasiumGrpc.HealthServer,
     GymnasiumGrpc.ModelsServer,
     GymnasiumGrpc.ProjectsServer
   ])

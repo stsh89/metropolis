@@ -2,10 +2,10 @@
 
 grpcurl -d @ \
     -import-path ./protobuf \
-    -proto ./protobuf/proto/gymnasium/v1/dimensions.proto \
+    -proto ./protobuf/proto/gymnasium/v1/health/health.proto \
     -plaintext \
     localhost:50052 \
-    proto.gymnasium.v1.HealthCheck/GetHealthCheck <<EOM
+    proto.gymnasium.v1.health.Health/GetHealthCheck <<EOM
 {
 }
 EOM

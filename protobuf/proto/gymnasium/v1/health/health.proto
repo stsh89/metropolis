@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package proto.gymnasium.v1.health;
+
+// Heath check service.
+service Health {
+    // Check servers health.
+    rpc GetHealthCheck(GetHealthCheckRequest) returns (HealthCheck);
+}
+
+// Server's health check.
+message HealthCheck {
+    // List of servers health states.
+    enum State {
+        // Unspecified.
+        STATE_UNSPECIFIED = 0;
+
+        // Healthy.
+        STATE_HEALTHY = 1;
+
+        // Unhealty.
+        STATE_UNHEALTHY = 2;
+    }
+
+    // Server's health state.
+    State state = 1;
+}
+
+// Client's requst on health check.
+message GetHealthCheckRequest {}
