@@ -1,30 +1,25 @@
-use crate::{datastore, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait DeleteModel {
-    async fn get_model(
-        &self,
-        project_slug: &str,
-        model_slug: &str,
-    ) -> FoundationResult<datastore::model::Model>;
-
-    async fn delete_model(&self, attribute: datastore::model::Model) -> FoundationResult<()>;
-}
+use crate::{
+    model::{DeleteModelRecord, GetModelRecord},
+    FoundationResult,
+};
 
 pub struct Request {
     pub project_slug: String,
     pub model_slug: String,
 }
 
-pub async fn execute(repo: &impl DeleteModel, request: Request) -> FoundationResult<()> {
+pub async fn execute(
+    repo: &(impl GetModelRecord + DeleteModelRecord),
+    request: Request,
+) -> FoundationResult<()> {
     let Request {
         project_slug,
         model_slug,
     } = request;
 
-    let model_record = repo.get_model(&project_slug, &model_slug).await?;
+    let model_record = repo.get_model_record(&project_slug, &model_slug).await?;
 
-    repo.delete_model(model_record).await?;
+    repo.delete_model_record(model_record).await?;
 
     Ok(())
 }
@@ -39,32 +34,6 @@ mod tests {
             ProjectRepo,
         },
     };
-
-    #[async_trait::async_trait]
-    impl DeleteModel for Repo {
-        async fn get_model(
-            &self,
-            project_slug: &str,
-            model_slug: &str,
-        ) -> FoundationResult<datastore::model::Model> {
-            let project_record = self.project_repo.find_by_slug(project_slug).await?;
-
-            self.model_repo
-                .find_by_slug(project_record.id, model_slug)
-                .await
-        }
-
-        async fn delete_model(
-            &self,
-            model_record: datastore::model::Model,
-        ) -> FoundationResult<()> {
-            let mut model_records = self.model_repo.records.write().await;
-
-            model_records.remove(&model_record.id);
-
-            Ok(())
-        }
-    }
 
     #[tokio::test]
     async fn it_deletes_a_model() -> FoundationResult<()> {

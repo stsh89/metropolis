@@ -1,13 +1,8 @@
-use crate::{datastore, model::ModelOverview, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait GetModelOverview {
-    async fn get_model_overview(
-        &self,
-        project_slug: &str,
-        model_slug: &str,
-    ) -> FoundationResult<datastore::model::ModelOverview>;
-}
+use crate::{
+    datastore,
+    model::{GetModelOverviewRecord, ModelOverview},
+    FoundationResult,
+};
 
 pub struct GetModelResponse {
     pub model: datastore::model::Model,
@@ -24,13 +19,18 @@ pub struct Response {
     pub model_overview: ModelOverview,
 }
 
-pub async fn execute(repo: &impl GetModelOverview, request: Request) -> FoundationResult<Response> {
+pub async fn execute(
+    repo: &impl GetModelOverviewRecord,
+    request: Request,
+) -> FoundationResult<Response> {
     let Request {
         project_slug,
         model_slug,
     } = request;
 
-    let model_overview_record = repo.get_model_overview(&project_slug, &model_slug).await?;
+    let model_overview_record = repo
+        .get_model_overview_record(&project_slug, &model_slug)
+        .await?;
 
     let response = Response {
         model_overview: ModelOverview {
@@ -63,31 +63,6 @@ mod tests {
             ProjectRepo,
         },
     };
-
-    #[async_trait::async_trait]
-    impl GetModelOverview for Repo {
-        async fn get_model_overview(
-            &self,
-            project_slug: &str,
-            model_slug: &str,
-        ) -> FoundationResult<datastore::model::ModelOverview> {
-            let project_record = self.project_repo.find_by_slug(project_slug).await?;
-
-            let model_record = self
-                .model_repo
-                .find_by_slug(project_record.id, model_slug)
-                .await?;
-            let model_attribute_records = self.model_attribute_repo.list(model_record.id).await?;
-            let model_association_records =
-                self.model_association_repo.list(model_record.id).await?;
-
-            Ok(datastore::model::ModelOverview {
-                model: model_record,
-                attributes: model_attribute_records,
-                associations: model_association_records,
-            })
-        }
-    }
 
     #[tokio::test]
     async fn it_returns_model_with_attributes_and_associations() -> FoundationResult<()> {

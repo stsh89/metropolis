@@ -1,12 +1,7 @@
-use crate::{datastore, model::Model, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait ListModels {
-    async fn list_models(
-        &self,
-        project_slug: &str,
-    ) -> FoundationResult<Vec<datastore::model::Model>>;
-}
+use crate::{
+    model::{ListModelRecords, Model},
+    FoundationResult,
+};
 
 pub struct Request {
     pub project_slug: String,
@@ -16,10 +11,10 @@ pub struct Response {
     pub models: Vec<Model>,
 }
 
-pub async fn execute(repo: &impl ListModels, request: Request) -> FoundationResult<Response> {
+pub async fn execute(repo: &impl ListModelRecords, request: Request) -> FoundationResult<Response> {
     let Request { project_slug } = request;
 
-    let model_records = repo.list_models(&project_slug).await?;
+    let model_records = repo.list_model_records(&project_slug).await?;
 
     let response = Response {
         models: model_records.into_iter().map(Into::into).collect(),
@@ -38,26 +33,6 @@ mod tests {
             ProjectRepo,
         },
     };
-
-    #[async_trait::async_trait]
-    impl ListModels for Repo {
-        async fn list_models(
-            &self,
-            project_slug: &str,
-        ) -> FoundationResult<Vec<datastore::model::Model>> {
-            let project_record = self.project_repo.find_by_slug(project_slug).await?;
-
-            let model_records = self
-                .model_repo
-                .records()
-                .await
-                .into_iter()
-                .filter(|model_record| model_record.project_id == project_record.id)
-                .collect();
-
-            Ok(model_records)
-        }
-    }
 
     #[tokio::test]
     async fn it_returns_a_list_of_project_models() -> FoundationResult<()> {

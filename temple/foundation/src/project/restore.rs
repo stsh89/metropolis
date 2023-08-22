@@ -1,25 +1,21 @@
-use crate::{datastore, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait RestoreProject {
-    async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project>;
-
-    async fn restore_project(
-        &self,
-        project_record: datastore::project::Project,
-    ) -> FoundationResult<()>;
-}
+use crate::{
+    project::{GetProjectRecord, RestoreProjectRecord},
+    FoundationResult,
+};
 
 pub struct Request {
     pub slug: String,
 }
 
-pub async fn execute(repo: &impl RestoreProject, request: Request) -> FoundationResult<()> {
+pub async fn execute(
+    repo: &(impl GetProjectRecord + RestoreProjectRecord),
+    request: Request,
+) -> FoundationResult<()> {
     let Request { slug } = request;
 
-    let project_record = repo.get_project(slug).await?;
+    let project_record = repo.get_project_record(&slug).await?;
 
-    repo.restore_project(project_record).await?;
+    repo.restore_project_record(project_record).await?;
 
     Ok(())
 }
@@ -31,28 +27,6 @@ mod tests {
         tests::{project_record_fixture, ProjectRecordFixture, ProjectRepo},
         Utc,
     };
-
-    #[async_trait::async_trait]
-    impl RestoreProject for ProjectRepo {
-        async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project> {
-            self.find_by_slug(&slug).await
-        }
-
-        async fn restore_project(
-            &self,
-            project_record: datastore::project::Project,
-        ) -> FoundationResult<()> {
-            let mut found_project_record = self.get(project_record.id).await?;
-
-            let mut project_records = self.records.write().await;
-
-            found_project_record.archived_at = None;
-
-            project_records.insert(found_project_record.id, found_project_record.clone());
-
-            Ok(())
-        }
-    }
 
     #[tokio::test]
     async fn it_removes_archivation_mark_from_project() -> FoundationResult<()> {

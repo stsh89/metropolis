@@ -3,6 +3,11 @@
 use super::*;
 use crate::{
     datastore::model::{AssociationKind, AttributeKind},
+    project::{
+        ArchiveProjectRecord, CreateProjectRecord, DeleteProjectRecord, GetProjectRecord,
+        ListProjectRecordFilterArchive, ListProjectRecordFilters, ListProjectRecords, Project,
+        RenameProjectRecord, RestoreProjectRecord,
+    },
     FoundationError, FoundationResult, Uuid,
 };
 use std::collections::HashMap;
@@ -10,6 +15,135 @@ use tokio::sync::RwLock;
 
 pub struct ProjectRepo {
     pub records: RwLock<HashMap<Uuid, datastore::project::Project>>,
+}
+
+#[async_trait::async_trait]
+impl CreateProjectRecord for ProjectRepo {
+    async fn create_project_record(
+        &self,
+        project: Project,
+    ) -> FoundationResult<datastore::project::Project> {
+        let Project {
+            description,
+            name,
+            slug,
+        } = project;
+
+        let mut project_records = self.records.write().await;
+
+        let project_record = datastore::project::Project {
+            description: description.unwrap_or_default(),
+            name,
+            slug,
+            ..Default::default()
+        };
+
+        project_records.insert(project_record.id, project_record.clone());
+
+        Ok(project_record)
+    }
+}
+
+#[async_trait::async_trait]
+impl RenameProjectRecord for ProjectRepo {
+    async fn rename_project_record(
+        &self,
+        project_record: datastore::project::Project,
+    ) -> FoundationResult<datastore::project::Project> {
+        let mut found_project_record = self.get(project_record.id).await?;
+
+        let mut project_records = self.records.write().await;
+
+        found_project_record.name = project_record.name;
+        found_project_record.slug = project_record.slug;
+
+        project_records.insert(found_project_record.id, found_project_record.clone());
+
+        Ok(found_project_record)
+    }
+}
+
+#[async_trait::async_trait]
+impl GetProjectRecord for ProjectRepo {
+    async fn get_project_record(
+        &self,
+        slug: &str,
+    ) -> FoundationResult<datastore::project::Project> {
+        self.find_by_slug(&slug).await
+    }
+}
+
+#[async_trait::async_trait]
+impl ListProjectRecords for ProjectRepo {
+    async fn list_project_records(
+        &self,
+        filters: ListProjectRecordFilters,
+    ) -> FoundationResult<Vec<datastore::project::Project>> {
+        let project_records = self
+            .records
+            .read()
+            .await
+            .values()
+            .filter(|project| match filters.archive_filter {
+                ListProjectRecordFilterArchive::Any => true,
+                ListProjectRecordFilterArchive::ArchivedOnly => project.archived_at.is_some(),
+                ListProjectRecordFilterArchive::NotArchivedOnly => project.archived_at.is_none(),
+            })
+            .cloned()
+            .collect();
+
+        Ok(project_records)
+    }
+}
+
+#[async_trait::async_trait]
+impl DeleteProjectRecord for ProjectRepo {
+    async fn delete_project_record(
+        &self,
+        project_record: datastore::project::Project,
+    ) -> FoundationResult<()> {
+        let mut project_records = self.records.write().await;
+
+        project_records.remove(&project_record.id);
+
+        Ok(())
+    }
+}
+
+#[async_trait::async_trait]
+impl RestoreProjectRecord for ProjectRepo {
+    async fn restore_project_record(
+        &self,
+        project_record: datastore::project::Project,
+    ) -> FoundationResult<()> {
+        let mut found_project_record = self.get(project_record.id).await?;
+
+        let mut project_records = self.records.write().await;
+
+        found_project_record.archived_at = None;
+
+        project_records.insert(found_project_record.id, found_project_record.clone());
+
+        Ok(())
+    }
+}
+
+#[async_trait::async_trait]
+impl ArchiveProjectRecord for ProjectRepo {
+    async fn archive_project_record(
+        &self,
+        project_record: datastore::project::Project,
+    ) -> FoundationResult<()> {
+        let mut found_project_record = self.get(project_record.id).await?;
+
+        let mut project_records = self.records.write().await;
+
+        found_project_record.archived_at = Some(Utc::now());
+
+        project_records.insert(found_project_record.id, found_project_record.clone());
+
+        Ok(())
+    }
 }
 
 impl ProjectRepo {

@@ -1,20 +1,7 @@
-use crate::{datastore, model::Association, util, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait CreateModelAssociation {
-    async fn get_model(
-        &self,
-        project_slug: &str,
-        model_slug: &str,
-    ) -> FoundationResult<datastore::model::Model>;
-
-    async fn create_model_association(
-        &self,
-        model: datastore::model::Model,
-        associated_model: datastore::model::Model,
-        association: Association,
-    ) -> FoundationResult<datastore::model::Association>;
-}
+use crate::{
+    model::{Association, CreateModelAssociationRecord, GetModelRecord},
+    util, FoundationResult,
+};
 
 pub struct Request {
     pub project_slug: String,
@@ -30,7 +17,7 @@ pub struct Response {
 }
 
 pub async fn execute(
-    repo: &impl CreateModelAssociation,
+    repo: &(impl GetModelRecord + CreateModelAssociationRecord),
     request: Request,
 ) -> FoundationResult<Response> {
     let Request {
@@ -42,14 +29,14 @@ pub async fn execute(
         associated_model_slug,
     } = request;
 
-    let model_record = repo.get_model(&project_slug, &model_slug).await?;
+    let model_record = repo.get_model_record(&project_slug, &model_slug).await?;
 
     let associated_model_record = repo
-        .get_model(&project_slug, &associated_model_slug)
+        .get_model_record(&project_slug, &associated_model_slug)
         .await?;
 
     let association_record = repo
-        .create_model_association(
+        .create_model_association_record(
             model_record,
             associated_model_record.clone(),
             Association {
@@ -78,53 +65,6 @@ mod tests {
             ProjectRepo,
         },
     };
-
-    #[async_trait::async_trait]
-    impl CreateModelAssociation for Repo {
-        async fn get_model(
-            &self,
-            project_slug: &str,
-            model_slug: &str,
-        ) -> FoundationResult<datastore::model::Model> {
-            let project_record = self.project_repo.find_by_slug(project_slug).await?;
-
-            self.model_repo
-                .find_by_slug(project_record.id, model_slug)
-                .await
-        }
-
-        async fn create_model_association(
-            &self,
-            model_record: datastore::model::Model,
-            associated_model_record: datastore::model::Model,
-            association: Association,
-        ) -> FoundationResult<datastore::model::Association> {
-            let Association {
-                description,
-                name,
-                kind,
-                model: _,
-            } = association;
-
-            let mut model_association_records = self.model_association_repo.records.write().await;
-
-            let model_association_record = datastore::model::Association {
-                model_id: model_record.id,
-                description: description.unwrap_or_default(),
-                name,
-                kind: kind.into(),
-                associated_model: associated_model_record,
-                ..Default::default()
-            };
-
-            model_association_records.insert(
-                model_association_record.id,
-                model_association_record.clone(),
-            );
-
-            Ok(model_association_record)
-        }
-    }
 
     #[tokio::test]
     async fn it_creates_a_model_association() -> FoundationResult<()> {

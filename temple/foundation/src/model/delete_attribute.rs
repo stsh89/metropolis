@@ -1,19 +1,7 @@
-use crate::{datastore, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait DeleteModelAttribute {
-    async fn get_model_attribute(
-        &self,
-        project_slug: &str,
-        model_slug: &str,
-        name: &str,
-    ) -> FoundationResult<datastore::model::Attribute>;
-
-    async fn delete_model_attribute(
-        &self,
-        attribute: datastore::model::Attribute,
-    ) -> FoundationResult<()>;
-}
+use crate::{
+    model::{DeleteModelAttributeRecord, GetModelAttributeRecord},
+    FoundationResult,
+};
 
 pub struct Request {
     pub project_slug: String,
@@ -21,7 +9,10 @@ pub struct Request {
     pub model_attribute_name: String,
 }
 
-pub async fn execute(repo: &impl DeleteModelAttribute, request: Request) -> FoundationResult<()> {
+pub async fn execute(
+    repo: &(impl GetModelAttributeRecord + DeleteModelAttributeRecord),
+    request: Request,
+) -> FoundationResult<()> {
     let Request {
         project_slug,
         model_slug,
@@ -29,10 +20,11 @@ pub async fn execute(repo: &impl DeleteModelAttribute, request: Request) -> Foun
     } = request;
 
     let model_attribute_record = repo
-        .get_model_attribute(&project_slug, &model_slug, &model_attribute_name)
+        .get_model_attribute_record(&project_slug, &model_slug, &model_attribute_name)
         .await?;
 
-    repo.delete_model_attribute(model_attribute_record).await?;
+    repo.delete_model_attribute_record(model_attribute_record)
+        .await?;
 
     Ok(())
 }
@@ -48,38 +40,6 @@ mod tests {
             ProjectRepo,
         },
     };
-
-    #[async_trait::async_trait]
-    impl DeleteModelAttribute for Repo {
-        async fn get_model_attribute(
-            &self,
-            project_slug: &str,
-            model_slug: &str,
-            model_attribute_name: &str,
-        ) -> FoundationResult<datastore::model::Attribute> {
-            let project_record = self.project_repo.find_by_slug(project_slug).await?;
-
-            let model_record = self
-                .model_repo
-                .find_by_slug(project_record.id, model_slug)
-                .await?;
-
-            self.model_attribute_repo
-                .find_by_name(model_record.id, model_attribute_name)
-                .await
-        }
-
-        async fn delete_model_attribute(
-            &self,
-            model_attribute_record: datastore::model::Attribute,
-        ) -> FoundationResult<()> {
-            let mut model_attribute_records = self.model_attribute_repo.records.write().await;
-
-            model_attribute_records.remove(&model_attribute_record.id);
-
-            Ok(())
-        }
-    }
 
     #[tokio::test]
     async fn it_deletes_a_model_attribute() -> FoundationResult<()> {

@@ -1,12 +1,7 @@
-use crate::{datastore, project::Project, util, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait CreateProject {
-    async fn create_project(
-        &self,
-        project: Project,
-    ) -> FoundationResult<datastore::project::Project>;
-}
+use crate::{
+    project::{CreateProjectRecord, Project},
+    util, FoundationResult,
+};
 
 pub struct Request {
     pub name: String,
@@ -17,11 +12,14 @@ pub struct Response {
     pub project: Project,
 }
 
-pub async fn execute(repo: &impl CreateProject, request: Request) -> FoundationResult<Response> {
+pub async fn execute(
+    repo: &impl CreateProjectRecord,
+    request: Request,
+) -> FoundationResult<Response> {
     let Request { name, description } = request;
 
     let project_record = repo
-        .create_project(Project {
+        .create_project_record(Project {
             slug: util::slug::sluggify(&name),
             name,
             description: util::string::optional(&description),
@@ -39,33 +37,6 @@ pub async fn execute(repo: &impl CreateProject, request: Request) -> FoundationR
 mod tests {
     use super::*;
     use crate::tests::ProjectRepo;
-
-    #[async_trait::async_trait]
-    impl CreateProject for ProjectRepo {
-        async fn create_project(
-            &self,
-            project: Project,
-        ) -> FoundationResult<datastore::project::Project> {
-            let Project {
-                description,
-                name,
-                slug,
-            } = project;
-
-            let mut project_records = self.records.write().await;
-
-            let project_record = datastore::project::Project {
-                description: description.unwrap_or_default(),
-                name,
-                slug,
-                ..Default::default()
-            };
-
-            project_records.insert(project_record.id, project_record.clone());
-
-            Ok(project_record)
-        }
-    }
 
     #[tokio::test]
     async fn it_creates_a_project() -> FoundationResult<()> {

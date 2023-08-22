@@ -1,19 +1,7 @@
-use crate::{datastore, model::Attribute, util, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait CreateModelAttribute {
-    async fn get_model(
-        &self,
-        project_slug: &str,
-        model_slug: &str,
-    ) -> FoundationResult<datastore::model::Model>;
-
-    async fn create_model_attribute(
-        &self,
-        model: datastore::model::Model,
-        attribute: Attribute,
-    ) -> FoundationResult<datastore::model::Attribute>;
-}
+use crate::{
+    model::{Attribute, CreateModelAttributeRecord, GetModelRecord},
+    util, FoundationResult,
+};
 
 pub struct Request {
     pub project_slug: String,
@@ -28,7 +16,7 @@ pub struct Response {
 }
 
 pub async fn execute(
-    repo: &impl CreateModelAttribute,
+    repo: &(impl GetModelRecord + CreateModelAttributeRecord),
     request: Request,
 ) -> FoundationResult<Response> {
     let Request {
@@ -39,10 +27,10 @@ pub async fn execute(
         name,
     } = request;
 
-    let model_record = repo.get_model(&project_slug, &model_slug).await?;
+    let model_record = repo.get_model_record(&project_slug, &model_slug).await?;
 
     let model_attribute_record = repo
-        .create_model_attribute(
+        .create_model_attribute_record(
             model_record,
             Attribute {
                 description: util::string::optional(&description),
@@ -69,48 +57,6 @@ mod tests {
             ProjectRepo,
         },
     };
-
-    #[async_trait::async_trait]
-    impl CreateModelAttribute for Repo {
-        async fn get_model(
-            &self,
-            project_slug: &str,
-            model_slug: &str,
-        ) -> FoundationResult<datastore::model::Model> {
-            let project_record = self.project_repo.find_by_slug(project_slug).await?;
-
-            self.model_repo
-                .find_by_slug(project_record.id, model_slug)
-                .await
-        }
-
-        async fn create_model_attribute(
-            &self,
-            model_record: datastore::model::Model,
-            attribute: Attribute,
-        ) -> FoundationResult<datastore::model::Attribute> {
-            let Attribute {
-                description,
-                name,
-                kind,
-            } = attribute;
-
-            let mut model_attribute_records = self.model_attribute_repo.records.write().await;
-
-            let model_attribute_record = datastore::model::Attribute {
-                model_id: model_record.id,
-                description: description.unwrap_or_default(),
-                name,
-                kind: kind.into(),
-                ..Default::default()
-            };
-
-            model_attribute_records
-                .insert(model_attribute_record.id, model_attribute_record.clone());
-
-            Ok(model_attribute_record)
-        }
-    }
 
     #[tokio::test]
     async fn it_creates_a_model_attribute() -> FoundationResult<()> {

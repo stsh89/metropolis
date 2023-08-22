@@ -1,21 +1,8 @@
-use crate::{datastore, diagram, model::Attribute, FoundationResult};
-
-use super::Association;
-
-#[async_trait::async_trait]
-pub trait GetModel {
-    async fn get_model(
-        &self,
-        project_slug: &str,
-        model_slug: &str,
-    ) -> FoundationResult<GetModelResponse>;
-}
-
-pub struct GetModelResponse {
-    pub model: datastore::model::Model,
-    pub associations: Vec<datastore::model::Association>,
-    pub attributes: Vec<datastore::model::Attribute>,
-}
+use crate::{
+    diagram,
+    model::{Association, Attribute, GetModelOverviewRecord},
+    FoundationResult,
+};
 
 pub struct Request {
     pub project_slug: String,
@@ -26,13 +13,18 @@ pub struct Response {
     pub diagram: String,
 }
 
-pub async fn execute(repo: &impl GetModel, request: Request) -> FoundationResult<Response> {
+pub async fn execute(
+    repo: &impl GetModelOverviewRecord,
+    request: Request,
+) -> FoundationResult<Response> {
     let Request {
         project_slug,
         model_slug,
     } = request;
 
-    let get_model_response = repo.get_model(&project_slug, &model_slug).await?;
+    let get_model_response = repo
+        .get_model_overview_record(&project_slug, &model_slug)
+        .await?;
 
     let attributes: Vec<Attribute> = get_model_response
         .attributes
@@ -69,31 +61,6 @@ mod tests {
             ProjectRepo,
         },
     };
-
-    #[async_trait::async_trait]
-    impl GetModel for Repo {
-        async fn get_model(
-            &self,
-            project_slug: &str,
-            model_slug: &str,
-        ) -> FoundationResult<GetModelResponse> {
-            let project_record = self.project_repo.find_by_slug(project_slug).await?;
-
-            let model_record = self
-                .model_repo
-                .find_by_slug(project_record.id, model_slug)
-                .await?;
-            let model_attribute_records = self.model_attribute_repo.list(model_record.id).await?;
-            let model_association_records =
-                self.model_association_repo.list(model_record.id).await?;
-
-            Ok(GetModelResponse {
-                model: model_record,
-                attributes: model_attribute_records,
-                associations: model_association_records,
-            })
-        }
-    }
 
     #[tokio::test]
     async fn it_returns_model_class_diagram() -> FoundationResult<()> {

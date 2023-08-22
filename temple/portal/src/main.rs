@@ -14,7 +14,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let server_socket_address = configuration.server()?.socket_address()?;
     let projects = server::Projects {
-        repo: repo::Repo {
+        projects_repo: repo::ProjectsRepo {
+            connection_string: configuration.database()?.connection_string()?,
+        },
+        models_repo: repo::ModelsRepo {
             connection_string: configuration.database()?.connection_string()?,
         },
     };
@@ -22,9 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Running server::proto::projects_server::ProjectsServer with tonic::transport::Server using http://{server_socket_address}");
 
     tonic::transport::Server::builder()
-        .add_service(server::proto::projects_server::ProjectsServer::new(
-            projects,
-        ))
+        .add_service(server::rpc::projects_server::ProjectsServer::new(projects))
         .serve(server_socket_address)
         .await?;
 

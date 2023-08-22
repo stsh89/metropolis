@@ -1,16 +1,19 @@
-use crate::{datastore, project::Project, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait ListProjects {
-    async fn list_projects(&self) -> FoundationResult<Vec<datastore::project::Project>>;
-}
+use crate::{
+    project::Project,
+    project::{ListProjectRecordFilterArchive, ListProjectRecordFilters, ListProjectRecords},
+    FoundationResult,
+};
 
 pub struct Response {
     pub projects: Vec<Project>,
 }
 
-pub async fn execute(repo: &impl ListProjects) -> FoundationResult<Response> {
-    let project_records = repo.list_projects().await?;
+pub async fn execute(repo: &impl ListProjectRecords) -> FoundationResult<Response> {
+    let project_records = repo
+        .list_project_records(ListProjectRecordFilters {
+            archive_filter: ListProjectRecordFilterArchive::NotArchivedOnly,
+        })
+        .await?;
 
     let response = Response {
         projects: project_records.into_iter().map(Into::into).collect(),
@@ -26,22 +29,6 @@ mod tests {
         tests::{project_record_fixture, ProjectRecordFixture, ProjectRepo},
         Utc,
     };
-
-    #[async_trait::async_trait]
-    impl ListProjects for ProjectRepo {
-        async fn list_projects(&self) -> FoundationResult<Vec<datastore::project::Project>> {
-            let project_records = self
-                .records
-                .read()
-                .await
-                .values()
-                .filter(|project| project.archived_at.is_none())
-                .cloned()
-                .collect();
-
-            Ok(project_records)
-        }
-    }
 
     #[tokio::test]
     async fn it_returns_not_archived_projects() -> FoundationResult<()> {

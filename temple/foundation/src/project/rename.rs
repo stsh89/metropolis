@@ -1,14 +1,9 @@
-use crate::{datastore, project::Project, util, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait RenameProject {
-    async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project>;
-
-    async fn rename_project(
-        &self,
-        project_record: datastore::project::Project,
-    ) -> FoundationResult<datastore::project::Project>;
-}
+use crate::{
+    datastore,
+    project::Project,
+    project::{GetProjectRecord, RenameProjectRecord},
+    util, FoundationResult,
+};
 
 pub struct Request {
     pub slug: String,
@@ -19,13 +14,16 @@ pub struct Response {
     pub project: Project,
 }
 
-pub async fn execute(repo: &impl RenameProject, request: Request) -> FoundationResult<Response> {
+pub async fn execute(
+    repo: &(impl GetProjectRecord + RenameProjectRecord),
+    request: Request,
+) -> FoundationResult<Response> {
     let Request { slug, name } = request;
 
-    let project_record = repo.get_project(slug).await?;
+    let project_record = repo.get_project_record(&slug).await?;
 
     let project_record = repo
-        .rename_project(datastore::project::Project {
+        .rename_project_record(datastore::project::Project {
             slug: util::slug::sluggify(&name),
             name,
             ..project_record
@@ -43,29 +41,6 @@ pub async fn execute(repo: &impl RenameProject, request: Request) -> FoundationR
 mod tests {
     use super::*;
     use crate::tests::{project_record_fixture, ProjectRepo};
-
-    #[async_trait::async_trait]
-    impl RenameProject for ProjectRepo {
-        async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project> {
-            self.find_by_slug(&slug).await
-        }
-
-        async fn rename_project(
-            &self,
-            project_record: datastore::project::Project,
-        ) -> FoundationResult<datastore::project::Project> {
-            let mut found_project_record = self.get(project_record.id).await?;
-
-            let mut project_records = self.records.write().await;
-
-            found_project_record.name = project_record.name;
-            found_project_record.slug = project_record.slug;
-
-            project_records.insert(found_project_record.id, found_project_record.clone());
-
-            Ok(found_project_record)
-        }
-    }
 
     #[tokio::test]
     async fn it_changes_project_name_and_slug() -> FoundationResult<()> {

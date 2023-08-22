@@ -1,19 +1,7 @@
-use crate::{datastore, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait DeleteModelAssociation {
-    async fn get_model_association(
-        &self,
-        project_slug: &str,
-        model_slug: &str,
-        name: &str,
-    ) -> FoundationResult<datastore::model::Association>;
-
-    async fn delete_model_association(
-        &self,
-        association: datastore::model::Association,
-    ) -> FoundationResult<()>;
-}
+use crate::{
+    model::{DeleteModelAssociationRecord, GetModelAssociationRecord},
+    FoundationResult,
+};
 
 pub struct Request {
     pub project_slug: String,
@@ -21,7 +9,10 @@ pub struct Request {
     pub model_association_name: String,
 }
 
-pub async fn execute(repo: &impl DeleteModelAssociation, request: Request) -> FoundationResult<()> {
+pub async fn execute(
+    repo: &(impl GetModelAssociationRecord + DeleteModelAssociationRecord),
+    request: Request,
+) -> FoundationResult<()> {
     let Request {
         project_slug,
         model_slug,
@@ -29,10 +20,10 @@ pub async fn execute(repo: &impl DeleteModelAssociation, request: Request) -> Fo
     } = request;
 
     let model_association_record = repo
-        .get_model_association(&project_slug, &model_slug, &model_association_name)
+        .get_model_association_record(&project_slug, &model_slug, &model_association_name)
         .await?;
 
-    repo.delete_model_association(model_association_record)
+    repo.delete_model_association_record(model_association_record)
         .await?;
 
     Ok(())
@@ -49,38 +40,6 @@ mod tests {
             ProjectRepo,
         },
     };
-
-    #[async_trait::async_trait]
-    impl DeleteModelAssociation for Repo {
-        async fn get_model_association(
-            &self,
-            project_slug: &str,
-            model_slug: &str,
-            model_association_name: &str,
-        ) -> FoundationResult<datastore::model::Association> {
-            let project_record = self.project_repo.find_by_slug(project_slug).await?;
-
-            let model_record = self
-                .model_repo
-                .find_by_slug(project_record.id, model_slug)
-                .await?;
-
-            self.model_association_repo
-                .find_by_name(model_record.id, model_association_name)
-                .await
-        }
-
-        async fn delete_model_association(
-            &self,
-            model_association_record: datastore::model::Association,
-        ) -> FoundationResult<()> {
-            let mut model_association_records = self.model_association_repo.records.write().await;
-
-            model_association_records.remove(&model_association_record.id);
-
-            Ok(())
-        }
-    }
 
     #[tokio::test]
     async fn it_deletes_a_model_association() -> FoundationResult<()> {

@@ -1,14 +1,8 @@
-use crate::{datastore, diagram, FoundationResult};
-
-use super::ModelOverview;
-
-#[async_trait::async_trait]
-pub trait ListModelOverviews {
-    async fn list_model_overviews(
-        &self,
-        project_slug: &str,
-    ) -> FoundationResult<Vec<datastore::model::ModelOverview>>;
-}
+use crate::{
+    diagram,
+    model::{ListModelOverviewRecords, ModelOverview},
+    FoundationResult,
+};
 
 pub struct Request {
     pub project_slug: String,
@@ -19,13 +13,13 @@ pub struct Response {
 }
 
 pub async fn execute(
-    repo: &impl ListModelOverviews,
+    repo: &impl ListModelOverviewRecords,
     request: Request,
 ) -> FoundationResult<Response> {
     let Request { project_slug } = request;
 
     let model_overviews: Vec<ModelOverview> = repo
-        .list_model_overviews(&project_slug)
+        .list_model_overview_records(&project_slug)
         .await?
         .into_iter()
         .map(|model_overview_record| ModelOverview {
@@ -71,42 +65,6 @@ mod tests {
             ProjectRepo,
         },
     };
-
-    #[async_trait::async_trait]
-    impl ListModelOverviews for Repo {
-        async fn list_model_overviews(
-            &self,
-            project_slug: &str,
-        ) -> FoundationResult<Vec<datastore::model::ModelOverview>> {
-            let project_record = self.project_repo.find_by_slug(project_slug).await?;
-
-            let mut model_records: Vec<datastore::model::Model> = self
-                .model_repo
-                .records()
-                .await
-                .into_iter()
-                .filter(|model_record| model_record.project_id == project_record.id)
-                .collect();
-
-            model_records.sort_by(|a, b| a.name.cmp(&b.name));
-
-            let mut model_overviews: Vec<datastore::model::ModelOverview> =
-                Vec::with_capacity(model_records.len());
-
-            for model_record in model_records {
-                let associations = self.model_association_repo.list(model_record.id).await?;
-                let attributes = self.model_attribute_repo.list(model_record.id).await?;
-
-                model_overviews.push(datastore::model::ModelOverview {
-                    model: model_record,
-                    associations,
-                    attributes,
-                });
-            }
-
-            Ok(model_overviews)
-        }
-    }
 
     #[tokio::test]
     async fn it_returns_project_class_diagram() -> FoundationResult<()> {

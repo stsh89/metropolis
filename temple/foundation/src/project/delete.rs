@@ -1,25 +1,21 @@
-use crate::{datastore, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait DeleteProject {
-    async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project>;
-
-    async fn delete_project(
-        &self,
-        project_record: datastore::project::Project,
-    ) -> FoundationResult<()>;
-}
+use crate::{
+    project::{DeleteProjectRecord, GetProjectRecord},
+    FoundationResult,
+};
 
 pub struct Request {
     pub slug: String,
 }
 
-pub async fn execute(repo: &impl DeleteProject, request: Request) -> FoundationResult<()> {
+pub async fn execute(
+    repo: &(impl GetProjectRecord + DeleteProjectRecord),
+    request: Request,
+) -> FoundationResult<()> {
     let Request { slug } = request;
 
-    let project_record = repo.get_project(slug).await?;
+    let project_record = repo.get_project_record(&slug).await?;
 
-    repo.delete_project(project_record).await?;
+    repo.delete_project_record(project_record).await?;
 
     Ok(())
 }
@@ -28,24 +24,6 @@ pub async fn execute(repo: &impl DeleteProject, request: Request) -> FoundationR
 mod tests {
     use super::*;
     use crate::tests::{project_record_fixture, ProjectRepo};
-
-    #[async_trait::async_trait]
-    impl DeleteProject for ProjectRepo {
-        async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project> {
-            self.find_by_slug(&slug).await
-        }
-
-        async fn delete_project(
-            &self,
-            project_record: datastore::project::Project,
-        ) -> FoundationResult<()> {
-            let mut project_records = self.records.write().await;
-
-            project_records.remove(&project_record.id);
-
-            Ok(())
-        }
-    }
 
     #[tokio::test]
     async fn it_deletes_project() -> FoundationResult<()> {

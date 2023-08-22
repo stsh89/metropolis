@@ -1,9 +1,7 @@
-use crate::{datastore, project::Project, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait GetProject {
-    async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project>;
-}
+use crate::{
+    project::{GetProjectRecord, Project},
+    FoundationResult,
+};
 
 pub struct Request {
     pub slug: String,
@@ -13,10 +11,10 @@ pub struct Response {
     pub project: Project,
 }
 
-pub async fn execute(repo: &impl GetProject, request: Request) -> FoundationResult<Response> {
+pub async fn execute(repo: &impl GetProjectRecord, request: Request) -> FoundationResult<Response> {
     let Request { slug } = request;
 
-    let project_record = repo.get_project(slug).await?;
+    let project_record = repo.get_project_record(&slug).await?;
 
     let response = Response {
         project: project_record.into(),
@@ -33,13 +31,6 @@ mod tests {
         tests::{project_record_fixture, ProjectRepo},
         FoundationError,
     };
-
-    #[async_trait::async_trait]
-    impl GetProject for ProjectRepo {
-        async fn get_project(&self, slug: String) -> FoundationResult<datastore::project::Project> {
-            self.find_by_slug(&slug).await
-        }
-    }
 
     #[tokio::test]
     async fn it_returns_found_project() -> FoundationResult<()> {

@@ -1,15 +1,6 @@
-use crate::{datastore, model::Model, util, FoundationResult};
-
-#[async_trait::async_trait]
-pub trait CreateModel {
-    async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project>;
-
-    async fn create_model(
-        &self,
-        project: datastore::project::Project,
-        model: Model,
-    ) -> FoundationResult<datastore::model::Model>;
-}
+use crate::{
+    model::CreateModelRecord, model::Model, project::GetProjectRecord, util, FoundationResult,
+};
 
 pub struct Request {
     pub project_slug: String,
@@ -21,17 +12,20 @@ pub struct Response {
     pub model: Model,
 }
 
-pub async fn execute(repo: &impl CreateModel, request: Request) -> FoundationResult<Response> {
+pub async fn execute(
+    repo: &(impl GetProjectRecord + CreateModelRecord),
+    request: Request,
+) -> FoundationResult<Response> {
     let Request {
         project_slug,
         name,
         description,
     } = request;
 
-    let project_record = repo.get_project(&project_slug).await?;
+    let project_record = repo.get_project_record(&project_slug).await?;
 
     let model_record = repo
-        .create_model(
+        .create_model_record(
             project_record,
             Model {
                 slug: util::slug::sluggify(&name),
@@ -55,39 +49,6 @@ mod tests {
         model::tests::Repo,
         tests::{project_record_fixture, ModelRepo, ProjectRepo},
     };
-
-    #[async_trait::async_trait]
-    impl CreateModel for Repo {
-        async fn get_project(&self, slug: &str) -> FoundationResult<datastore::project::Project> {
-            self.project_repo.find_by_slug(slug).await
-        }
-
-        async fn create_model(
-            &self,
-            project_record: datastore::project::Project,
-            model: Model,
-        ) -> FoundationResult<datastore::model::Model> {
-            let Model {
-                description,
-                name,
-                slug,
-            } = model;
-
-            let mut model_records = self.model_repo.records.write().await;
-
-            let model_record = datastore::model::Model {
-                project_id: project_record.id,
-                description: description.unwrap_or_default(),
-                name,
-                slug,
-                ..Default::default()
-            };
-
-            model_records.insert(model_record.id, model_record.clone());
-
-            Ok(model_record)
-        }
-    }
 
     #[tokio::test]
     async fn it_creates_a_model() -> FoundationResult<()> {
