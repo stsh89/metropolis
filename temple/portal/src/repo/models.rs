@@ -64,23 +64,7 @@ impl GetModelOverviewRecord for ModelsRepo {
             .map_err(map_status_error)?
             .into_inner();
 
-        let model_overview = datastore::model::ModelOverview {
-            model: proto_model_overview
-                .model
-                .map(datastore_model)
-                .transpose()?
-                .ok_or(FoundationError::internal(""))?,
-            associations: proto_model_overview
-                .associations
-                .into_iter()
-                .map(datastore_model_association)
-                .collect::<FoundationResult<Vec<datastore::model::Association>>>()?,
-            attributes: proto_model_overview
-                .attributes
-                .into_iter()
-                .map(datastore_model_attribute)
-                .collect::<FoundationResult<Vec<datastore::model::Attribute>>>()?,
-        };
+        let model_overview = datastore_model_overview(proto_model_overview)?;
 
         Ok(model_overview)
     }
