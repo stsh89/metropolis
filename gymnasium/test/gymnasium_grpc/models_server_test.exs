@@ -5,6 +5,8 @@ defmodule GymnasiumGrpc.ModelsServerTest do
   alias Gymnasium.Models.{Model, Association, Attribute}
   alias Gymnasium.Projects.Project
 
+  alias Proto.Gymnasium.V1.Models, as: Rpc
+
   alias Proto.Gymnasium.V1.Models.{
     CreateModelRequest,
     DeleteModelRequest,
@@ -77,6 +79,48 @@ defmodule GymnasiumGrpc.ModelsServerTest do
 
     defp assert_models(list, expected_list) do
       assert Enum.map(list, fn m -> m.slug end) == Enum.map(expected_list, fn m -> m.slug end)
+    end
+  end
+
+  describe "Project model overviews listing" do
+    test "list_project_model_overviews/2 returns models with attributes and associations for given project slug" do
+      %Project{id: project_id, slug: project_slug} = project_fixture()
+      model = model_fixture(project_id: project_id)
+      associated_model = model_fixture(project_id: project_id, name: "Author", slug: "author")
+      attribute = model_attribute_fixture(model_id: model.id)
+
+      association =
+        model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
+
+      %Rpc.ListProjectModelOverviewsResponse{model_overviews: model_overviews} =
+        ModelsServer.list_project_model_overviews(
+          %Rpc.ListProjectModelOverviewsRequest{
+            project_slug: project_slug
+          },
+          nil
+        )
+
+      assert_result =
+        Enum.map(model_overviews, fn mo ->
+          %{
+            model: mo.model.name,
+            attributes: mo.attributes |> Enum.map(fn a -> a.name end),
+            associations: mo.associations |> Enum.map(fn a -> a.name end)
+          }
+        end)
+
+      assert assert_result == [
+               %{
+                 model: associated_model.name,
+                 attributes: [],
+                 associations: []
+               },
+               %{
+                 model: model.name,
+                 attributes: [attribute.name],
+                 associations: [association.name]
+               }
+             ]
     end
   end
 

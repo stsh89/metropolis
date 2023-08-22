@@ -53,6 +53,21 @@ defmodule GymnasiumGrpc.ModelsServer do
     end
   end
 
+  def list_project_model_overviews(%Proto.ListProjectModelOverviewsRequest{} = request, _stream) do
+    %Proto.ListProjectModelOverviewsRequest{
+      project_slug: project_slug
+    } = request
+
+    model_overviews =
+      project_slug
+      |> ModelService.list_project_model_overviews()
+      |> Enum.map(fn m -> to_proto_model_overview(m) end)
+
+    %Proto.ListProjectModelOverviewsResponse{
+      model_overviews: model_overviews
+    }
+  end
+
   def find_project_models_overview(%Proto.FindProjectModelsOverviewRequest{} = request, _stream) do
     %Proto.FindProjectModelsOverviewRequest{
       project_slug: project_slug
@@ -60,7 +75,7 @@ defmodule GymnasiumGrpc.ModelsServer do
 
     model_overviews =
       project_slug
-      |> ModelService.find_project_models_overview()
+      |> ModelService.list_project_model_overviews()
       |> Enum.map(fn m -> to_proto_model_overview(m) end)
 
     %Proto.FindProjectModelsOverviewResponse{

@@ -68,12 +68,12 @@ defmodule GymnasiumGrpc.ModelService do
 
   ## Examples
 
-      iex> find_project_models_overview("book-store")
+      iex> list_project_model_overviews("book-store")
       [%Model{}, ...]
 
   """
-  @spec find_project_models_overview(String.t()) :: [Model.t()]
-  def find_project_models_overview(project_slug) do
+  @spec list_project_model_overviews(String.t()) :: [Model.t()]
+  def list_project_model_overviews(project_slug) do
     ProjectModels.list_project_models(project_slug,
       preloads: [:attributes, [associations: :associated_model]]
     )
