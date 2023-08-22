@@ -1,16 +1,12 @@
-use crate::{
-    datastore,
-    model::{Association, Attribute, Model},
-    FoundationResult,
-};
+use crate::{datastore, model::ModelOverview, FoundationResult};
 
 #[async_trait::async_trait]
-pub trait GetModel {
-    async fn get_model(
+pub trait GetModelOverview {
+    async fn get_model_overview(
         &self,
         project_slug: &str,
         model_slug: &str,
-    ) -> FoundationResult<GetModelResponse>;
+    ) -> FoundationResult<datastore::model::ModelOverview>;
 }
 
 pub struct GetModelResponse {
@@ -25,31 +21,31 @@ pub struct Request {
 }
 
 pub struct Response {
-    pub model: Model,
-    pub attributes: Vec<Attribute>,
-    pub associations: Vec<Association>,
+    pub model_overview: ModelOverview,
 }
 
-pub async fn execute(repo: &impl GetModel, request: Request) -> FoundationResult<Response> {
+pub async fn execute(repo: &impl GetModelOverview, request: Request) -> FoundationResult<Response> {
     let Request {
         project_slug,
         model_slug,
     } = request;
 
-    let get_model_response = repo.get_model(&project_slug, &model_slug).await?;
+    let model_overview_record = repo.get_model_overview(&project_slug, &model_slug).await?;
 
     let response = Response {
-        model: get_model_response.model.into(),
-        attributes: get_model_response
-            .attributes
-            .into_iter()
-            .map(Into::into)
-            .collect(),
-        associations: get_model_response
-            .associations
-            .into_iter()
-            .map(Into::into)
-            .collect(),
+        model_overview: ModelOverview {
+            model: model_overview_record.model.into(),
+            associations: model_overview_record
+                .associations
+                .into_iter()
+                .map(Into::into)
+                .collect(),
+            attributes: model_overview_record
+                .attributes
+                .into_iter()
+                .map(Into::into)
+                .collect(),
+        },
     };
 
     Ok(response)
@@ -59,7 +55,7 @@ pub async fn execute(repo: &impl GetModel, request: Request) -> FoundationResult
 mod tests {
     use super::*;
     use crate::{
-        model::tests::Repo,
+        model::{tests::Repo, Association, Attribute},
         tests::{
             model_association_record_fixture, model_attribute_record_fixture, model_record_fixture,
             project_record_fixture, ModelAssociationRecordFixture, ModelAssociationRepo,
@@ -69,12 +65,12 @@ mod tests {
     };
 
     #[async_trait::async_trait]
-    impl GetModel for Repo {
-        async fn get_model(
+    impl GetModelOverview for Repo {
+        async fn get_model_overview(
             &self,
             project_slug: &str,
             model_slug: &str,
-        ) -> FoundationResult<GetModelResponse> {
+        ) -> FoundationResult<datastore::model::ModelOverview> {
             let project_record = self.project_repo.find_by_slug(project_slug).await?;
 
             let model_record = self
@@ -85,7 +81,7 @@ mod tests {
             let model_association_records =
                 self.model_association_repo.list(model_record.id).await?;
 
-            Ok(GetModelResponse {
+            Ok(datastore::model::ModelOverview {
                 model: model_record,
                 attributes: model_attribute_records,
                 associations: model_association_records,
@@ -140,16 +136,16 @@ mod tests {
         )
         .await?;
 
-        assert_eq!(response.model, model_record.into());
+        assert_eq!(response.model_overview.model, model_record.into());
         assert_eq!(
-            response.attributes,
+            response.model_overview.attributes,
             vec![model_attribute_record]
                 .into_iter()
                 .map(Into::into)
                 .collect::<Vec<Attribute>>()
         );
         assert_eq!(
-            response.associations,
+            response.model_overview.associations,
             vec![model_association_record]
                 .into_iter()
                 .map(Into::into)

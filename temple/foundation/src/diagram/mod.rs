@@ -96,7 +96,7 @@ fn to_diagram_class_attribute(
 fn to_diagram_attribute_kind(kind: &model::AttributeKind) -> mermaid::class_diagram::AttributeKind {
     match kind {
         model::AttributeKind::String => mermaid::class_diagram::AttributeKind::String,
-        model::AttributeKind::Int64 => mermaid::class_diagram::AttributeKind::Integer,
-        model::AttributeKind::Bool => mermaid::class_diagram::AttributeKind::Boolean,
+        model::AttributeKind::Integer => mermaid::class_diagram::AttributeKind::Integer,
+        model::AttributeKind::Boolean => mermaid::class_diagram::AttributeKind::Boolean,
     }
 }

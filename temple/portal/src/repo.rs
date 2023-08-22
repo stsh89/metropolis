@@ -245,23 +245,17 @@ impl model::delete_association::DeleteModelAssociation for Repo {
 }
 
 #[async_trait::async_trait]
-impl model::get::GetModel for Repo {
-    async fn get_model(
+impl model::get::GetModelOverview for Repo {
+    async fn get_model_overview(
         &self,
         project_slug: &str,
         model_slug: &str,
-    ) -> FoundationResult<model::get::GetModelResponse> {
-        let (model, associations, attributes) = self
-            .get_model_full(project_slug.to_owned(), model_slug.to_owned())
+    ) -> FoundationResult<datastore::model::ModelOverview> {
+        let model_overview = self
+            .get_model_overview(project_slug.to_owned(), model_slug.to_owned())
             .await?;
 
-        let response = model::get::GetModelResponse {
-            model,
-            associations,
-            attributes,
-        };
-
-        Ok(response)
+        Ok(model_overview)
     }
 }
 
@@ -272,14 +266,14 @@ impl model::get_class_diagram::GetModel for Repo {
         project_slug: &str,
         model_slug: &str,
     ) -> FoundationResult<model::get_class_diagram::GetModelResponse> {
-        let (model, associations, attributes) = self
-            .get_model_full(project_slug.to_owned(), model_slug.to_owned())
+        let model_overview = self
+            .get_model_overview(project_slug.to_owned(), model_slug.to_owned())
             .await?;
 
         let response = model::get_class_diagram::GetModelResponse {
-            model,
-            associations,
-            attributes,
+            model: model_overview.model,
+            associations: model_overview.associations,
+            attributes: model_overview.attributes,
         };
 
         Ok(response)
@@ -287,29 +281,14 @@ impl model::get_class_diagram::GetModel for Repo {
 }
 
 #[async_trait::async_trait]
-impl model::get_project_class_diagram::ListModels for Repo {
-    async fn list_models(
+impl model::get_project_class_diagram::ListModelOverviews for Repo {
+    async fn list_model_overviews(
         &self,
         project_slug: &str,
-    ) -> FoundationResult<model::get_project_class_diagram::ListModelsResponse> {
-        let project_overview = self
-            .find_project_models_overview(project_slug.to_owned())
-            .await?;
+    ) -> FoundationResult<Vec<datastore::model::ModelOverview>> {
+        let model_overviews = self.list_model_overviews(project_slug.to_owned()).await?;
 
-        let models = project_overview
-            .into_iter()
-            .map(
-                |(model, attributes, associations)| model::get_project_class_diagram::ModelData {
-                    model,
-                    attributes,
-                    associations,
-                },
-            )
-            .collect();
-
-        let response = model::get_project_class_diagram::ListModelsResponse { models };
-
-        Ok(response)
+        Ok(model_overviews)
     }
 }
 
@@ -478,98 +457,76 @@ impl Repo {
         Ok(model)
     }
 
-    async fn get_model_full(
+    async fn get_model_overview(
         &self,
         project_slug: String,
         model_slug: String,
-    ) -> PortalResult<(
-        datastore::model::Model,
-        Vec<datastore::model::Association>,
-        Vec<datastore::model::Attribute>,
-    )> {
+    ) -> PortalResult<datastore::model::ModelOverview> {
         let mut client = self.models_client().await?;
 
-        let proto_model = client
-            .find_project_model(proto::models::FindProjectModelRequest {
+        let proto_model_overview = client
+            .find_project_model_overview(proto::models::FindProjectModelOverviewRequest {
                 project_slug: project_slug.clone(),
                 model_slug: model_slug.clone(),
             })
             .await?
             .into_inner();
 
-        let model = datastore_model(proto_model)?;
+        let model_overview = datastore::model::ModelOverview {
+            model: proto_model_overview
+                .model
+                .map(datastore_model)
+                .transpose()?
+                .ok_or(PortalError::internal("".to_string()))?,
+            associations: proto_model_overview
+                .associations
+                .into_iter()
+                .map(datastore_model_association)
+                .collect::<PortalResult<Vec<datastore::model::Association>>>()?,
+            attributes: proto_model_overview
+                .attributes
+                .into_iter()
+                .map(datastore_model_attribute)
+                .collect::<PortalResult<Vec<datastore::model::Attribute>>>()?,
+        };
 
-        let response = client
-            .list_project_model_associations(proto::models::ListProjectModelAssociationsRequest {
-                project_slug: project_slug.clone(),
-                model_slug: model_slug.clone(),
-            })
-            .await?
-            .into_inner();
-
-        let associations = response
-            .associations
-            .into_iter()
-            .map(datastore_model_association)
-            .collect::<PortalResult<Vec<datastore::model::Association>>>()?;
-
-        let response = client
-            .list_project_model_attributes(proto::models::ListProjectModelAttributesRequest {
-                project_slug,
-                model_slug,
-            })
-            .await?
-            .into_inner();
-
-        let attributes = response
-            .attributes
-            .into_iter()
-            .map(datastore_model_attribute)
-            .collect::<PortalResult<Vec<datastore::model::Attribute>>>()?;
-
-        Ok((model, associations, attributes))
+        Ok(model_overview)
     }
 
-    async fn find_project_models_overview(
+    async fn list_model_overviews(
         &self,
         project_slug: String,
-    ) -> PortalResult<
-        Vec<(
-            datastore::model::Model,
-            Vec<datastore::model::Attribute>,
-            Vec<datastore::model::Association>,
-        )>,
-    > {
+    ) -> PortalResult<Vec<datastore::model::ModelOverview>> {
         let mut client = self.models_client().await?;
 
-        let response = client
+        let model_overviews = client
             .list_project_model_overviews(proto::models::ListProjectModelOverviewsRequest {
                 project_slug,
             })
             .await?
-            .into_inner();
-
-        let mut model_overviews = Vec::with_capacity(response.model_overviews.len());
-
-        for model_overview in response.model_overviews {
-            if model_overview.model.is_none() {
-                return Err(PortalError::internal("missing model"));
-            }
-
-            model_overviews.push((
-                datastore_model(model_overview.model.unwrap())?,
-                model_overview
-                    .attributes
-                    .into_iter()
-                    .map(datastore_model_attribute)
-                    .collect::<PortalResult<Vec<datastore::model::Attribute>>>()?,
-                model_overview
-                    .associations
-                    .into_iter()
-                    .map(datastore_model_association)
-                    .collect::<PortalResult<Vec<datastore::model::Association>>>()?,
-            ))
-        }
+            .into_inner()
+            .model_overviews
+            .into_iter()
+            .map(|proto_model_overview| {
+                Ok(datastore::model::ModelOverview {
+                    model: proto_model_overview
+                        .model
+                        .map(datastore_model)
+                        .transpose()?
+                        .ok_or(PortalError::internal("".to_string()))?,
+                    associations: proto_model_overview
+                        .associations
+                        .into_iter()
+                        .map(datastore_model_association)
+                        .collect::<PortalResult<Vec<datastore::model::Association>>>()?,
+                    attributes: proto_model_overview
+                        .attributes
+                        .into_iter()
+                        .map(datastore_model_attribute)
+                        .collect::<PortalResult<Vec<datastore::model::Attribute>>>()?,
+                })
+            })
+            .collect::<PortalResult<Vec<datastore::model::ModelOverview>>>()?;
 
         Ok(model_overviews)
     }
@@ -642,8 +599,8 @@ impl Repo {
                 name: model_attribute.name,
                 kind: match model_attribute.kind {
                     model::AttributeKind::String => proto::models::AttributeKind::String,
-                    model::AttributeKind::Int64 => proto::models::AttributeKind::Integer,
-                    model::AttributeKind::Bool => proto::models::AttributeKind::Boolean,
+                    model::AttributeKind::Integer => proto::models::AttributeKind::Integer,
+                    model::AttributeKind::Boolean => proto::models::AttributeKind::Boolean,
                 }
                 .into(),
             })

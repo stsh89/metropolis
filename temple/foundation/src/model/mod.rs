@@ -46,9 +46,9 @@ pub struct Association {
 pub enum AttributeKind {
     String,
 
-    Int64,
+    Integer,
 
-    Bool,
+    Boolean,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -58,6 +58,15 @@ pub enum AssociationKind {
     HasOne,
 
     HasMany,
+}
+
+#[derive(Clone, Debug)]
+pub struct ModelOverview {
+    pub model: Model,
+
+    pub attributes: Vec<Attribute>,
+
+    pub associations: Vec<Association>,
 }
 
 impl From<datastore::model::Model> for Model {
@@ -104,8 +113,8 @@ impl From<datastore::model::AttributeKind> for AttributeKind {
     fn from(value: datastore::model::AttributeKind) -> Self {
         match value {
             datastore::model::AttributeKind::String => AttributeKind::String,
-            datastore::model::AttributeKind::Int64 => AttributeKind::Int64,
-            datastore::model::AttributeKind::Bool => AttributeKind::Bool,
+            datastore::model::AttributeKind::Int64 => AttributeKind::Integer,
+            datastore::model::AttributeKind::Bool => AttributeKind::Boolean,
         }
     }
 }
@@ -114,8 +123,8 @@ impl From<AttributeKind> for datastore::model::AttributeKind {
     fn from(value: AttributeKind) -> Self {
         match value {
             AttributeKind::String => datastore::model::AttributeKind::String,
-            AttributeKind::Int64 => datastore::model::AttributeKind::Int64,
-            AttributeKind::Bool => datastore::model::AttributeKind::Bool,
+            AttributeKind::Integer => datastore::model::AttributeKind::Int64,
+            AttributeKind::Boolean => datastore::model::AttributeKind::Bool,
         }
     }
 }
@@ -212,8 +221,8 @@ impl FromStr for AttributeKind {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "string" => Ok(AttributeKind::String),
-            "int64" => Ok(AttributeKind::Int64),
-            "bool" => Ok(AttributeKind::Bool),
+            "int64" => Ok(AttributeKind::Integer),
+            "bool" => Ok(AttributeKind::Boolean),
             other => Err(FoundationError::invalid_argument(format! {
                 "`#{other}` is not a valid AttributeKind for the Model"
             })),

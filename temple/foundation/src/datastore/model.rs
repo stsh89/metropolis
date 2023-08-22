@@ -73,6 +73,15 @@ pub enum AssociationKind {
     HasMany,
 }
 
+#[derive(Clone)]
+pub struct ModelOverview {
+    pub model: Model,
+
+    pub attributes: Vec<Attribute>,
+
+    pub associations: Vec<Association>,
+}
+
 impl Default for Model {
     fn default() -> Self {
         let now = Utc::now();

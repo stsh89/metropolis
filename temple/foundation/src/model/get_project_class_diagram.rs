@@ -1,18 +1,13 @@
-use crate::{datastore, diagram, model, FoundationResult};
+use crate::{datastore, diagram, FoundationResult};
+
+use super::ModelOverview;
 
 #[async_trait::async_trait]
-pub trait ListModels {
-    async fn list_models(&self, project_slug: &str) -> FoundationResult<ListModelsResponse>;
-}
-
-pub struct ListModelsResponse {
-    pub models: Vec<ModelData>,
-}
-
-pub struct ModelData {
-    pub model: datastore::model::Model,
-    pub associations: Vec<datastore::model::Association>,
-    pub attributes: Vec<datastore::model::Attribute>,
+pub trait ListModelOverviews {
+    async fn list_model_overviews(
+        &self,
+        project_slug: &str,
+    ) -> FoundationResult<Vec<datastore::model::ModelOverview>>;
 }
 
 pub struct Request {
@@ -23,34 +18,37 @@ pub struct Response {
     pub diagram: String,
 }
 
-pub async fn execute(repo: &impl ListModels, request: Request) -> FoundationResult<Response> {
+pub async fn execute(
+    repo: &impl ListModelOverviews,
+    request: Request,
+) -> FoundationResult<Response> {
     let Request { project_slug } = request;
 
-    let list_models_response = repo.list_models(&project_slug).await?;
-
-    let asdf = list_models_response
-        .models
+    let model_overviews: Vec<ModelOverview> = repo
+        .list_model_overviews(&project_slug)
+        .await?
         .into_iter()
-        .map(|model_data| {
-            let attributes: Vec<model::Attribute> =
-                model_data.attributes.into_iter().map(Into::into).collect();
-
-            let associations: Vec<model::Association> = model_data
+        .map(|model_overview_record| ModelOverview {
+            model: model_overview_record.model.into(),
+            associations: model_overview_record
                 .associations
                 .into_iter()
                 .map(Into::into)
-                .collect();
-
-            (model_data.model.into(), attributes, associations)
+                .collect(),
+            attributes: model_overview_record
+                .attributes
+                .into_iter()
+                .map(Into::into)
+                .collect(),
         })
-        .collect::<Vec<(model::Model, Vec<model::Attribute>, Vec<model::Association>)>>();
+        .collect();
 
-    let diagram_model_classes = asdf
+    let diagram_model_classes = model_overviews
         .iter()
-        .map(|(model, attributes, associations)| diagram::ModelClass {
-            model,
-            attributes: attributes.as_slice(),
-            associations: associations.as_slice(),
+        .map(|model_overview| diagram::ModelClass {
+            model: &model_overview.model,
+            associations: model_overview.associations.as_slice(),
+            attributes: model_overview.attributes.as_slice(),
         })
         .collect();
 
@@ -75,8 +73,11 @@ mod tests {
     };
 
     #[async_trait::async_trait]
-    impl ListModels for Repo {
-        async fn list_models(&self, project_slug: &str) -> FoundationResult<ListModelsResponse> {
+    impl ListModelOverviews for Repo {
+        async fn list_model_overviews(
+            &self,
+            project_slug: &str,
+        ) -> FoundationResult<Vec<datastore::model::ModelOverview>> {
             let project_record = self.project_repo.find_by_slug(project_slug).await?;
 
             let mut model_records: Vec<datastore::model::Model> = self
@@ -89,20 +90,21 @@ mod tests {
 
             model_records.sort_by(|a, b| a.name.cmp(&b.name));
 
-            let mut models: Vec<ModelData> = Vec::with_capacity(model_records.len());
+            let mut model_overviews: Vec<datastore::model::ModelOverview> =
+                Vec::with_capacity(model_records.len());
 
             for model_record in model_records {
                 let associations = self.model_association_repo.list(model_record.id).await?;
                 let attributes = self.model_attribute_repo.list(model_record.id).await?;
 
-                models.push(ModelData {
+                model_overviews.push(datastore::model::ModelOverview {
                     model: model_record,
                     associations,
                     attributes,
                 });
             }
 
-            Ok(ListModelsResponse { models })
+            Ok(model_overviews)
         }
     }
 

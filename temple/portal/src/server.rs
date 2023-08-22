@@ -92,13 +92,15 @@ impl proto::projects_server::Projects for Projects {
         .map_err(Into::<PortalError>::into)?;
 
         Ok(Response::new(proto::GetModelResponse {
-            model: Some(to_proto_model(response.model)),
+            model: Some(to_proto_model(response.model_overview.model)),
             attributes: response
+                .model_overview
                 .attributes
                 .into_iter()
                 .map(to_proto_model_attribute)
                 .collect(),
             associations: response
+                .model_overview
                 .associations
                 .into_iter()
                 .map(to_proto_model_association)
@@ -491,8 +493,8 @@ fn to_proto_model_attribute(model_attribute: model::Attribute) -> proto::ModelAt
         name: model_attribute.name,
         kind: match model_attribute.kind {
             model::AttributeKind::String => String,
-            model::AttributeKind::Int64 => Int64,
-            model::AttributeKind::Bool => Bool,
+            model::AttributeKind::Integer => Int64,
+            model::AttributeKind::Boolean => Bool,
         }
         .into(),
     }
