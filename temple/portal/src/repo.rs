@@ -657,6 +657,7 @@ impl Repo {
     ) -> PortalResult<datastore::model::Association> {
         let mut client = self.models_client().await?;
 
+
         let proto_model_association = client
             .create_association(proto::models::CreateAssociationRequest {
                 model_id: model_record.id.to_string(),
@@ -791,8 +792,8 @@ fn datastore_model_attribute(
                 return Err(PortalError::internal("UnspecifiedAttributeKind"))
             }
             AttributeKind::String => datastore::model::AttributeKind::String,
-            AttributeKind::Integer => datastore::model::AttributeKind::Int64,
-            AttributeKind::Boolean => datastore::model::AttributeKind::Bool,
+            AttributeKind::Integer => datastore::model::AttributeKind::Integer,
+            AttributeKind::Boolean => datastore::model::AttributeKind::Boolean,
         },
         name: proto_model_attribute.name,
         inserted_at: util::proto::from_proto_timestamp(create_time, "insert_time")?,

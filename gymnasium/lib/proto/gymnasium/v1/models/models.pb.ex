@@ -164,7 +164,7 @@ defmodule Proto.Gymnasium.V1.Models.CreateAssociationRequest do
   field :model_id, 1, type: :string, json_name: "modelId"
   field :associated_model_id, 2, type: :string, json_name: "associatedModelId"
   field :description, 3, type: :string
-  field :kind, 4, type: Proto.Gymnasium.V1.Models.AttributeKind, enum: true
+  field :kind, 4, type: Proto.Gymnasium.V1.Models.AssociationKind, enum: true
   field :name, 5, type: :string
 end
 

@@ -227,7 +227,7 @@ message CreateAssociationRequest {
     string description = 3;
 
     // Kind of the Model's association;
-    AttributeKind kind = 4;
+    AssociationKind kind = 4;
 
     // The name of the Model's association.
     string name = 5;

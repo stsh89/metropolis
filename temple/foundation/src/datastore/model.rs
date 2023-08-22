@@ -39,9 +39,9 @@ pub enum AttributeKind {
     #[default]
     String,
 
-    Int64,
+    Integer,
 
-    Bool,
+    Boolean,
 }
 
 #[derive(Clone, Default)]

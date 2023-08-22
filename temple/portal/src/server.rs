@@ -266,7 +266,7 @@ impl proto::projects_server::Projects for Projects {
         &self,
         request: Request<proto::CreateModelAttributeRequest>, // Accept request of type HelloRequest
     ) -> Result<Response<proto::CreateModelAttributeResponse>, Status> {
-        use proto::ModelAttributeKind::*;
+        use proto::ModelAttributeKind;
 
         println!("Got a request: {:?}", request);
 
@@ -289,10 +289,10 @@ impl proto::projects_server::Projects for Projects {
                 model_slug,
                 description,
                 kind: match attribute_kind {
-                    UnspecifiedAttributeKind => "unspecified",
-                    String => "string",
-                    Int64 => "int64",
-                    Bool => "bool",
+                    ModelAttributeKind::Unspecified => "unspecified",
+                    ModelAttributeKind::String => "string",
+                    ModelAttributeKind::Integer => "integer",
+                    ModelAttributeKind::Boolean => "boolean",
                 }
                 .to_string(),
                 name,
@@ -337,7 +337,7 @@ impl proto::projects_server::Projects for Projects {
         &self,
         request: Request<proto::CreateModelAssociationRequest>, // Accept request of type HelloRequest
     ) -> Result<Response<proto::CreateModelAssociationResponse>, Status> {
-        use proto::ModelAssociationKind::*;
+        use proto::ModelAssociationKind;
 
         println!("Got a request: {:?}", request);
 
@@ -362,10 +362,10 @@ impl proto::projects_server::Projects for Projects {
                 associated_model_slug,
                 description,
                 kind: match association_kind {
-                    UnspecifiedAssociationKind => "unspecified",
-                    HasMany => "has_many",
-                    HasOne => "has_one",
-                    BelongsTo => "belongs_to",
+                    ModelAssociationKind::Unspecified => "unspecified",
+                    ModelAssociationKind::HasMany => "has_many",
+                    ModelAssociationKind::HasOne => "has_one",
+                    ModelAssociationKind::BelongsTo => "belongs_to",
                 }
                 .to_string(),
                 name,
@@ -486,15 +486,15 @@ fn to_proto_model_association(model_association: model::Association) -> proto::M
 }
 
 fn to_proto_model_attribute(model_attribute: model::Attribute) -> proto::ModelAttribute {
-    use proto::ModelAttributeKind::*;
+    use proto::ModelAttributeKind;
 
     proto::ModelAttribute {
         description: model_attribute.description.unwrap_or_default(),
         name: model_attribute.name,
         kind: match model_attribute.kind {
-            model::AttributeKind::String => String,
-            model::AttributeKind::Integer => Int64,
-            model::AttributeKind::Boolean => Bool,
+            model::AttributeKind::String => ModelAttributeKind::String,
+            model::AttributeKind::Integer => ModelAttributeKind::Integer,
+            model::AttributeKind::Boolean => ModelAttributeKind::Boolean,
         }
         .into(),
     }

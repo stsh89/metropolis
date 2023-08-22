@@ -12,7 +12,7 @@
   <div class="field">
     <label class="label">Kind</label>
     <div class="control">
-      <%= form.select :kind, [["Belongs To", "BelongsTo"], ["Has Many", "HasMany"], ["Has One", "HasOne"]], selected: "BelongsTo" %>
+      <%= form.select :kind, [["Belongs To", "MODEL_ASSOCIATION_KIND_BELONGS_TO"], ["Has Many", "MODEL_ASSOCIATION_KIND_HAS_MANY"], ["Has One", "MODEL_ASSOCIATION_KIND_HAS_ONE"]], selected: "MODEL_ASSOCIATION_KIND_BELONGS_TO" %>
     </div>
   </div>
 

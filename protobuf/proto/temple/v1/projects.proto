@@ -61,10 +61,13 @@ message ModelAttribute {
 }
 
 enum ModelAttributeKind {
-    UnspecifiedAttributeKind = 0;
-    String = 1;
-    Int64 = 2;
-    Bool = 3;
+    MODEL_ATTRIBUTE_KIND_UNSPECIFIED = 0;
+
+    MODEL_ATTRIBUTE_KIND_STRING = 1;
+
+    MODEL_ATTRIBUTE_KIND_INTEGER = 2;
+
+    MODEL_ATTRIBUTE_KIND_BOOLEAN = 3;
 }
 
 message ModelAssociation {
@@ -82,10 +85,10 @@ message ModelAssociation {
 }
 
 enum ModelAssociationKind {
-    UnspecifiedAssociationKind = 0;
-    BelongsTo = 1;
-    HasOne = 2;
-    HasMany = 3;
+    MODEL_ASSOCIATION_KIND_UNSPECIFIED = 0;
+    MODEL_ASSOCIATION_KIND_BELONGS_TO = 1;
+    MODEL_ASSOCIATION_KIND_HAS_ONE = 2;
+    MODEL_ASSOCIATION_KIND_HAS_MANY = 3;
 }
 
 message ListProjectsRequest {}
