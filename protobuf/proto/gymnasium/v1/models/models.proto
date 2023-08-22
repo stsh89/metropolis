@@ -13,9 +13,6 @@ service Models {
     // Find a model associated with some Project.
     rpc FindProjectModel(FindProjectModelRequest) returns (Model);
 
-    // Get Project's models with all attributes and associations.
-    rpc FindProjectModelsOverview(FindProjectModelsOverviewRequest) returns (FindProjectModelsOverviewResponse);
-
     // List Project's models with all attributes and associations.
     rpc ListProjectModelOverviews(ListProjectModelOverviewsRequest) returns (ListProjectModelOverviewsResponse);
 
@@ -161,25 +158,13 @@ message FindProjectModelRequest {
     string model_slug = 2;
 }
 
-// Request definition for Project Models overview.
-message FindProjectModelsOverviewRequest {
-    // Project's unique web identifier.
-    string project_slug = 1;
-}
-
-// Response definition for Project Models listing.
-message FindProjectModelsOverviewResponse {
-    // List of Project's models with all their attributes and associations.
-    repeated ModelOverview model_overviews = 1;
-}
-
-// Request definition for Project Models overview.
+// Request definition for Project Model overviews.
 message ListProjectModelOverviewsRequest {
     // Project's unique web identifier.
     string project_slug = 1;
 }
 
-// Response definition for Project Models listing.
+// Response definition for Project Model overview listing.
 message ListProjectModelOverviewsResponse {
     // List of Project's models with all their attributes and associations.
     repeated ModelOverview model_overviews = 1;
