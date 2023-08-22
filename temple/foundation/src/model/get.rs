@@ -28,25 +28,12 @@ pub async fn execute(
         model_slug,
     } = request;
 
-    let model_overview_record = repo
+    let model_overview: ModelOverview = repo
         .get_model_overview_record(&project_slug, &model_slug)
-        .await?;
+        .await?
+        .into();
 
-    let response = Response {
-        model_overview: ModelOverview {
-            model: model_overview_record.model.into(),
-            associations: model_overview_record
-                .associations
-                .into_iter()
-                .map(Into::into)
-                .collect(),
-            attributes: model_overview_record
-                .attributes
-                .into_iter()
-                .map(Into::into)
-                .collect(),
-        },
-    };
+    let response = Response { model_overview };
 
     Ok(response)
 }

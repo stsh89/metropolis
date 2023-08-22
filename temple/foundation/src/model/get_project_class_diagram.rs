@@ -22,19 +22,7 @@ pub async fn execute(
         .list_model_overview_records(&project_slug)
         .await?
         .into_iter()
-        .map(|model_overview_record| ModelOverview {
-            model: model_overview_record.model.into(),
-            associations: model_overview_record
-                .associations
-                .into_iter()
-                .map(Into::into)
-                .collect(),
-            attributes: model_overview_record
-                .attributes
-                .into_iter()
-                .map(Into::into)
-                .collect(),
-        })
+        .map(Into::into)
         .collect();
 
     let diagram_model_classes = model_overviews

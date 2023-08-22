@@ -1,6 +1,6 @@
 use crate::{
     diagram,
-    model::{Association, Attribute, GetModelOverviewRecord},
+    model::{GetModelOverviewRecord, ModelOverview},
     FoundationResult,
 };
 
@@ -22,26 +22,15 @@ pub async fn execute(
         model_slug,
     } = request;
 
-    let get_model_response = repo
+    let model_overview: ModelOverview = repo
         .get_model_overview_record(&project_slug, &model_slug)
-        .await?;
-
-    let attributes: Vec<Attribute> = get_model_response
-        .attributes
-        .into_iter()
-        .map(Into::into)
-        .collect();
-
-    let associations: Vec<Association> = get_model_response
-        .associations
-        .into_iter()
-        .map(Into::into)
-        .collect();
+        .await?
+        .into();
 
     let diagram = diagram::model_class_diagram(diagram::ModelClass {
-        model: &get_model_response.model.into(),
-        attributes: attributes.as_slice(),
-        associations: &associations,
+        model: &model_overview.model,
+        attributes: &model_overview.attributes,
+        associations: &model_overview.associations,
     });
 
     let response = Response { diagram };

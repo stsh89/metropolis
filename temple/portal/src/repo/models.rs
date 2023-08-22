@@ -129,25 +129,7 @@ impl ListModelOverviewRecords for ModelsRepo {
             .into_inner()
             .model_overviews
             .into_iter()
-            .map(|proto_model_overview| {
-                Ok(datastore::model::ModelOverview {
-                    model: proto_model_overview
-                        .model
-                        .map(datastore_model)
-                        .transpose()?
-                        .ok_or(FoundationError::internal("".to_string()))?,
-                    associations: proto_model_overview
-                        .associations
-                        .into_iter()
-                        .map(datastore_model_association)
-                        .collect::<FoundationResult<Vec<datastore::model::Association>>>()?,
-                    attributes: proto_model_overview
-                        .attributes
-                        .into_iter()
-                        .map(datastore_model_attribute)
-                        .collect::<FoundationResult<Vec<datastore::model::Attribute>>>()?,
-                })
-            })
+            .map(datastore_model_overview)
             .collect::<FoundationResult<Vec<datastore::model::ModelOverview>>>()?;
 
         Ok(model_overviews)
@@ -474,4 +456,28 @@ pub fn datastore_model_association(
     };
 
     Ok(model_attribute)
+}
+
+fn datastore_model_overview(
+    proto_model_overview: rpc::ModelOverview,
+) -> FoundationResult<datastore::model::ModelOverview> {
+    Ok(datastore::model::ModelOverview {
+        model: proto_model_overview
+            .model
+            .map(datastore_model)
+            .transpose()?
+            .ok_or(FoundationError::internal(
+                "missing #model field".to_string(),
+            ))?,
+        associations: proto_model_overview
+            .associations
+            .into_iter()
+            .map(datastore_model_association)
+            .collect::<FoundationResult<Vec<datastore::model::Association>>>()?,
+        attributes: proto_model_overview
+            .attributes
+            .into_iter()
+            .map(datastore_model_attribute)
+            .collect::<FoundationResult<Vec<datastore::model::Attribute>>>()?,
+    })
 }
