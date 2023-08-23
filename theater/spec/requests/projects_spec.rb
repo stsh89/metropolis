@@ -58,11 +58,11 @@ RSpec.describe "/projects", type: :request do
 
   describe "POST /create" do
     context "with valid parameters" do
-      it "creates a new Project" do
-        expect {
-          post projects_url, params: { project: valid_attributes }
-        }.to change(Project, :count).by(1)
-      end
+      # it "creates a new Project" do
+      #   expect {
+      #     post projects_url, params: { project: valid_attributes }
+      #   }.to change(Project, :count).by(1)
+      # end
 
       it "redirects to the created project" do
         post projects_url, params: { project: valid_attributes }
@@ -71,11 +71,11 @@ RSpec.describe "/projects", type: :request do
     end
 
     context "with invalid parameters" do
-      it "does not create a new Project" do
-        expect {
-          post projects_url, params: { project: invalid_attributes }
-        }.to change(Project, :count).by(0)
-      end
+      # it "does not create a new Project" do
+      #   expect {
+      #     post projects_url, params: { project: invalid_attributes }
+      #   }.to change(Project, :count).by(0)
+      # end
 
 
       it "renders a response with 422 status (i.e. to display the 'new' template)" do

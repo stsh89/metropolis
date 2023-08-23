@@ -2,7 +2,11 @@ require 'rails_helper'
 
 RSpec.describe "projects/edit", type: :view do
   let(:project) {
-    Project.create!()
+    Project.new(
+      name: "Book store",
+      description: "Buy and sell books platform.",
+      slug: "book-store"
+    )
   }
 
   before(:each) do
@@ -13,6 +17,10 @@ RSpec.describe "projects/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", project_path(project), "post" do
+
+      assert_select "input[name=?]", "project[name]"
+
+      assert_select "textarea[name=?]", "project[description]"
     end
   end
 end
