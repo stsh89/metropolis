@@ -1,18 +1,15 @@
-<div class="columns">
-  <div class="column has-text-centered">
-    <h1 class="title">Projects</h1><br>
-  </div>
-</div>
+<p style="color: green"><%= notice %></p>
 
-<div class="columns">
-  <div class="column">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li><%= link_to "Dashboard", root_path %></li>
-        <li class="is-active"><a href="#" aria-current="page">Projects</a></li>
-      </ul>
-    </nav>
-  </div>
-</div>
+<h1>Projects</h1>
 
-<%= render "projects", projects: @page.projects %>
+<%= link_to "New project", new_project_path %> |
+<%= link_to "Archived projects", archived_projects_path %>
+
+<div id="projects">
+  <% @projects.each do |project| %>
+    <%= render project %>
+    <p>
+      <%= link_to "Show this project", project %>
+    </p>
+  <% end %>
+</div>

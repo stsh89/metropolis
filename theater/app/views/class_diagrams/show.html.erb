@@ -2,9 +2,9 @@
 
 <div>
   <% if @model %>
-    <%= link_to "Back", plan_model_path(@plan, @model) %>
+    <%= link_to "Back", project_model_path(@project, @model) %>
   <% else %>
-    <%= link_to "Back", plan_path(@plan) %>
+    <%= link_to "Back", project_path(@project) %>
   <% end %>
 </div>
 

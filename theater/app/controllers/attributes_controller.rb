@@ -11,8 +11,8 @@ class AttributesController < ApplicationController
   def create
     @attribute = ModelAttribute.new(attribute_params)
 
-    if @attribute.save(@plan, @model)
-      redirect_to plan_model_path(@plan, @model), notice: "Attribute was successfully created."
+    if @attribute.save(@project, @model)
+      redirect_to project_model_path(@project, @model), notice: "Attribute was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -20,19 +20,19 @@ class AttributesController < ApplicationController
 
   # DELETE /projects/book-store/models/book/attributes/title
   def destroy
-    @model.destroy_attribute(@plan, params[:id])
-    redirect_to plan_model_path(@plan, @model), notice: "Attribute was successfully destroyed.", status: :see_other
+    @model.destroy_attribute(@project, params[:id])
+    redirect_to project_model_path(@project, @model), notice: "Attribute was successfully destroyed.", status: :see_other
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_project
-      @plan = Plan.find(params[:plan_id])
+      @project = Project.find(params[:project_id])
     end
 
     # Use callbacks to share common setup or constraints between actions.
     def set_model
-      @model = @plan.find_model(params[:model_id])
+      @model = @project.find_model(params[:model_id])
     end
 
     # Only allow a list of trusted parameters through.

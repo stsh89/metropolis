@@ -1,12 +1,12 @@
 <p style="color: green"><%= notice %></p>
 
 <div>
-  <%= link_to "Back", plan_models_path(@plan) %> |
-  <%= link_to "Class Diagram", plan_model_class_diagram_path(@plan, @model) %> |
-  <%= link_to "New attribute", new_plan_model_attribute_path(@plan, @model) %> |
-  <%= link_to "New association", new_plan_model_association_path(@plan, @model) %>
+  <%= link_to "Back", project_models_path(@project) %> |
+  <%= link_to "Class Diagram", project_model_class_diagram_path(@project, @model) %> |
+  <%= link_to "New attribute", new_project_model_attribute_path(@project, @model) %> |
+  <%= link_to "New association", new_project_model_association_path(@project, @model) %>
 
-  <%= button_to "Destroy this model", plan_model_path(@plan, @model), method: :delete %>
+  <%= button_to "Destroy this model", project_model_path(@project, @model), method: :delete %>
 </div>
 
 <%= render @model %>
@@ -15,7 +15,7 @@
   <% @model.associations.each do |association| %>
     <%= render association %>
     <p>
-      <%= button_to "Destroy this association", plan_model_association_path(@plan, @model, association), method: :delete %>
+      <%= button_to "Destroy this association", project_model_association_path(@project, @model, association), method: :delete %>
     </p>
   <% end %>
 </div>
@@ -24,7 +24,7 @@
   <% @model.attributes.each do |attribute| %>
     <%= render attribute %>
     <p>
-      <%= button_to "Destroy this attribute", plan_model_attribute_path(@plan, @model, attribute), method: :delete %>
+      <%= button_to "Destroy this attribute", project_model_attribute_path(@project, @model, attribute), method: :delete %>
     </p>
   <% end %>
 </div>

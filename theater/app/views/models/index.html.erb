@@ -2,14 +2,14 @@
 
 <h1>Models</h1>
 
-<%= link_to "Back", @plan %> |
-<%= link_to "New model", new_plan_model_path(@plan) %>
+<%= link_to "Back", @project %> |
+<%= link_to "New model", new_project_model_path(@project) %>
 
-<div id="plans">
+<div id="projects">
   <% @models.each do |model| %>
     <%= render model %>
     <p>
-      <%= link_to "Show this model", plan_model_path(@plan, model) %>
+      <%= link_to "Show this model", project_model_path(@project, model) %>
     </p>
   <% end %>
 </div>

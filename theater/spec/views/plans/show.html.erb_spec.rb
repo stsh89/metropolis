@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe "plans/show", type: :view do
+RSpec.describe "projects/show", type: :view do
   before(:each) do
-    assign(:plan, Plan.create!(
+    assign(:project, Project.create!(
       name: "Name",
       description: "MyText"
     ))

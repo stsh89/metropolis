@@ -1,25 +1,25 @@
 require 'rails_helper'
 
-RSpec.describe "plans/edit", type: :view do
-  let(:plan) {
-    Plan.create!(
+RSpec.describe "projects/edit", type: :view do
+  let(:project) {
+    Project.create!(
       name: "MyString",
       description: "MyText"
     )
   }
 
   before(:each) do
-    assign(:plan, plan)
+    assign(:project, project)
   end
 
-  it "renders the edit plan form" do
+  it "renders the edit project form" do
     render
 
-    assert_select "form[action=?][method=?]", plan_path(plan), "post" do
+    assert_select "form[action=?][method=?]", project_path(project), "post" do
 
-      assert_select "input[name=?]", "plan[name]"
+      assert_select "input[name=?]", "project[name]"
 
-      assert_select "textarea[name=?]", "plan[description]"
+      assert_select "textarea[name=?]", "project[description]"
     end
   end
 end

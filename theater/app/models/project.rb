@@ -1,4 +1,4 @@
-class Plan
+class Project
   include ActiveModel::API
   include ActiveModel::Validations
 
@@ -25,7 +25,7 @@ class Plan
         .create_project(self)
         .project
 
-      Plan.from_proto(proto_project)
+      Project.from_proto(proto_project)
     else
       false
     end
@@ -38,10 +38,10 @@ class Plan
       .rename_project(id: @slug, new_name: params[:name])
       .project
 
-      updated_plan = Plan.from_proto(proto_project)
+      updated_project = Project.from_proto(proto_project)
 
-      @slug = updated_plan.slug
-      updated_plan
+      @slug = updated_project.slug
+      updated_project
     else
       false
     end
@@ -86,7 +86,7 @@ class Plan
 
   class << self
     def from_proto(proto_project)
-      Plan.new(
+      Project.new(
         description: proto_project.description,
         name: proto_project.name,
         slug: proto_project.slug
@@ -98,7 +98,7 @@ class Plan
         .new
         .list_projects
         .projects
-        .map { |proto_project| Plan.from_proto(proto_project) }
+        .map { |proto_project| Project.from_proto(proto_project) }
     end
 
     def archived
@@ -106,7 +106,7 @@ class Plan
       .new
       .list_archived_projects
       .projects
-      .map { |proto_project| Plan.from_proto(proto_project) }
+      .map { |proto_project| Project.from_proto(proto_project) }
     end
 
     def find(id)
@@ -116,7 +116,7 @@ class Plan
         .get_project(id)
         .project
 
-      Plan.from_proto(proto_project)
+      Project.from_proto(proto_project)
     end
   end
 end

@@ -1,4 +1,4 @@
-<%= form_with(model: association, url: plan_model_associations_path(@plan, @model)) do |form| %>
+<%= form_with(model: association, url: project_model_associations_path(@project, @model)) do |form| %>
   <% if association.errors.any? %>
     <div style="color: red">
       <h2><%= pluralize(association.errors.count, "error") %> prohibited this model from being saved:</h2>
@@ -23,7 +23,7 @@
 
   <div>
     <%= form.label :associated_model_slug, "Associated model", style: "display: block" %>
-    <%= form.select :associated_model_slug, @plan.models.map { |m| [m.name, m.slug] } %>
+    <%= form.select :associated_model_slug, @project.models.map { |m| [m.name, m.slug] } %>
   </div>
 
   <div>

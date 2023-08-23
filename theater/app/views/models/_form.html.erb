@@ -1,4 +1,4 @@
-<%= form_with(model: model, url: plan_models_path(@plan)) do |form| %>
+<%= form_with(model: model, url: project_models_path(@project)) do |form| %>
   <% if model.errors.any? %>
     <div style="color: red">
       <h2><%= pluralize(model.errors.count, "error") %> prohibited this model from being saved:</h2>

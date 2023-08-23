@@ -1,19 +1,12 @@
-<div class="columns">
-  <div class="column has-text-centered">
-    <h1 class="title"><%= @page.project.name %></h1><br>
-  </div>
+<p style="color: green"><%= notice %></p>
+
+<div>
+  <%= link_to "Back", projects_path %> |
+  <%= link_to "Models", project_models_path(@project) %> |
+  <%= link_to "Edit this project", edit_project_path(@project) %> |
+  <%= link_to "Class Diagram", project_class_diagram_path(@project) %> |
+
+  <%= button_to "Archive this project", project_archive_path(@project), method: :put %>
 </div>
 
-<div class="columns">
-  <div class="column">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li><%= link_to "Dashboard", root_path %></li>
-        <li><%= link_to "Projects", projects_path %></li>
-        <li class="is-active"><a href="#" aria-current="page"><%= @page.project.name %></a></li>
-      </ul>
-    </nav>
-  </div>
-</div>
-
-<%= render "models", models: @page.models, project: @page.project %>
+<%= render @project %>

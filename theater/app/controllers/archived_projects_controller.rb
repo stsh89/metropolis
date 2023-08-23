@@ -1,9 +1,9 @@
 class ArchivedProjectsController < ApplicationController
-  before_action :set_plan, only: %i[ show update destroy ]
+  before_action :set_project, only: %i[ show update destroy ]
 
   # GET /archived_projects
   def index
-    @projects = Plan.archived
+    @projects = Project.archived
   end
 
   # GET /archived_projects/book-store
@@ -13,12 +13,12 @@ class ArchivedProjectsController < ApplicationController
   # DELETE /archived_projects/book-store
   def destroy
     @project.destroy
-    redirect_to plans_url, notice: "Plan was successfully destroyed.", status: :see_other
+    redirect_to projects_url, notice: "Project was successfully destroyed.", status: :see_other
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_plan
-      @project = Plan.find(params[:id])
+    def set_project
+      @project = Project.find(params[:id])
     end
 end

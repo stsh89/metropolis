@@ -3,7 +3,7 @@
 <div>
   <%= link_to "Back", archived_projects_path %>
 
-  <%= button_to "Restore this project", plan_restore_path(@project), method: :put %>
+  <%= button_to "Restore this project", project_restore_path(@project), method: :put %>
 
   <%= button_to "Destroy this project", archived_project_path(@project), method: :delete %>
 </div>

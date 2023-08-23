@@ -54,22 +54,6 @@ class Model
       .delete_model_association(project, self, association_name)
   end
 
-  # def update(params)
-  #   if self.valid?
-  #     proto_project = ProjectsApi
-  #     .new
-  #     .rename_project(id: @slug, new_name: params[:name])
-  #     .project
-
-  #     updated_plan = Plan.from_proto(proto_project)
-
-  #     @slug = updated_plan.slug
-  #     updated_plan
-  #   else
-  #     false
-  #   end
-  # end
-
   class << self
     def from_proto(proto_model)
       Model.new(
@@ -78,15 +62,5 @@ class Model
         slug: proto_model.slug
       )
     end
-
-    # def find(id)
-    #   proto_project =
-    #     ProjectsApi
-    #     .new
-    #     .get_project(id)
-    #     .project
-
-    #   Plan.from_proto(proto_project)
-    # end
   end
 end
