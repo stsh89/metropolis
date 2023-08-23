@@ -129,17 +129,15 @@ defmodule Gymnasium.ModelsTest do
       assert Models.list_associations() == []
     end
 
-    test "delete_model/1 sets nil for associated models" do
+    test "delete_model/1 removes associations" do
       model = model_fixture()
       associated_model = model_fixture(name: "Author", slug: "author")
       model_attribute_fixture(model_id: model.id)
-
-      association =
-        model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
+      model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
 
       assert {:ok, %Model{}} = Models.delete_model!(associated_model)
       assert Models.list_models() == [model]
-      assert Models.list_associations() == [Map.put(association, :associated_model_id, nil)]
+      assert Models.list_associations() == []
     end
 
     test "delete_model/1 raises Ecto.NoPrimaryKeyValueError" do

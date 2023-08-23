@@ -132,11 +132,7 @@ defmodule Gymnasium.Models do
       Repo.delete_all(from ma in Attribute, where: ma.id in ^model_attribute_ids)
 
       if model.id != nil do
-        from(ma in Association,
-          where: ma.associated_model_id == ^model.id,
-          update: [set: [associated_model_id: nil]]
-        )
-        |> Repo.update_all([])
+        Repo.delete_all(from ma in Association, where: ma.associated_model_id == ^model.id)
       end
 
       Repo.delete!(model)
