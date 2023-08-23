@@ -1,0 +1,15 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Models</h1>
+
+<%= link_to "Back", @plan %> |
+<%= link_to "New model", new_plan_model_path(@plan) %>
+
+<div id="plans">
+  <% @models.each do |model| %>
+    <%= render model %>
+    <p>
+      <%= link_to "Show this model", plan_model_path(@plan, model) %>
+    </p>
+  <% end %>
+</div>

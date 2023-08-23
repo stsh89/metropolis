@@ -1,18 +1,11 @@
-<div class="column is-3">
-  <div class="card is-equal-height">
-    <div class="card-content">
-      <div class="content">
-        <p>
-          <%= project.name %>
-        </p>
-        <p>
-          <%= project.description %>
-        </p>
-      </div>
-    </div>
-    <footer class="card-footer">
-      <%= link_to "Restore", archived_project_path(project.slug, project: {restore: true}), class: "card-footer-item", data: { "turbo-method": :put } %>
-      <%= link_to "Delete", archived_project_path(project.slug), class: "card-footer-item", data: { "turbo-method": :delete } %>
-    </footer>
-  </div>
+<div id="<%= dom_id project %>">
+  <p>
+    <strong>Name:</strong>
+    <%= project.name %>
+  </p>
+
+  <p>
+    <strong>Description:</strong>
+    <%= project.description %>
+  </p>
 </div>

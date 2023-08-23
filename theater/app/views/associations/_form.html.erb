@@ -1,0 +1,37 @@
+<%= form_with(model: association, url: plan_model_associations_path(@plan, @model)) do |form| %>
+  <% if association.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(association.errors.count, "error") %> prohibited this model from being saved:</h2>
+
+      <ul>
+        <% association.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, style: "display: block" %>
+    <%= form.text_field :name, autofocus: true %>
+  </div>
+
+  <div>
+    <%= form.label :kind, style: "display: block" %>
+    <%= form.select :kind, [["Has many", "has_many"], ["Has one", "has_one"], ["Belongs to", "belongs_to"]], selected: "belongs_to" %>
+  </div>
+
+  <div>
+    <%= form.label :associated_model_slug, "Associated model", style: "display: block" %>
+    <%= form.select :associated_model_slug, @plan.models.map { |m| [m.name, m.slug] } %>
+  </div>
+
+  <div>
+    <%= form.label :description, style: "display: block" %>
+    <%= form.text_area :description %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

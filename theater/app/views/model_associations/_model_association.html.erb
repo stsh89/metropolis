@@ -1,0 +1,21 @@
+<div id="<%= dom_id model_association %>">
+  <p>
+    <strong>Name:</strong>
+    <%= model_association.name %>
+  </p>
+
+  <p>
+    <strong>Kind:</strong>
+    <%= model_association.kind %>
+  </p>
+
+  <p>
+    <strong>Associated model:</strong>
+    <%= link_to model_association.model.name, plan_model_path(@plan, model_association.model) %>
+  </p>
+
+  <p>
+    <strong>Description:</strong>
+    <%= model_association.description %>
+  </p>
+</div>

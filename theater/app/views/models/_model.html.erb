@@ -1,14 +1,11 @@
-<div class="column is-3">
-  <div class="card is-equal-height">
-    <div class="card-content">
-      <div class="content">
-        <p>
-          <%= link_to model.name, project_model_path(project.slug, model.slug) %>
-        </p>
-        <p>
-          <%= model.description %>
-        </p>
-      </div>
-    </div>
-  </div>
+<div id="<%= dom_id model %>">
+  <p>
+    <strong>Name:</strong>
+    <%= model.name %>
+  </p>
+
+  <p>
+    <strong>Description:</strong>
+    <%= model.description %>
+  </p>
 </div>

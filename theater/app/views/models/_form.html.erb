@@ -1,21 +1,27 @@
-<%= form_with scope: :model, url: project_models_path do |form| %>
-  <div class="field">
-    <label class="label">Name</label>
-    <div class="control">
-      <%= form.text_field :name, class: "input", placeholder: "Name", autofocus: true %>
+<%= form_with(model: model, url: plan_models_path(@plan)) do |form| %>
+  <% if model.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(model.errors.count, "error") %> prohibited this model from being saved:</h2>
+
+      <ul>
+        <% model.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
     </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, style: "display: block" %>
+    <%= form.text_field :name %>
   </div>
 
-  <div class="field">
-    <label class="label">Description</label>
-    <div class="control">
-      <%= form.text_field :description, class: "input", placeholder: "Description" %>
-    </div>
+  <div>
+    <%= form.label :description, style: "display: block" %>
+    <%= form.text_area :description, readonly: model.persisted? %>
   </div>
 
-  <div class="field is-grouped mt-5">
-    <div class="control">
-      <%= form.button class: "button is-link is-inverted" %>
-    </div>
+  <div>
+    <%= form.submit %>
   </div>
 <% end %>

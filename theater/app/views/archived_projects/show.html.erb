@@ -1,0 +1,11 @@
+<p style="color: green"><%= notice %></p>
+
+<div>
+  <%= link_to "Back", archived_projects_path %>
+
+  <%= button_to "Restore this project", plan_restore_path(@project), method: :put %>
+
+  <%= button_to "Destroy this project", archived_project_path(@project), method: :delete %>
+</div>
+
+<%= render @project %>

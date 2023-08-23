@@ -1,34 +1,11 @@
-<div class="columns">
-  <div class="column has-text-centered">
-    <% if @page.model %>
-      <h1 class="title"><%= @page.model.name %> Model Class Diagram</h1><br>
-    <% else %>
-      <h1 class="title"><%= @page.project.name %> Project Class Diagram</h1><br>
-    <% end %>
-  </div>
+<p style="color: green"><%= notice %></p>
+
+<div>
+  <% if @model %>
+    <%= link_to "Back", plan_model_path(@plan, @model) %>
+  <% else %>
+    <%= link_to "Back", plan_path(@plan) %>
+  <% end %>
 </div>
 
-<div class="columns">
-  <div class="column">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li><%= link_to "Dashboard", root_path %></li>
-        <li><%= link_to "Projects", projects_path %></li>
-        <li><%= link_to @page.project.name, project_path(@page.project.slug) %></li>
-        <% if @page.model %>
-          <li><%= link_to @page.model.name, project_model_path(@page.project.slug, @page.model.slug) %></li>
-        <% end %>
-        <li class="is-active"><a href="#" aria-current="page">Class Diagram</a></li>
-      </ul>
-    </nav>
-  </div>
-</div>
-
-<div class="row columns is-multiline" data-controller="mermaid">
-  <textarea data-mermaid-target="input" class="is-hidden" readonly="true">
-    <%= @page.class_diagram.html_safe %>
-  </textarea>
-
-  <div data-mermaid-target="output">
-  </div>
-</div>
+<%= render @class_diagram %>

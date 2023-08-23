@@ -1,67 +1,30 @@
-<div class="columns">
-  <div class="column has-text-centered">
-    <h1 class="title"><%= @page.model.name %></h1><br>
-  </div>
+<p style="color: green"><%= notice %></p>
+
+<div>
+  <%= link_to "Back", plan_models_path(@plan) %> |
+  <%= link_to "Class Diagram", plan_model_class_diagram_path(@plan, @model) %> |
+  <%= link_to "New attribute", new_plan_model_attribute_path(@plan, @model) %> |
+  <%= link_to "New association", new_plan_model_association_path(@plan, @model) %>
+
+  <%= button_to "Destroy this model", plan_model_path(@plan, @model), method: :delete %>
 </div>
 
-<div class="columns">
-  <div class="column">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li><%= link_to "Dashboard", root_path %></li>
-        <li><%= link_to "Projects", projects_path %></li>
-        <li><%= link_to @page.project.name, project_path(@page.project.slug) %></li>
-        <li class="is-active"><a href="#" aria-current="page"><%= @page.model.name %></a></li>
-      </ul>
-    </nav>
-  </div>
+<%= render @model %>
+
+<div id="model-associations">
+  <% @model.associations.each do |association| %>
+    <%= render association %>
+    <p>
+      <%= button_to "Destroy this association", plan_model_association_path(@plan, @model, association), method: :delete %>
+    </p>
+  <% end %>
 </div>
 
-<div class="row columns is-multiline">
-  <div class="column is-3">
-    <div class="card is-equal-height">
-      <div class="card-content">
-        <div class="content">
-          <p>
-            <%= link_to "New Model Association", new_project_model_model_association_path(@page.project.slug, @page.model.slug) %>
-          </p>
-          <p>
-            Create a new Model Association.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="column is-3">
-    <div class="card is-equal-height">
-      <div class="card-content">
-        <div class="content">
-          <p>
-            <%= link_to "New Model Attribute", new_project_model_model_attribute_path(@page.project.slug, @page.model.slug) %>
-          </p>
-          <p>
-            Create a new Model Attribute.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="column is-3">
-    <div class="card is-equal-height">
-      <div class="card-content">
-        <div class="content">
-          <p>
-            <%= link_to "Class Diagram", project_model_class_diagram_path(@page.project.slug, @page.model.slug) %>
-          </p>
-          <p>
-            Show Class Diagram.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <%= render partial: 'model_attribute', collection: @page.model_attributes, locals: {project: @page.project, model: @page.model} %>
-
-  <%= render partial: 'model_association', collection: @page.model_associations, locals: {project: @page.project, model: @page.model} %>
+<div id="model-attributes">
+  <% @model.attributes.each do |attribute| %>
+    <%= render attribute %>
+    <p>
+      <%= button_to "Destroy this attribute", plan_model_attribute_path(@plan, @model, attribute), method: :delete %>
+    </p>
+  <% end %>
 </div>

@@ -1,28 +1,9 @@
-<div class="columns">
-  <div class="column has-text-centered">
-    <h1 class="title">New Model</h1><br>
-  </div>
-</div>
+<h1>New model</h1>
 
-<div class="columns">
-  <div class="column">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li><%= link_to "Dashboard", root_path %></li>
-        <li><%= link_to "Projects", projects_path %></li>
-        <li><%= link_to @page.project.name, project_path(@page.project.slug) %></li>
-        <li class="is-active"><a href="#" aria-current="page">New Model</a></li>
-      </ul>
-    </nav>
-  </div>
-</div>
+<%= render "form", model: @model %>
 
-<div class="columns">
-  <div class="column">
-    <div class="box">
-      <div class="block">
-        <%= render "form", model: @page.model, project: @page.project %>
-      </div>
-    </div>
-  </div>
+<br>
+
+<div>
+  <%= link_to "Back", plan_path(@plan) %>
 </div>

@@ -1,28 +1,24 @@
 class ArchivedProjectsController < ApplicationController
-  # GET /archived-projects
+  before_action :set_plan, only: %i[ show update destroy ]
+
+  # GET /archived_projects
   def index
-    @page = IndexProjectsArchivePage.new
+    @projects = Plan.archived
   end
 
-  # PATCH/PUT /archived-projects/data-store
-  def update
-    @page = UpdateArchivedProjectPage.new(params[:id], params[:project])
-
-    if @page.update_project
-      redirect_to project_path(params[:id])
-    else
-      redirect_to root_path
-    end
+  # GET /archived_projects/book-store
+  def show
   end
 
-  # DELETE /archived-projects/data-store
+  # DELETE /archived_projects/book-store
   def destroy
-    @page = DeleteArchivedProjectPage.new(params[:id])
-
-    if @page.delete_project
-      redirect_to projects_path
-    else
-      redirect_to projects_path
-    end
+    @project.destroy
+    redirect_to plans_url, notice: "Plan was successfully destroyed.", status: :see_other
   end
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_plan
+      @project = Plan.find(params[:id])
+    end
 end

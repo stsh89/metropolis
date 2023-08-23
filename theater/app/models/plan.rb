@@ -47,6 +47,43 @@ class Plan
     end
   end
 
+  def archive
+    ProjectsApi
+      .new
+      .archive_project(self)
+  end
+
+  def restore
+    ProjectsApi
+      .new
+      .restore_project(self)
+  end
+
+  def destroy
+    ProjectsApi
+      .new
+      .delete_project(self)
+  end
+
+  def models
+    ProjectsApi
+      .new
+      .list_models(self)
+      .models
+      .map { |proto_model| Model.from_proto(proto_model) }
+  end
+
+  def find_model(model_id)
+    response = ProjectsApi
+    .new
+    .get_model(self, model_id)
+
+    model = Model.from_proto(response.model)
+    model.attributes = response.attributes.map { |proto_attribute| ModelAttribute.from_proto(proto_attribute) }
+    model.associations = response.associations.map { |proto_association| ModelAssociation.from_proto(proto_association) }
+    model
+  end
+
   class << self
     def from_proto(proto_project)
       Plan.new(
@@ -62,6 +99,14 @@ class Plan
         .list_projects
         .projects
         .map { |proto_project| Plan.from_proto(proto_project) }
+    end
+
+    def archived
+      ProjectsApi
+      .new
+      .list_archived_projects
+      .projects
+      .map { |proto_project| Plan.from_proto(proto_project) }
     end
 
     def find(id)
