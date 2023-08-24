@@ -1,5 +1,5 @@
 # Metropolis
-Simple tool for tracking software data structures and their interactions within a project.
+This is a pet project for tracking software data structures and their interactions within a project.
 
 Describe your models, entities, etc., and see how they relate to one another in a diagram (drawn using [mermaid](https://mermaid.js.org/)).
 
