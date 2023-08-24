@@ -13,7 +13,7 @@ class ArchivedProjectsController < ApplicationController
   # DELETE /archived_projects/book-store
   def destroy
     @project.destroy
-    redirect_to projects_url, notice: "Project was successfully destroyed.", status: :see_other
+    redirect_to archived_projects_url, notice: "Project was successfully destroyed.", status: :see_other
   end
 
   private

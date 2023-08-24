@@ -1,12 +1,12 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: %i[ show edit update destroy ]
+  before_action :set_project, only: %i[ show edit update ]
 
   # GET /projects
   def index
     @projects = Project.all
   end
 
-  # GET /projects/1
+  # GET /projects/book-store
   def show
   end
 
@@ -15,7 +15,7 @@ class ProjectsController < ApplicationController
     @project = Project.new
   end
 
-  # GET /projects/1/edit
+  # GET /projects/book-store/edit
   def edit
   end
 
@@ -30,19 +30,13 @@ class ProjectsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /projects/1
+  # PATCH/PUT /projects/book-store
   def update
-    if @project.update(project_params)
-      redirect_to @project, notice: "Project was successfully updated."
+    if @project.rename(project_params[:name])
+      redirect_to @project, notice: "Project was successfully renamed."
     else
       render :edit, status: :unprocessable_entity
     end
-  end
-
-  # DELETE /projects/1
-  def destroy
-    @project.destroy
-    redirect_to projects_url, notice: "Project was successfully destroyed.", status: :see_other
   end
 
   private
@@ -53,6 +47,6 @@ class ProjectsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def project_params
-      params.require(:project).permit(:name, :description)
+      params.require(:project).permit(:name)
     end
 end

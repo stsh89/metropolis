@@ -1,9 +1,13 @@
-<h1>New attribute</h1>
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><%= link_to "Entrypoint", root_path %></li>
+    <li><%= link_to "Projects", projects_path %></li>
+    <li><%= link_to @project.name, @project %></li>
+    <li><%= link_to @model.name, project_model_path(@project, @model) %></li>
+    <li class="is-active"><a href="#" aria-current="page">New attribute</a></li>
+  </ul>
+</nav>
+
+<h1 class="title">New attribute</h1>
 
 <%= render "form", attribute: @attribute %>
-
-<br>
-
-<div>
-  <%= link_to "Back", project_model_path(@project, @model) %>
-</div>

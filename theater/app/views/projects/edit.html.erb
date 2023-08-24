@@ -1,9 +1,12 @@
-<h1>Editing project</h1>
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><%= link_to "Entrypoint", root_path %></li>
+    <li><%= link_to "Projects", projects_path %></li>
+    <li><%= link_to @project.name, @project %></li>
+    <li class="is-active"><a href="#" aria-current="page">Renam</a></li>
+  </ul>
+</nav>
+
+<h1 class="title">Rename project</h1>
 
 <%= render "form", project: @project %>
-
-<br>
-
-<div>
-  <%= link_to "Back", @project %>
-</div>

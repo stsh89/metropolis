@@ -30,7 +30,7 @@ class ModelsController < ApplicationController
   # DELETE /projects/book-store/models/book
   def destroy
     @model.destroy(@project)
-    redirect_to project_models_path(@project), notice: "Model was successfully destroyed.", status: :see_other
+    redirect_to @project, notice: "Model was successfully destroyed.", status: :see_other
   end
 
   private

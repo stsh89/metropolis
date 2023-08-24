@@ -7,16 +7,14 @@ export default class extends Controller {
   async connect() {
     mermaid.initialize({ startOnLoad: false  });
 
+    await this.drawDiagram();
+  }
+
+  async drawDiagram() {
     const input = this.inputTarget;
     const output = this.outputTarget;
-
-    const drawDiagram = async function () {
-      const graphDefinition = input.value;
-      console.log(graphDefinition);
-      const { svg  } = await mermaid.render('graphDiv', graphDefinition);
-      output.innerHTML = svg;
-    };
-
-    await drawDiagram();
+    const graphDefinition = input.value;
+    const { svg  } = await mermaid.render('graphDiv', graphDefinition);
+    output.innerHTML = svg;
   }
 }

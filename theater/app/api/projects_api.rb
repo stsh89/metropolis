@@ -114,7 +114,7 @@ class ProjectsApi
   end
 
   def restore_project(project)
-    @stub.archive_project(Proto::Temple::V1::RestoreProjectRequest.new(
+    @stub.restore_project(Proto::Temple::V1::RestoreProjectRequest.new(
       slug: project.slug
     ))
   end

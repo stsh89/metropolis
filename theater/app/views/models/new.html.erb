@@ -1,9 +1,12 @@
-<h1>New model</h1>
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><%= link_to "Entrypoint", root_path %></li>
+    <li><%= link_to "Projects", projects_path %></li>
+    <li><%= link_to @project.name, @project %></li>
+    <li class="is-active"><a href="#" aria-current="page">New</a></li>
+  </ul>
+</nav>
+
+<h1 class="title">New model</h1>
 
 <%= render "form", model: @model %>
-
-<br>
-
-<div>
-  <%= link_to "Back", project_path(@project) %>
-</div>

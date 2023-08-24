@@ -11,27 +11,33 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name, autofocus: true %>
+  <div class="field">
+    <%= form.label :name, class: "label" %>
+    <%= form.text_field :name, autofocus: true, class: "input" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :kind, class: "label" %>
+
+    <div class="select">
+      <%= form.select :kind, [["Has many", "has_many"], ["Has one", "has_one"], ["Belongs to", "belongs_to"]], selected: "belongs_to" %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :associated_model_slug, "Associated model", class: "label" %>
+
+    <div class="select">
+      <%= form.select :associated_model_slug, @project.models.map { |m| [m.name, m.slug] } %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :description, class: "label" %>
+    <%= form.text_area :description, class: "textarea" %>
   </div>
 
   <div>
-    <%= form.label :kind, style: "display: block" %>
-    <%= form.select :kind, [["Has many", "has_many"], ["Has one", "has_one"], ["Belongs to", "belongs_to"]], selected: "belongs_to" %>
-  </div>
-
-  <div>
-    <%= form.label :associated_model_slug, "Associated model", style: "display: block" %>
-    <%= form.select :associated_model_slug, @project.models.map { |m| [m.name, m.slug] } %>
-  </div>
-
-  <div>
-    <%= form.label :description, style: "display: block" %>
-    <%= form.text_area :description %>
-  </div>
-
-  <div>
-    <%= form.submit %>
+    <%= form.submit class: "button is-primary"%>
   </div>
 <% end %>

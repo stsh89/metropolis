@@ -11,17 +11,17 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
+  <div class="field">
+    <%= form.label :name, class: "label", autofocus: true %>
+    <%= form.text_field :name, class: "input" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description, class: "label" %>
+    <%= form.text_area :description, class: "textarea" %>
   </div>
 
   <div>
-    <%= form.label :description, style: "display: block" %>
-    <%= form.text_area :description, readonly: model.persisted? %>
-  </div>
-
-  <div>
-    <%= form.submit %>
+    <%= form.submit class: "button is-primary" %>
   </div>
 <% end %>

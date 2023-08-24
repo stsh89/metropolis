@@ -1,5 +1,7 @@
 # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
+  resource :entrypoint, only: [:show]
+
   resources :archived_projects, only: [:index, :destroy, :show]
 
   resources :projects do
@@ -17,5 +19,5 @@ Rails.application.routes.draw do
   end
 
   # Defines the root path route ("/")
-  root "projects#index"
+  root "entrypoints#show"
 end

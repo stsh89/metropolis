@@ -18,11 +18,14 @@
   <body>
     <section class="section">
       <div class="container">
-        <%= yield %>
+        <div class="columns is-centered">
+          <div class="column is-two-thirds">
+            <div class="block">
+              <%= yield %>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
-
-    <script>
-    </script>
   </body>
 </html>

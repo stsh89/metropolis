@@ -1,12 +1,36 @@
 <p style="color: green"><%= notice %></p>
 
-<div>
-  <%= link_to "Back", projects_path %> |
-  <%= link_to "Models", project_models_path(@project) %> |
-  <%= link_to "Edit this project", edit_project_path(@project) %> |
-  <%= link_to "Class Diagram", project_class_diagram_path(@project) %> |
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><%= link_to "Entrypoint", root_path %></li>
+    <li><%= link_to "Projects", projects_path %></li>
+    <li class="is-active"><a href="#" aria-current="page"><%= @project.name %></a></li>
+  </ul>
+</nav>
 
-  <%= button_to "Archive this project", project_archive_path(@project), method: :put %>
+<h1 class="title"><%= @project.name %></h1>
+
+<div class="block">
+  <%= render @project %>
 </div>
 
-<%= render @project %>
+<div class="block">
+  <aside class="menu">
+    <ul class="menu-list">
+      <li><%= link_to "New model", new_project_model_path(@project) %></li>
+      <li><%= link_to "Class Diagram", project_class_diagram_path(@project) %></li>
+      <li><%= link_to "Rename this project", edit_project_path(@project) %></li>
+      <li><%= link_to "Archive this project", project_archive_path(@project), data: { "turbo-method": :put  } %></li>
+    </ul>
+  </aside>
+</div>
+
+<div id="models">
+  <% @project.models.each do |model| %>
+    <div class="block">
+      <%= render model %>
+
+      <%= link_to "Show this model", project_model_path(@project, model) %>
+    </div>
+  <% end %>
+</div>

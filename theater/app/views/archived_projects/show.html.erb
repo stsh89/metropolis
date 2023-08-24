@@ -1,11 +1,24 @@
 <p style="color: green"><%= notice %></p>
 
-<div>
-  <%= link_to "Back", archived_projects_path %>
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><%= link_to "Entrypoint", root_path %></li>
+    <li><%= link_to "Archive", archived_projects_path %></li>
+    <li class="is-active"><a href="#" aria-current="page"><%= @project.name %></a></li>
+  </ul>
+</nav>
 
-  <%= button_to "Restore this project", project_restore_path(@project), method: :put %>
+<h1 class="title"><%= @project.name %></h1>
 
-  <%= button_to "Destroy this project", archived_project_path(@project), method: :delete %>
+<div class="block">
+  <%= render @project %>
 </div>
 
-<%= render @project %>
+<div class="block">
+  <aside class="menu">
+    <ul class="menu-list">
+      <li><%= link_to "Restore this project", project_restore_path(@project), data: { "turbo-method": :put } %></li>
+      <li><%= link_to "Destroy this project", archived_project_path(@project), data: { "turbo-method": :delete , "turbo-confirm": "Are you sure?"} %></li>
+    </ul>
+  </aside>
+</div>

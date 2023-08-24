@@ -25,17 +25,23 @@ class Project
         .create_project(self)
         .project
 
-      Project.from_proto(proto_project)
+      project = Project.from_proto(proto_project)
+
+      @slug = project.slug
+
+      project
     else
       false
     end
   end
 
-  def update(params)
+  def rename(new_name)
+    @name = new_name
+
     if self.valid?
       proto_project = ProjectsApi
       .new
-      .rename_project(id: @slug, new_name: params[:name])
+      .rename_project(self)
       .project
 
       updated_project = Project.from_proto(proto_project)

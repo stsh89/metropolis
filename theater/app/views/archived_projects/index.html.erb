@@ -1,14 +1,20 @@
 <p style="color: green"><%= notice %></p>
 
-<h1>Archived projects</h1>
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><%= link_to "Entrypoint", root_path %></li>
+    <li class="is-active"><a href="#" aria-current="page">Archive</a></li>
+  </ul>
+</nav>
 
-<%= link_to "Projects", projects_path %>
+<h1 class="title">Archived projects</h1>
 
 <div id="projects">
   <% @projects.each do |project| %>
-    <%= render project %>
-    <p>
+    <div class="block">
+      <%= render project %>
+
       <%= link_to "Show this project", archived_project_path(project) %>
-    </p>
+    </div>
   <% end %>
 </div>

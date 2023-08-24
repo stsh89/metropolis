@@ -1,30 +1,48 @@
 <p style="color: green"><%= notice %></p>
 
-<div>
-  <%= link_to "Back", project_models_path(@project) %> |
-  <%= link_to "Class Diagram", project_model_class_diagram_path(@project, @model) %> |
-  <%= link_to "New attribute", new_project_model_attribute_path(@project, @model) %> |
-  <%= link_to "New association", new_project_model_association_path(@project, @model) %>
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><%= link_to "Entrypoint", root_path %></li>
+    <li><%= link_to "Projects", projects_path %></li>
+    <li><%= link_to @project.name, @project %></li>
+    <li class="is-active"><a href="#" aria-current="page"><%= @model.name %></a></li>
+  </ul>
+</nav>
 
-  <%= button_to "Destroy this model", project_model_path(@project, @model), method: :delete %>
+<h1 class="title"><%= @model.name %></h1>
+
+<div class="block">
+  <%= render @model %>
 </div>
 
-<%= render @model %>
+<div class="block">
+  <aside class="menu">
+    <ul class="menu-list">
+      <li><%= link_to "New attribute", new_project_model_attribute_path(@project, @model) %></li>
+      <li><%= link_to "New association", new_project_model_association_path(@project, @model) %></li>
+      <li><%= link_to "Class Diagram", project_model_class_diagram_path(@project, @model) %></li>
+      <li><%= link_to "Destroy this model", project_model_path(@project, @model), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?" } %></li>
+    </ul>
+  </aside>
+</div>
 
-<div id="model-associations">
+
+<div id="model-associations" class="block">
   <% @model.associations.each do |association| %>
-    <%= render association %>
-    <p>
-      <%= button_to "Destroy this association", project_model_association_path(@project, @model, association), method: :delete %>
-    </p>
+    <div class="block">
+      <%= render association %>
+
+      <%= link_to "Destroy this association", project_model_association_path(@project, @model, association), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?"} %>
+    </div>
   <% end %>
 </div>
 
 <div id="model-attributes">
   <% @model.attributes.each do |attribute| %>
-    <%= render attribute %>
-    <p>
-      <%= button_to "Destroy this attribute", project_model_attribute_path(@project, @model, attribute), method: :delete %>
-    </p>
+    <div class="block">
+      <%= render attribute %>
+
+      <%= link_to "Destroy this association", project_model_attribute_path(@project, @model, attribute), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?"} %>
+    </div>
   <% end %>
 </div>
