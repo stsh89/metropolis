@@ -20,7 +20,7 @@ mod tests {
     use super::*;
     use crate::{
         attribute_type::tests::{attribute_type_record_fixture, AttributeTypeRepo},
-        FoundationError, FoundationErrorCode,
+        FoundationErrorCode,
     };
 
     #[tokio::test]
