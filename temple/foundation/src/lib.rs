@@ -1,3 +1,7 @@
+//! The main module, which is a place for the definitions of the core entities
+//! and operations.
+
+pub mod attribute_type;
 pub mod datastore;
 pub mod model;
 pub mod project;
