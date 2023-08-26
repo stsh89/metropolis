@@ -1,6 +1,7 @@
 //! This module is dedicated to the [`AttributeType`] entity and the operations
 //! on it.
 
+mod create;
 mod get;
 mod list;
 
@@ -8,8 +9,17 @@ mod tests;
 
 use crate::{datastore::Record, FoundationResult};
 
+pub use create::execute as create;
 pub use get::execute as get;
 pub use list::execute as list;
+
+#[async_trait::async_trait]
+pub trait CreateAttributeTypeRecord {
+    async fn create_attribute_type_record(
+        &self,
+        attribute_type: AttributeType,
+    ) -> FoundationResult<AttributeTypeRecord>;
+}
 
 #[async_trait::async_trait]
 pub trait ListAttributeTypeRecords {

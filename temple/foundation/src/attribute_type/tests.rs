@@ -3,7 +3,7 @@
 use super::*;
 use crate::{
     datastore::tests::{RecordFactory, Repo},
-    FoundationError,
+    FoundationError, Utc, Uuid,
 };
 
 struct AttributeTypeFactory {}
@@ -19,6 +19,27 @@ impl AttributeTypeFactory {
 }
 
 pub type AttributeTypeRepo = Repo<AttributeType>;
+
+#[async_trait::async_trait]
+impl CreateAttributeTypeRecord for AttributeTypeRepo {
+    async fn create_attribute_type_record(
+        &self,
+        attribute_type: AttributeType,
+    ) -> FoundationResult<AttributeTypeRecord> {
+        let now = Utc::now();
+
+        let attribute_type_record = AttributeTypeRecord {
+            id: Uuid::new_v4(),
+            inner: attribute_type,
+            inserted_at: now,
+            updated_at: now,
+        };
+
+        self.save(attribute_type_record.clone()).await;
+
+        Ok(attribute_type_record)
+    }
+}
 
 #[async_trait::async_trait]
 impl ListAttributeTypeRecords for AttributeTypeRepo {
