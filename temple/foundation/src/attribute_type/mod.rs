@@ -1,17 +1,24 @@
 //! This module is dedicated to the [`AttributeType`] entity and the operations
 //! on it.
 
+mod get;
 mod list;
 
 mod tests;
 
 use crate::{datastore::Record, FoundationResult};
 
+pub use get::execute as get;
 pub use list::execute as list;
 
 #[async_trait::async_trait]
 pub trait ListAttributeTypeRecords {
     async fn list_attribute_type_records(&self) -> FoundationResult<Vec<AttributeTypeRecord>>;
+}
+
+#[async_trait::async_trait]
+pub trait GetAttributeTypeRecord {
+    async fn get_attribute_type_record(&self, slug: &str) -> FoundationResult<AttributeTypeRecord>;
 }
 
 #[derive(Clone, Debug, PartialEq)]

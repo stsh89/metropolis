@@ -1,7 +1,10 @@
 #![cfg(test)]
 
 use super::*;
-use crate::datastore::tests::{RecordFactory, Repo};
+use crate::{
+    datastore::tests::{RecordFactory, Repo},
+    FoundationError,
+};
 
 struct AttributeTypeFactory {}
 
@@ -21,6 +24,21 @@ pub type AttributeTypeRepo = Repo<AttributeType>;
 impl ListAttributeTypeRecords for AttributeTypeRepo {
     async fn list_attribute_type_records(&self) -> FoundationResult<Vec<AttributeTypeRecord>> {
         Ok(self.records().await)
+    }
+}
+
+#[async_trait::async_trait]
+impl GetAttributeTypeRecord for AttributeTypeRepo {
+    async fn get_attribute_type_record(&self, slug: &str) -> FoundationResult<AttributeTypeRecord> {
+        let record = self
+            .records()
+            .await
+            .iter()
+            .find(|record| record.inner.slug == slug)
+            .ok_or(FoundationError::not_found("AttributeType not found."))?
+            .to_owned();
+
+        Ok(record)
     }
 }
 
