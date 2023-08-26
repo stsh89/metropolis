@@ -3,10 +3,11 @@
 pub mod model;
 pub mod project;
 
-mod tests;
+pub mod tests;
 
 use crate::{UtcDateTime, Uuid};
 
+#[derive(Clone, Debug)]
 /// Generic representation of the model in the repository.
 pub struct Record<T> {
     /// Identifier that is unique within the list of all records.

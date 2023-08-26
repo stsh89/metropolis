@@ -2,6 +2,8 @@
 
 use super::*;
 use crate::Utc;
+use std::collections::HashMap;
+use tokio::sync::RwLock;
 
 #[derive(Clone, Debug, PartialEq)]
 struct Book {
@@ -20,10 +22,35 @@ impl BookFactory {
     }
 }
 
-struct RecordFactory {}
+pub struct RecordFactory {}
+
+pub struct Repo<T> {
+    records: RwLock<HashMap<Uuid, Record<T>>>,
+}
+
+impl<T> Repo<T> {
+    pub fn new() -> Self {
+        Self {
+            records: Default::default(),
+        }
+    }
+
+    pub async fn records(&self) -> Vec<Record<T>>
+    where
+        T: Clone,
+    {
+        self.records.read().await.values().cloned().collect()
+    }
+
+    pub async fn save(&self, record: Record<T>) {
+        let mut records = self.records.write().await;
+
+        records.insert(record.id, record);
+    }
+}
 
 impl RecordFactory {
-    fn build<T>(inner: &T) -> Record<T>
+    pub fn build<T>(inner: &T) -> Record<T>
     where
         T: Clone,
     {
