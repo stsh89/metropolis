@@ -1,8 +1,11 @@
+//! [`AttributeType`]s listing.
+
 use crate::{
     attribute_type::{AttributeType, ListAttributeTypeRecords},
     FoundationResult,
 };
 
+/// List all [`AttributeType`]s.
 pub async fn execute(repo: &impl ListAttributeTypeRecords) -> FoundationResult<Vec<AttributeType>> {
     let attribute_types = repo
         .list_attribute_type_records()
