@@ -42,6 +42,25 @@ impl CreateAttributeTypeRecord for AttributeTypeRepo {
 }
 
 #[async_trait::async_trait]
+impl UpdateAttributeTypeRecord for AttributeTypeRepo {
+    async fn update_attribute_type_record(
+        &self,
+        attribute_type_record: AttributeTypeRecord,
+    ) -> FoundationResult<AttributeTypeRecord> {
+        let mut attribute_type_records = self.records.write().await;
+
+        let attribute_type_record = AttributeTypeRecord {
+            updated_at: Utc::now(),
+            ..attribute_type_record
+        };
+
+        attribute_type_records.insert(attribute_type_record.id, attribute_type_record.clone());
+
+        Ok(attribute_type_record)
+    }
+}
+
+#[async_trait::async_trait]
 impl DeleteAttributeTypeRecord for AttributeTypeRepo {
     async fn delete_attribute_type_record(
         &self,

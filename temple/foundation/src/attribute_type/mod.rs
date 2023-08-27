@@ -5,6 +5,7 @@ mod create;
 mod delete;
 mod get;
 mod list;
+mod update;
 
 mod tests;
 
@@ -14,12 +15,21 @@ pub use create::execute as create;
 pub use delete::execute as delete;
 pub use get::execute as get;
 pub use list::execute as list;
+pub use update::execute as update;
 
 #[async_trait::async_trait]
 pub trait CreateAttributeTypeRecord {
     async fn create_attribute_type_record(
         &self,
         attribute_type: AttributeType,
+    ) -> FoundationResult<AttributeTypeRecord>;
+}
+
+#[async_trait::async_trait]
+pub trait UpdateAttributeTypeRecord {
+    async fn update_attribute_type_record(
+        &self,
+        attribute_type: AttributeTypeRecord,
     ) -> FoundationResult<AttributeTypeRecord>;
 }
 
