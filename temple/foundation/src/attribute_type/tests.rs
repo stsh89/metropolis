@@ -3,7 +3,7 @@
 use super::*;
 use crate::{
     datastore::tests::{RecordFactory, Repo},
-    FoundationError, Utc, Uuid,
+    Utc, Uuid,
 };
 
 struct AttributeTypeFactory {}
@@ -42,6 +42,20 @@ impl CreateAttributeTypeRecord for AttributeTypeRepo {
 }
 
 #[async_trait::async_trait]
+impl DeleteAttributeTypeRecord for AttributeTypeRepo {
+    async fn delete_attribute_type_record(
+        &self,
+        attribute_type_record: AttributeTypeRecord,
+    ) -> FoundationResult<()> {
+        let mut records = self.records.write().await;
+
+        records.remove(&attribute_type_record.id);
+
+        Ok(())
+    }
+}
+
+#[async_trait::async_trait]
 impl ListAttributeTypeRecords for AttributeTypeRepo {
     async fn list_attribute_type_records(&self) -> FoundationResult<Vec<AttributeTypeRecord>> {
         Ok(self.records().await)
@@ -50,7 +64,10 @@ impl ListAttributeTypeRecords for AttributeTypeRepo {
 
 #[async_trait::async_trait]
 impl GetAttributeTypeRecord for AttributeTypeRepo {
-    async fn get_attribute_type_record(&self, slug: &str) -> FoundationResult<Option<AttributeTypeRecord>> {
+    async fn get_attribute_type_record(
+        &self,
+        slug: &str,
+    ) -> FoundationResult<Option<AttributeTypeRecord>> {
         let maybe_record = self
             .records()
             .await

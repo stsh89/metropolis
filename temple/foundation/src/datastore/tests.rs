@@ -25,7 +25,7 @@ impl BookFactory {
 pub struct RecordFactory {}
 
 pub struct Repo<T> {
-    records: RwLock<HashMap<Uuid, Record<T>>>,
+    pub records: RwLock<HashMap<Uuid, Record<T>>>,
 }
 
 impl<T> Repo<T> {

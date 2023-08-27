@@ -11,6 +11,7 @@ mod tests;
 use crate::{datastore::Record, FoundationResult};
 
 pub use create::execute as create;
+pub use delete::execute as delete;
 pub use get::execute as get;
 pub use list::execute as list;
 
@@ -29,7 +30,18 @@ pub trait ListAttributeTypeRecords {
 
 #[async_trait::async_trait]
 pub trait GetAttributeTypeRecord {
-    async fn get_attribute_type_record(&self, slug: &str) -> FoundationResult<Option<AttributeTypeRecord>>;
+    async fn get_attribute_type_record(
+        &self,
+        slug: &str,
+    ) -> FoundationResult<Option<AttributeTypeRecord>>;
+}
+
+#[async_trait::async_trait]
+pub trait DeleteAttributeTypeRecord {
+    async fn delete_attribute_type_record(
+        &self,
+        attribute_type_record: AttributeTypeRecord,
+    ) -> FoundationResult<()>;
 }
 
 #[derive(Clone, Debug, PartialEq)]
