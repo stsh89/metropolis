@@ -35,3 +35,7 @@ And serve:
 ```
 python3 -m http.server 8002 --directory target/doc/
 ```
+
+## Useful links
+
+* [Style guide](https://doc.rust-lang.org/beta/style-guide/index.html)

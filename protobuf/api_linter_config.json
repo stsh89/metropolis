@@ -16,6 +16,7 @@
       "core::0133::request-parent-required",
       "core::0133::request-resource-field",
       "core::0133::request-unknown-fields",
+      "core::0134::method-signature",
       "core::0135::method-signature",
       "core::0135::request-name-required",
       "core::0135::request-unknown-fields",

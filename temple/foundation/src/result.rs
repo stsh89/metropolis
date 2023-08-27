@@ -1,3 +1,5 @@
+use crate::util::validator::{ValidationError, ValidationErrorKind};
+
 pub type FoundationResult<T> = Result<T, FoundationError>;
 
 #[derive(Clone)]
@@ -128,5 +130,24 @@ impl std::fmt::Display for FoundationError {
 impl std::error::Error for FoundationError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         self.source.as_ref().map(|err| (&**err) as _)
+    }
+}
+
+impl From<ValidationError> for FoundationError {
+    fn from(value: ValidationError) -> Self {
+        use ValidationErrorKind::*;
+
+        let ValidationError { field_name, kind } = value;
+
+        match kind {
+            Required => {
+                let message = format!("{field_name} can't be blank");
+                FoundationError::invalid_argument(message)
+            }
+            MaxLength(max) => {
+                let message = format!("{field_name} is too long, maximum length is {max} bytes");
+                FoundationError::invalid_argument(message)
+            }
+        }
     }
 }
