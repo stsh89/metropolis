@@ -64,7 +64,7 @@ message ListAttributeTypesResponse {
 message UpdateAttributeTypeRequest {
     // Required. The attribute type to update.
     //
-    // The attribute type's `slug` field is used to identify the attribute to be updated.
+    // The attribute type's `slug` field is used to identify the attribute type to be updated.
     AttributeType attribute_type = 1;
 
     // The list of fields to be updated.
