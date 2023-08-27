@@ -2,7 +2,7 @@
 
 use crate::{
     attribute_type::{AttributeType, GetAttributeTypeRecord},
-    FoundationResult, FoundationError,
+    FoundationError, FoundationResult,
 };
 
 /// Find [`AttributeType`] by slug.
@@ -10,8 +10,7 @@ pub async fn execute(
     repo: &impl GetAttributeTypeRecord,
     slug: &str,
 ) -> FoundationResult<AttributeType> {
-    let attribute_type =
-        repo
+    let attribute_type = repo
         .get_attribute_type_record(slug)
         .await?
         .ok_or(FoundationError::not_found("Attribute type not found."))?
@@ -48,6 +47,7 @@ mod tests {
         let error = execute(&repo, "bigint").await.unwrap_err();
 
         assert!(matches!(error.code(), FoundationErrorCode::NotFound));
+        assert_eq!(error.message(), "Attribute type not found.");
 
         Ok(())
     }
