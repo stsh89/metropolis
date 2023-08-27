@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+package proto.gymnasium.v1.attribute_types;
+
+// Attribute types API.
+service AttributeTypes {
+    // Create attribute type.
+    rpc CreateAttributeType(CreateAttributeTypeRequest) returns (AttributeType);
+
+    // Show properties of the single attribute type.
+    rpc FindAttributeType(FindAttributeTypeRequest) returns (AttributeType);
+
+    // List all attribute types.
+    rpc ListAttributeTypes(ListAttributeTypesRequest) returns (ListAttributeTypesResponse);
+
+    // Modify the properties of the attribute type.
+    rpc UpdateAttributeType(UpdateAttributeTypeRequest) returns (AttributeType);
+
+    // Delete attribute type.
+    rpc DeleteAttributeType(DeleteAttributeTypeRequest) returns (google.protobuf.Empty);
+}
+
+// Representation of attribute type.
+message AttributeType {
+    // Mandatory field. Unique identifier of the attribute type. UUID in the string form.
+    string id = 1;
+
+    // A short hint about how the type is used or what it's intended for.
+    string description = 2;
+
+    // Mandatory field. A short, meaningful title of the attribute type.
+    string name = 3;
+
+    // Mandatory field. Unique web identifier of the attribute type.
+    string slug = 4;
+
+    // Mandatory field. The time the attribute type was created.
+    google.protobuf.Timestamp create_time = 5;
+
+    // Mandatory field. The last time that the attribute type was changed.
+    google.protobuf.Timestamp update_time = 6;
+}
+
+
+// Client's request to create attribute type.
+message CreateAttributeTypeRequest {
+    // A short hint about how the type is used or what it's intended for.
+    string description = 1;
+
+    // Required. A short, meaningful title of the attribute type.
+    string name = 2;
+
+    // Required. Unique web identifier of the attribute type.
+    string slug = 3;
+}
+
+// Client's request to show single attribute type.
+message FindAttributeTypeRequest {
+    // Required. Unique web identifier of the attribute type.
+    string slug = 1;
+}
+
+// Client's request to list attribute types.
+message ListAttributeTypesRequest {}
+
+// Server's request on attribute types list request.
+message ListAttributeTypesResponse {
+    // List of the attribute types.
+    repeated AttributeType attribute_types = 1;
+}
+
+// Client's request to update attribute type.
+message UpdateAttributeTypeRequest {
+    // Required. The attribute type to update.
+    //
+    // The attribute type's `id` field is used to identify the attribute type to be updated.
+    AttributeType attribute_type = 1;
+
+    // The list of fields to be updated.
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+// Client's request to delete single attribute type.
+message DeleteAttributeTypeRequest {
+    // Required. Unique identifier of the attribute type.
+    string id = 1;
+}
