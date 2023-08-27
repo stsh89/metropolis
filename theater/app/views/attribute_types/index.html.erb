@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Attribute types</h1>
+
+<div id="attribute_types">
+  <% @attribute_types.each do |attribute_type| %>
+    <%= render attribute_type %>
+    <p>
+      <%= link_to "Show this attribute type", attribute_type %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New attribute type", new_attribute_type_path %>
