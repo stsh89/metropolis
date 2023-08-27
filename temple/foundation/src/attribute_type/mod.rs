@@ -9,7 +9,7 @@ mod update;
 
 mod tests;
 
-use crate::{datastore::Record, FoundationResult};
+use crate::{datastore::Record, util, FoundationResult};
 
 pub use create::execute as create;
 pub use delete::execute as delete;
@@ -74,4 +74,16 @@ impl From<AttributeTypeRecord> for AttributeType {
     fn from(value: AttributeTypeRecord) -> Self {
         value.into_inner()
     }
+}
+
+fn validate_slug(slug: &str) -> FoundationResult<()> {
+    let validation_errors = util::validator::Validator::new()
+        .validate_required("slug", slug)
+        .validate();
+
+    if validation_errors.is_empty() {
+        return Ok(());
+    }
+
+    Err(validation_errors.first().cloned().unwrap().into())
 }

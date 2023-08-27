@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+package proto.temple.v1;
+
+// Attribute types API.
+service AttributeTypes {
+    // Create attribute type.
+    rpc CreateAttributeType(CreateAttributeTypeRequest) returns (AttributeType);
+
+    // Show properties of the single attribute type.
+    rpc GetAttributeType(GetAttributeTypeRequest) returns (AttributeType);
+
+    // List all attribute types.
+    rpc ListAttributeTypes(ListAttributeTypesRequest) returns (ListAttributeTypesResponse);
+
+    // Modify the properties of the attribute type.
+    rpc UpdateAttributeType(UpdateAttributeTypeRequest) returns (AttributeType);
+
+    // Delete attribute type.
+    rpc DeleteAttributeType(DeleteAttributeTypeRequest) returns (google.protobuf.Empty);
+}
+
+// Representation of attribute type.
+message AttributeType {
+    // A short hint about how the type is used or what it's intended for.
+    string description = 1;
+
+    // Mandatory field. A short, meaningful title of the attribute type.
+    string name = 2;
+
+    // Mandatory field. Unique web identifier of the attribute type.
+    string slug = 3;
+}
+
+
+// Client's request to create attribute type.
+message CreateAttributeTypeRequest {
+    // A short hint about how the type is used or what it's intended for.
+    string description = 1;
+
+    // Required. A short, meaningful title of the attribute type.
+    string name = 2;
+}
+
+// Client's request to show single attribute type.
+message GetAttributeTypeRequest {
+    // Required. Unique web identifier of the attribute type.
+    string slug = 1;
+}
+
+// Client's request to list attribute types.
+message ListAttributeTypesRequest {}
+
+// Server's request on attribute types list request.
+message ListAttributeTypesResponse {
+    // List of the attribute types.
+    repeated AttributeType attribute_types = 1;
+}
+
+// Client's request to update attribute type.
+message UpdateAttributeTypeRequest {
+    // Required. The attribute type to update.
+    //
+    // The attribute type's `slug` field is used to identify the attribute to be updated.
+    AttributeType attribute_type = 1;
+
+    // The list of fields to be updated.
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+// Client's request to delete single attribute type.
+message DeleteAttributeTypeRequest {
+    // Required. Unique web identifier of the attribute type.
+    string slug = 1;
+}

@@ -1,19 +1,19 @@
 //! Get single [`AttributeType`].
 
-use crate::{
-    attribute_type::{AttributeType, GetAttributeTypeRecord},
-    FoundationError, FoundationResult,
-};
+use super::{validate_slug, AttributeType, GetAttributeTypeRecord};
+use crate::{FoundationError, FoundationResult};
 
 /// Find [`AttributeType`] by slug.
 pub async fn execute(
     repo: &impl GetAttributeTypeRecord,
     slug: &str,
 ) -> FoundationResult<AttributeType> {
+    validate_slug(slug)?;
+
     let attribute_type = repo
         .get_attribute_type_record(slug)
         .await?
-        .ok_or(FoundationError::not_found("Attribute type not found."))?
+        .ok_or(FoundationError::not_found("attribute type not found"))?
         .into();
 
     Ok(attribute_type)
@@ -47,7 +47,19 @@ mod tests {
         let error = execute(&repo, "bigint").await.unwrap_err();
 
         assert!(matches!(error.code(), FoundationErrorCode::NotFound));
-        assert_eq!(error.message(), "Attribute type not found.");
+        assert_eq!(error.message(), "attribute type not found");
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn it_returns_invalid_argument_error() -> FoundationResult<()> {
+        let repo = AttributeTypeRepo::new();
+
+        let error = execute(&repo, "").await.unwrap_err();
+
+        assert!(matches!(error.code(), FoundationErrorCode::InvalidArgument));
+        assert_eq!(error.message(), "slug can't be blank");
 
         Ok(())
     }

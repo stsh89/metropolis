@@ -1,15 +1,15 @@
 //! [`AttributeType`]'s deletion logic.
 
-use crate::{
-    attribute_type::{DeleteAttributeTypeRecord, GetAttributeTypeRecord},
-    FoundationError, FoundationResult,
-};
+use super::{validate_slug, DeleteAttributeTypeRecord, GetAttributeTypeRecord};
+use crate::{FoundationError, FoundationResult};
 
 /// Delete [`AttributeType`] by slug.
 pub async fn execute(
     repo: &(impl GetAttributeTypeRecord + DeleteAttributeTypeRecord),
     slug: &str,
 ) -> FoundationResult<()> {
+    validate_slug(slug)?;
+
     let attribute_type_record = repo
         .get_attribute_type_record(slug)
         .await?
@@ -47,6 +47,18 @@ mod tests {
 
         assert!(matches!(error.code(), FoundationErrorCode::NotFound));
         assert_eq!(error.message(), "Attribute type not found.");
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn it_returns_invalid_argument_error() -> FoundationResult<()> {
+        let repo = AttributeTypeRepo::new();
+
+        let error = execute(&repo, "").await.unwrap_err();
+
+        assert!(matches!(error.code(), FoundationErrorCode::InvalidArgument));
+        assert_eq!(error.message(), "slug can't be blank");
 
         Ok(())
     }
