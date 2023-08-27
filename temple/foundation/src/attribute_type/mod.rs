@@ -2,6 +2,7 @@
 //! on it.
 
 mod create;
+mod delete;
 mod get;
 mod list;
 
@@ -28,7 +29,7 @@ pub trait ListAttributeTypeRecords {
 
 #[async_trait::async_trait]
 pub trait GetAttributeTypeRecord {
-    async fn get_attribute_type_record(&self, slug: &str) -> FoundationResult<AttributeTypeRecord>;
+    async fn get_attribute_type_record(&self, slug: &str) -> FoundationResult<Option<AttributeTypeRecord>>;
 }
 
 #[derive(Clone, Debug, PartialEq)]

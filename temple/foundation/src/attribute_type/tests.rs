@@ -50,16 +50,15 @@ impl ListAttributeTypeRecords for AttributeTypeRepo {
 
 #[async_trait::async_trait]
 impl GetAttributeTypeRecord for AttributeTypeRepo {
-    async fn get_attribute_type_record(&self, slug: &str) -> FoundationResult<AttributeTypeRecord> {
-        let record = self
+    async fn get_attribute_type_record(&self, slug: &str) -> FoundationResult<Option<AttributeTypeRecord>> {
+        let maybe_record = self
             .records()
             .await
             .iter()
             .find(|record| record.inner.slug == slug)
-            .ok_or(FoundationError::not_found("AttributeType not found."))?
-            .to_owned();
+            .cloned();
 
-        Ok(record)
+        Ok(maybe_record)
     }
 }
 
