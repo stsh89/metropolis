@@ -23,7 +23,6 @@ class ModelAssociation
   end
 
   def save(project, model)
-    puts(self.associated_model_slug)
     if self.valid?
       proto_association = ProjectsApi
         .new

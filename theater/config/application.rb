@@ -33,5 +33,7 @@ module Theater
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    config.api_interaction_kind = :in_memory
   end
 end

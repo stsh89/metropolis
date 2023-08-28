@@ -4,12 +4,12 @@ RSpec.describe "attribute_types/index", type: :view do
   before(:each) do
     assign(:attribute_types, [
       AttributeType.create!(
-        name: "Name",
-        description: "MyText"
+        name: "Bigint",
+        description: "Long-ranged integer."
       ),
       AttributeType.create!(
-        name: "Name",
-        description: "MyText"
+        name: "Float",
+        description: "Inexact, variable-precision numeric type."
       )
     ])
   end
@@ -17,7 +17,7 @@ RSpec.describe "attribute_types/index", type: :view do
   it "renders a list of attribute_types" do
     render
     cell_selector = Rails::VERSION::STRING >= '7' ? 'div>p' : 'tr>td'
-    assert_select cell_selector, text: Regexp.new("Name".to_s), count: 2
-    assert_select cell_selector, text: Regexp.new("MyText".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Bigint".to_s), count: 1
+    assert_select cell_selector, text: Regexp.new("Float".to_s), count: 1
   end
 end

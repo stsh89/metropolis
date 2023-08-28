@@ -1,9 +1,7 @@
-<h1>New attribute type</h1>
+<%= render "ui/components/breadcrumbs",
+    breadcrumbs: attribute_types_breadcrumbs(page_code: :new),
+    current_page_name: "New" %>
+
+<%= render "ui/elements/title", title: "New attribute type" %>
 
 <%= render "form", attribute_type: @attribute_type %>
-
-<br>
-
-<div>
-  <%= link_to "Back to attribute types", attribute_types_path %>
-</div>

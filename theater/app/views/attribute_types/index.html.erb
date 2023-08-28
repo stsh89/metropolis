@@ -1,14 +1,14 @@
 <p style="color: green"><%= notice %></p>
 
-<h1>Attribute types</h1>
+<%= render "ui/components/breadcrumbs",
+    breadcrumbs: attribute_types_breadcrumbs(page_code: :index),
+    current_page_name: "Attribute types" %>
 
-<div id="attribute_types">
-  <% @attribute_types.each do |attribute_type| %>
-    <%= render attribute_type %>
-    <p>
-      <%= link_to "Show this attribute type", attribute_type %>
-    </p>
-  <% end %>
-</div>
+<%= render "ui/elements/title", title: "Attribute types" %>
 
-<%= link_to "New attribute type", new_attribute_type_path %>
+<%= render "ui/components/actions", links: [
+    link_to("New", new_attribute_type_path)
+] %>
+
+<%= render "ui/components/simple_cards_list", values: attribute_types_simple_card_values(@attribute_types) %>
+

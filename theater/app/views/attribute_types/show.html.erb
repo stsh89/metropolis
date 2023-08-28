@@ -1,10 +1,14 @@
 <p style="color: green"><%= notice %></p>
 
+<%= render "ui/components/breadcrumbs",
+    breadcrumbs: attribute_types_breadcrumbs(page_code: :show),
+    current_page_name: @attribute_type.name %>
+
+<%= render "ui/elements/title", title: @attribute_type.name %>
+
+<%= render "ui/components/actions", links: [
+    link_to("Edit", edit_attribute_type_path(@attribute_type)),
+    link_to("Delete", @attribute_type, data: { "turbo-method": :delete , "turbo-confirm": "Are you sure?"})
+] %>
+
 <%= render @attribute_type %>
-
-<div>
-  <%= link_to "Edit this attribute type", edit_attribute_type_path(@attribute_type) %> |
-  <%= link_to "Back to attribute types", attribute_types_path %>
-
-  <%= button_to "Destroy this attribute type", @attribute_type, method: :delete %>
-</div>

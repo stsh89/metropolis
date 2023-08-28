@@ -1,0 +1,9 @@
+<div class="block">
+  <div class="is-flex is-flex-wrap-wrap">
+    <% values.each do |value| %>
+      <div class="block pr-2">
+        <%= render "ui/components/simple_card", name: value[:name], show_path: value[:show_path] %>
+      </div>
+    <% end %>
+  </div>
+</div>
