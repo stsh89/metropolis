@@ -1,6 +1,4 @@
 class EntrypointsController < ApplicationController
-
   # GET /
-  def show
-  end
+  def show; end
 end
