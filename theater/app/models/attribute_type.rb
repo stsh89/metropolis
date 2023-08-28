@@ -2,11 +2,7 @@ class AttributeType
   include ActiveModel::API
   include ActiveModel::Validations
 
-  attr_accessor :description
-
-  attr_accessor :name
-
-  attr_accessor :slug
+  attr_accessor :description, :name, :slug
 
   validates :name, presence: true
 
@@ -19,37 +15,21 @@ class AttributeType
   end
 
   def save
-    if self.valid?
-      proto_attribute_type = AttributeTypesApi
-        .instance
-        .create_attribute_type(self)
+    return if invalid?
 
-      attribute_type = AttributeType.from_proto(proto_attribute_type)
-
-      @slug = attribute_type.slug
-
-      attribute_type
-    else
-      false
-    end
+    proto_attribute_type = AttributeTypesApi.instance.create_attribute_type(self)
+    @slug = proto_attribute_type.slug
+    AttributeType.from_proto(proto_attribute_type)
   end
 
   def update(params)
-    self.assign_attributes(params)
+    assign_attributes(params)
 
-    if self.valid?
-      proto_attribute_type = AttributeTypesApi
-        .instance
-        .update_attribute_type(self)
+    return if invalid?
 
-      attribute_type = AttributeType.from_proto(proto_attribute_type)
-
-      @slug = attribute_type.slug
-
-      attribute_type
-    else
-      false
-    end
+    proto_attribute_type = AttributeTypesApi.instance.update_attribute_type(self)
+    @slug = proto_attribute_type.slug
+    AttributeType.from_proto(proto_attribute_type)
   end
 
   def destroy
@@ -73,7 +53,7 @@ class AttributeType
       AttributeType.new(
         description: proto_attribute_type.description,
         name: proto_attribute_type.name,
-        slug: proto_attribute_type.slug
+        slug: proto_attribute_type.slug,
       )
     end
 
@@ -88,8 +68,8 @@ class AttributeType
     def find(id)
       proto_attribute_type =
         AttributeTypesApi
-        .instance
-        .get_attribute_type(id)
+          .instance
+          .get_attribute_type(id)
 
       AttributeType.from_proto(proto_attribute_type)
     end
@@ -108,8 +88,8 @@ class AttributeType
     def create!(attributes)
       attribute_type = AttributeType.new(attributes).save
 
-      if !attribute_type
-        raise StandardError.new("can't create attribute type with invalid attributes")
+      unless attribute_type
+        raise StandardError, "can't create attribute type with invalid attributes"
       end
 
       attribute_type
