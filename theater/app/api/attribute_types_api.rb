@@ -2,6 +2,7 @@ require Rails.root.join("lib/proto/temple/v1/attribute_types_pb").to_s
 require Rails.root.join("lib/proto/temple/v1/attribute_types_services_pb.rb").to_s
 require "google/protobuf/well_known_types"
 
+# API definitions around attribute types.
 class AttributeTypesApi
   include Singleton
 
@@ -9,26 +10,51 @@ class AttributeTypesApi
     @client = initialize_client
   end
 
+  # Request API to create new attribute type
+  #
+  # @param attribute_type [AttributeType]
+  # @return [AttributeType] new attribute type with generated slug
   def create_attribute_type(attribute_type)
-    @client.create_attribute_type(attribute_type)
+    response = @client.create_attribute_type(attribute_type)
+    to_model(response)
   end
 
+  # Request API to list attribute types.
+  #
+  # @return [Array<AttributeType>]
   def list_attribute_types
-    @client.list_attribute_types
+    response = @client.list_attribute_types
+    to_model_list(response.attribute_types)
   end
 
+  # Request API to get single attribute type.
+  #
+  # @param id [String] slug of the attribute type
+  # @return [AttributeType]
   def get_attribute_type(id)
-    @client.get_attribute_type(id)
+    response = @client.get_attribute_type(id)
+    to_model(response)
   end
 
+  # Request API to update attribute type.
+  #
+  # @param attribute_type [AttributeType]
+  # @return [AttributeType] with the updated values
   def update_attribute_type(attribute_type)
-    @client.update_attribute_type(attribute_type)
+    response = @client.update_attribute_type(attribute_type)
+    to_model(response)
   end
 
+  # Request API to delete attribute type.
+  #
+  # @param attribute_type [AttributeType] to delete
+  # @return nil
   def delete_attribute_type(attribute_type)
-    @client.delete_attribute_type(attribute_type)
+    _response = @client.delete_attribute_type(attribute_type)
+    nil
   end
 
+  # Remove all attribute types. Used for testing purposed only.
   def delete_all_attribute_types
     @client.delete_all_attribute_types
   end
@@ -37,64 +63,17 @@ class AttributeTypesApi
 
   def initialize_client
     {
-      in_memory: InMemoryAttributeTypesApi,
+      in_memory: InMemoryAttributeTypesApiClient,
     }
       .fetch(Theater::Application.config.api_interaction_kind)
       .new
   end
 
-  class InMemoryAttributeTypesApi
-    def initialize
-      @attribute_types = []
-    end
+  def to_model(proto)
+    AttributeTypeApiConverter.to_model(proto)
+  end
 
-    # rubocop:todo Metrics/MethodLength
-    def create_attribute_type(attribute_type)
-      proto_attribute_type = Proto::Temple::V1::AttributeType.new(
-        description: attribute_type.description,
-        name: attribute_type.name,
-        slug: attribute_type.name.downcase,
-      )
-
-      @attribute_types.push(proto_attribute_type)
-      @attribute_types.sort_by!(&:name)
-
-      proto_attribute_type
-    end
-    # rubocop:enable Metrics/MethodLength
-
-    def list_attribute_types
-      Proto::Temple::V1::ListAttributeTypesResponse.new(
-        attribute_types: @attribute_types,
-      )
-    end
-
-    def get_attribute_type(id)
-      @attribute_types.detect { |at| at.slug == id }
-    end
-
-    # rubocop:todo Metrics/MethodLength
-    def update_attribute_type(attribute_type)
-      proto_attribute_type = Proto::Temple::V1::AttributeType.new(
-        description: attribute_type.description,
-        name: attribute_type.name,
-        slug: attribute_type.slug,
-      )
-
-      @attribute_types.delete_if { |at| at.slug == attribute_type.slug }
-      @attribute_types.push(proto_attribute_type)
-      @attribute_types.sort_by!(&:name)
-
-      proto_attribute_type
-    end
-    # rubocop:enable Metrics/MethodLength
-
-    def delete_attribute_type(attribute_type)
-      @attribute_types.delete_if { |at| at.slug == attribute_type.slug }
-    end
-
-    def delete_all_attribute_types
-      @attribute_types = []
-    end
+  def to_model_list(protos)
+    protos.map { |proto| to_model(proto) }
   end
 end
