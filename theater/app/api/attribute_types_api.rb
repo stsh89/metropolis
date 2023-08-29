@@ -2,7 +2,7 @@ require Rails.root.join("lib/proto/temple/v1/attribute_types_pb").to_s
 require Rails.root.join("lib/proto/temple/v1/attribute_types_services_pb.rb").to_s
 require "google/protobuf/well_known_types"
 
-# API definitions around attribute types.
+# Remote API around attribute types.
 class AttributeTypesApi
   include Singleton
 
@@ -62,11 +62,19 @@ class AttributeTypesApi
   private
 
   def initialize_client
-    {
-      in_memory: InMemoryAttributeTypesApiClient,
-    }
-      .fetch(Theater::Application.config.api_interaction_kind)
-      .new
+    api_client.new
+  end
+
+  def api_interaction_kind
+    kind = Theater::Application.config.api_interaction_kind
+
+    return kind.to_s if kind.in?(%i[in_memory grpc])
+
+    raise StandardError, "not a valid API interaction kind"
+  end
+
+  def api_client
+    "#{api_interaction_kind.camelcase}AttributeTypesApiClient".constantize
   end
 
   def to_model(proto)
