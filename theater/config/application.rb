@@ -34,6 +34,13 @@ module Theater
     # Don't generate system test files.
     config.generators.system_tests = nil
 
-    config.api_interaction_kind = :in_memory
+    config.app_env = ENV["APP_ENV"].present? ? :live : :sandbox
+
+    config.api_interaction_kind =
+      if config.app_env == :sandbox
+        :in_memory
+      else
+        :grpc
+      end
   end
 end

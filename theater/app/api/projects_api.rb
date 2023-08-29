@@ -65,7 +65,7 @@ class ProjectsApi
 
   def get_project(slug)
     @stub.get_project(Proto::Temple::V1::GetProjectRequest.new(
-      slug:,
+      slug: slug,
     ))
   end
 
