@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render "ui/components/breadcrumbs",
+    breadcrumbs: attribute_types_breadcrumbs(page_code: :index),
+    current_page_name: "Attribute types" %>
+
+<%= render "ui/elements/title", title: "Attribute types" %>
+
+<%= render "ui/components/actions", links: [
+    link_to("New", new_attribute_type_path)
+] %>
+
+<%= render "ui/components/simple_cards_list", values: attribute_types_simple_card_values(@attribute_types) %>
+

@@ -30,4 +30,22 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  attribute_types:
+    created: "Attribute type was successfully created."
+    updated: "Attribute type was successfully updated."
+    destroyed: "Attribute type was successfully destroyed."
+  projects:
+    archived: "Project was successfully archived."
+    created: "Project was successfully created."
+    destroyed: "Project was successfully destroyed."
+    restored: "Project was successfully restored."
+    renamed: "Project was successfully renamed."
+  models:
+    created: "Model was successfully created."
+    destroyed: "Model was successfully destroyed."
+  model_attributes:
+    created: "Model attribute was successfully created."
+    destroyed: "Model attribute was successfully destroyed."
+  model_associations:
+    created: "Model association was successfully created."
+    destroyed: "Model association was successfully destroyed."

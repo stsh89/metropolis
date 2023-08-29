@@ -1,0 +1,9 @@
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <% breadcrumbs.each do |breadcrumb| %>
+      <li><%= link_to breadcrumb[:name], breadcrumb[:path] %></li>
+    <% end %>
+
+    <li class="is-active"><a href="#" aria-current="page"><%= current_page_name %></a></li>
+  </ul>
+</nav>

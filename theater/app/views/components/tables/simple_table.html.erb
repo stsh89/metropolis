@@ -1,0 +1,17 @@
+<div class="block" data-controller="simple-table">
+  <div class="block">
+    <input class="input" type="text" placeholder="Search" data-action="keyUp->simpleTable#search">
+  </div>
+  <div class="block">
+    <table class="table is-striped">
+      <tbody>
+        <% rows.each do |row| %>
+          <tr data-simple-table-target="row">
+            <td><%= row[:value] %></td>
+            <td><%= link_to "Manage", row[:action] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

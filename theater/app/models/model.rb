@@ -2,15 +2,7 @@ class Model
   include ActiveModel::API
   include ActiveModel::Validations
 
-  attr_accessor :description
-
-  attr_accessor :name
-
-  attr_accessor :slug
-
-  attr_accessor :attributes
-
-  attr_accessor :associations
+  attr_accessor :description, :name, :slug, :attributes, :associations
 
   validates :name, presence: true
 
@@ -23,23 +15,17 @@ class Model
   end
 
   def save(project)
-    if self.valid?
-      proto_model = ProjectsApi
-        .new
-        .create_model(project, self)
-        .model
+    return if invalid?
 
-      model = Model.from_proto(proto_model)
-      self.slug = model.slug
-    else
-      false
-    end
+    proto_model = ProjectsApi.new.create_model(project, self).model
+    self.slug = proto_model.slug
+    Model.from_proto(proto_model)
   end
 
   def destroy(project)
-      ProjectsApi
-        .new
-        .delete_model(project, self)
+    ProjectsApi
+      .new
+      .delete_model(project, self)
   end
 
   def destroy_attribute(project, attribute_name)
@@ -59,7 +45,7 @@ class Model
       Model.new(
         description: proto_model.description,
         name: proto_model.name,
-        slug: proto_model.slug
+        slug: proto_model.slug,
       )
     end
   end

@@ -39,12 +39,12 @@ gem "bootsnap", require: false
 # Use Sass to process CSS
 # gem "sassc-rails"
 
-gem 'grpc'
+gem "grpc"
 
 # Send RPCs from Ruby using GRPC
-gem 'grpc-tools'
+gem "grpc-tools"
 
-gem 'google-protobuf'
+gem "google-protobuf"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -66,5 +66,16 @@ group :development do
 
   # YARD is a Ruby Documentation tool.
   gem "yard"
-end
 
+  # Style Monitoring
+  gem "rubocop"
+
+  # Performance Monitoring
+  gem "rubocop-performance"
+
+  # Rails Style Monitoring
+  gem "rubocop-rails"
+
+  # Rspec Style Monitoring
+  gem "rubocop-rspec"
+end

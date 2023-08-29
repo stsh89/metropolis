@@ -1,0 +1,27 @@
+<%= form_with(model: attribute_type) do |form| %>
+  <% if attribute_type.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(attribute_type.errors.count, "error") %> prohibited this attribute_type from being saved:</h2>
+
+      <ul>
+        <% attribute_type.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name, class: "label", autofocus: true %>
+    <%= form.text_field :name, class: "input" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description, class: "label" %>
+    <%= form.text_area :description, class: "textarea" %>
+  </div>
+
+  <div>
+    <%= form.submit class: "button is-primary" %>
+  </div>
+<% end %>

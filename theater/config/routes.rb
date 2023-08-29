@@ -1,5 +1,6 @@
 # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 Rails.application.routes.draw do
+  resources :attribute_types
   resource :entrypoint, only: [:show]
 
   resources :archived_projects, only: [:index, :destroy, :show]
