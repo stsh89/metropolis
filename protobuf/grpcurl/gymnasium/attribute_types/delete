@@ -1,0 +1,12 @@
+#!/bin/sh
+
+grpcurl -d @ \
+    -import-path ./proto \
+    -proto ./proto/gymnasium/v1/attribute_types/attribute_types.proto \
+    -plaintext \
+    localhost:50052 \
+    proto.gymnasium.v1.attribute_types.AttributeTypes/DeleteAttributeType <<EOM
+{
+  "id": "7cfaf9f6-ec97-4596-a488-6a2636cebae3"
+}
+EOM

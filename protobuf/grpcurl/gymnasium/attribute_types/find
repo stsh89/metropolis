@@ -1,0 +1,12 @@
+#!/bin/sh
+
+grpcurl -d @ \
+    -import-path ./proto \
+    -proto ./proto/gymnasium/v1/attribute_types/attribute_types.proto \
+    -plaintext \
+    localhost:50052 \
+    proto.gymnasium.v1.attribute_types.AttributeTypes/FindAttributeType <<EOM
+{
+  "slug": "bigint"
+}
+EOM
