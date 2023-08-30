@@ -121,6 +121,7 @@ defmodule Gymnasium.AttributeTypes do
       %Ecto.Changeset{data: %AttributeType{}}
 
   """
+  @spec change_attribute_type(AttributeType.t(), map()) :: Ecto.Changeset.t()
   def change_attribute_type(%AttributeType{} = attribute_type, attrs \\ %{}) do
     AttributeType.changeset(attribute_type, attrs)
   end
