@@ -7,7 +7,7 @@ mod get;
 mod list;
 mod update;
 
-mod tests;
+pub mod tests;
 
 use crate::{datastore::Record, util, FoundationResult};
 
@@ -54,7 +54,7 @@ pub trait DeleteAttributeTypeRecord {
     ) -> FoundationResult<()>;
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Default, Clone, Debug, PartialEq)]
 /// Represents an attribute type of the model.
 pub struct AttributeType {
     /// An optional hint about how the type is used or what it's intended for.

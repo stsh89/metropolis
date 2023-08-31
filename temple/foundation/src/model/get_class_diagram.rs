@@ -87,6 +87,7 @@ mod tests {
             model_repo,
             model_attribute_repo,
             model_association_repo,
+            ..Default::default()
         };
 
         let response = execute(

@@ -5,7 +5,7 @@ pub mod project;
 
 pub mod tests;
 
-use crate::{UtcDateTime, Uuid};
+use crate::{Utc, UtcDateTime, Uuid};
 
 #[derive(Clone, Debug)]
 /// Generic representation of the model in the repository.
@@ -27,5 +27,21 @@ impl<T> Record<T> {
     /// Returns the actual data that is stored.
     pub fn into_inner(self) -> T {
         self.inner
+    }
+}
+
+impl<T> Default for Record<T>
+where
+    T: Default,
+{
+    fn default() -> Self {
+        let now = Utc::now();
+
+        Self {
+            id: Uuid::new_v4(),
+            inner: Default::default(),
+            inserted_at: now,
+            updated_at: now,
+        }
     }
 }

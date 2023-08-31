@@ -9,31 +9,14 @@ pub struct Class<'a> {
 }
 
 pub struct Attribute<'a> {
-    pub kind: AttributeKind,
+    pub kind: &'a str,
     pub name: &'a str,
-}
-
-pub enum AttributeKind {
-    String,
-    Boolean,
-    Integer,
 }
 
 pub struct Association<'a> {
     pub class_name: &'a str,
     pub associated_class_name: &'a str,
     pub description: Option<&'a str>,
-}
-
-impl ToString for AttributeKind {
-    fn to_string(&self) -> String {
-        match self {
-            AttributeKind::Boolean => "Boolean",
-            AttributeKind::Integer => "Integer",
-            AttributeKind::String => "String",
-        }
-        .to_string()
-    }
 }
 
 impl<'a> ClassDiagram<'a> {
@@ -83,7 +66,7 @@ impl<'a> Class<'a> {
             .map(|attribute| {
                 let Attribute { kind, name } = attribute;
 
-                format!("        +{} {name}", kind.to_string())
+                format!("        +{kind} {name}")
             })
             .collect::<Vec<String>>()
             .join("\n");

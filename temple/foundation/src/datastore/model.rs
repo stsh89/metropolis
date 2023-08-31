@@ -1,4 +1,4 @@
-use crate::{Utc, UtcDateTime, Uuid};
+use crate::{attribute_type::AttributeTypeRecord, Utc, UtcDateTime, Uuid};
 
 #[derive(Clone)]
 pub struct Model {
@@ -25,23 +25,13 @@ pub struct Attribute {
 
     pub description: String,
 
-    pub kind: AttributeKind,
+    pub r#type: AttributeTypeRecord,
 
     pub name: String,
 
     pub inserted_at: UtcDateTime,
 
     pub updated_at: UtcDateTime,
-}
-
-#[derive(Clone, Default)]
-pub enum AttributeKind {
-    #[default]
-    String,
-
-    Integer,
-
-    Boolean,
 }
 
 #[derive(Clone, Default)]
@@ -106,7 +96,7 @@ impl Default for Attribute {
             id: Uuid::new_v4(),
             model_id: Uuid::new_v4(),
             description: Default::default(),
-            kind: Default::default(),
+            r#type: Default::default(),
             name: Default::default(),
             inserted_at: now,
             updated_at: now,
