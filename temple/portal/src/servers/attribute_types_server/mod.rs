@@ -10,6 +10,8 @@ impl rpc::attribute_types_server::AttributeTypes for AttributeTypesServer {
         &self,
         request: tonic::Request<rpc::CreateAttributeTypeRequest>,
     ) -> std::result::Result<tonic::Response<rpc::AttributeType>, tonic::Status> {
+        println!("Got a request: {:?}", request);
+
         Err(tonic::Status::unimplemented(""))
     }
 
@@ -17,6 +19,8 @@ impl rpc::attribute_types_server::AttributeTypes for AttributeTypesServer {
         &self,
         request: tonic::Request<rpc::GetAttributeTypeRequest>,
     ) -> std::result::Result<tonic::Response<rpc::AttributeType>, tonic::Status> {
+        println!("Got a request: {:?}", request);
+
         Err(tonic::Status::unimplemented(""))
     }
 
@@ -24,6 +28,8 @@ impl rpc::attribute_types_server::AttributeTypes for AttributeTypesServer {
         &self,
         request: tonic::Request<rpc::ListAttributeTypesRequest>,
     ) -> std::result::Result<tonic::Response<rpc::ListAttributeTypesResponse>, tonic::Status> {
+        println!("Got a request: {:?}", request);
+
         Err(tonic::Status::unimplemented(""))
     }
 
@@ -31,6 +37,8 @@ impl rpc::attribute_types_server::AttributeTypes for AttributeTypesServer {
         &self,
         request: tonic::Request<rpc::UpdateAttributeTypeRequest>,
     ) -> std::result::Result<tonic::Response<rpc::AttributeType>, tonic::Status> {
+        println!("Got a request: {:?}", request);
+
         Err(tonic::Status::unimplemented(""))
     }
 
@@ -38,6 +46,8 @@ impl rpc::attribute_types_server::AttributeTypes for AttributeTypesServer {
         &self,
         request: tonic::Request<rpc::DeleteAttributeTypeRequest>,
     ) -> std::result::Result<tonic::Response<()>, tonic::Status> {
+        println!("Got a request: {:?}", request);
+
         Err(tonic::Status::unimplemented(""))
     }
 }
