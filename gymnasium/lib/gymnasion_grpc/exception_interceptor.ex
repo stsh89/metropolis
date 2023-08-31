@@ -1,6 +1,8 @@
 defmodule GymnasiumGrpc.ExceptionInterceptor do
   @moduledoc false
 
+  require Logger
+
   @behaviour GRPC.Server.Interceptor
 
   @impl true
@@ -14,10 +16,14 @@ defmodule GymnasiumGrpc.ExceptionInterceptor do
       next.(req, stream)
     rescue
       e in Ecto.NoResultsError ->
-        reraise GRPC.RPCError, [status: :not_found, exception: e], __STACKTRACE__
+        Logger.error(Exception.format(:error, e, __STACKTRACE__))
+
+        reraise GRPC.RPCError, [status: :not_found], __STACKTRACE__
 
       e ->
-        reraise GRPC.RPCError, [status: :internal, exception: e], __STACKTRACE__
+        Logger.error(Exception.format(:error, e, __STACKTRACE__))
+
+        reraise GRPC.RPCError, [status: :internal], __STACKTRACE__
     end
   end
 end

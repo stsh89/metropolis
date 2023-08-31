@@ -64,19 +64,9 @@ defmodule GymnasiumGrpc.ModelsServer do
       model_slug: model_slug
     }
 
-    try do
-      attributes
-      |> ModelService.find_project_model_overview!()
-      |> to_proto_model_overview
-    rescue
-      e in Ecto.NoResultsError ->
-        message =
-          "Model overview not found for Project \"#{project_slug}\" and Model \"#{model_slug}\"."
-
-        reraise GRPC.RPCError,
-                [status: :not_found, message: message, exception: e],
-                __STACKTRACE__
-    end
+    attributes
+    |> ModelService.find_project_model_overview!()
+    |> to_proto_model_overview
   end
 
   def list_project_model_overviews(%Rpc.ListProjectModelOverviewsRequest{} = request, _stream) do

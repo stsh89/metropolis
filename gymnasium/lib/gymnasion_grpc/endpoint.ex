@@ -2,6 +2,7 @@ defmodule GymnasiumGrpc.Endpoint do
   use GRPC.Endpoint
 
   intercept GRPC.Server.Interceptors.Logger
+  intercept GymnasiumGrpc.ParamsInterceptor
   intercept GymnasiumGrpc.ExceptionInterceptor
 
   run([

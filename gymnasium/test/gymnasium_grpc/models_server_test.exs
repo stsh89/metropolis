@@ -113,8 +113,7 @@ defmodule GymnasiumGrpc.ModelsServerTest do
     end
 
     test "find_project_model_overview/2 raises NotFound error" do
-      assert_raise GRPC.RPCError,
-                   "Model overview not found for Project \"book-store\" and Model \"book\".",
+      assert_raise Ecto.NoResultsError,
                    fn ->
                      ModelsServer.find_project_model_overview(
                        %Rpc.FindProjectModelOverviewRequest{

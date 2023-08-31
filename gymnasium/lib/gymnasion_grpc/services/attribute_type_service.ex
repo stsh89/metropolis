@@ -18,12 +18,18 @@ defmodule GymnasiumGrpc.AttributeTypeService do
   """
   @spec create_attribute_type(CreateAttributeTypeAttributes.t()) :: AttributeType.t()
   def create_attribute_type(%CreateAttributeTypeAttributes{} = attributes) do
-    {:ok, attribute_type} =
+    result =
       attributes
       |> Map.from_struct()
       |> AttributeTypes.create_attribute_type()
 
-    attribute_type
+    case result do
+      {:ok, attribute_type} ->
+        attribute_type
+
+      {:error, changeset} ->
+        raise Ecto.InvalidChangesetError, action: :insert, changeset: changeset
+    end
   end
 
   @doc """

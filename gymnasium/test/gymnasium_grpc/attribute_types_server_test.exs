@@ -23,7 +23,7 @@ defmodule GymnasiumGrpc.AttributeTypesServerTest do
     end
 
     test "create_attribute_type/2 returns error when request contains malformed" do
-      assert_raise GRPC.RPCError, "Internal errors", fn ->
+      assert_raise Ecto.ChangeError, fn ->
         AttributeTypesServer.create_attribute_type(
           %Rpc.CreateAttributeTypeRequest{
             name: "",
@@ -65,7 +65,7 @@ defmodule GymnasiumGrpc.AttributeTypesServerTest do
     end
 
     test "find_attribute_type/2 raises NotFound error" do
-      assert_raise Ecto.NoResultsError fn ->
+      assert_raise Ecto.NoResultsError, fn ->
         AttributeTypesServer.find_attribute_type(
           %Rpc.FindAttributeTypeRequest{
             slug: ""
@@ -102,7 +102,7 @@ defmodule GymnasiumGrpc.AttributeTypesServerTest do
     end
 
     test "update_attribute_type/2 raises internal error" do
-      assert_raise GRPC.RPCError, "Internal errors", fn ->
+      assert_raise Ecto.NoResultsError, fn ->
         AttributeTypesServer.update_attribute_type(
           %Rpc.UpdateAttributeTypeRequest{
             attribute_type: %Rpc.AttributeType{
@@ -135,7 +135,7 @@ defmodule GymnasiumGrpc.AttributeTypesServerTest do
     end
 
     test "delete_attribute_type/2 raises internal error" do
-      assert_raise GRPC.RPCError, "Internal errors", fn ->
+      assert_raise Ecto.NoResultsError, fn ->
         AttributeTypesServer.delete_attribute_type(
           %Rpc.DeleteAttributeTypeRequest{
             id: Ecto.UUID.generate()
