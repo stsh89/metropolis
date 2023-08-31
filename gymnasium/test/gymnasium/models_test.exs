@@ -3,10 +3,10 @@ defmodule Gymnasium.ModelsTest do
 
   alias Gymnasium.{Model, Models, Models}
   alias Gymnasium.Projects.Project
+  alias Gymnasium.AttributeTypes.AttributeType
   alias Gymnasium.Models.{Model, Attribute, Association}
 
-  import Gymnasium.ModelsFixtures
-  import Gymnasium.ProjectsFixtures
+  import Gymnasium.{ModelsFixtures, ProjectsFixtures, AttributeTypesFixtures}
 
   describe "create a model" do
     test "create_model/1 saves Model" do
@@ -156,10 +156,11 @@ defmodule Gymnasium.ModelsTest do
   describe "create model attribute" do
     test "create_attribute/1 saves Model's attribute" do
       %Model{id: model_id} = model_fixture()
+      %AttributeType{id: attribute_type_id} = attribute_type_fixture()
 
       attrs = %{
         model_id: model_id,
-        kind: "string",
+        attribute_type_id: attribute_type_id,
         description: "The title of the Book.",
         name: "Title"
       }
@@ -168,6 +169,7 @@ defmodule Gymnasium.ModelsTest do
       assert false == Models.list_attributes() |> Enum.empty?()
 
       assert attribute.model_id == model_id
+      assert attribute.attribute_type_id == attribute_type_id
       assert attribute.description == "The title of the Book."
       assert attribute.name == "Title"
     end
@@ -180,7 +182,7 @@ defmodule Gymnasium.ModelsTest do
     test "create_attribute/1 returns error on missing name" do
       valid_attrs = %{
         model_id: Ecto.UUID.generate(),
-        kind: "string",
+        attribute_type_id: Ecto.UUID.generate(),
         description: "The title of the book.",
         name: ""
       }
@@ -189,7 +191,7 @@ defmodule Gymnasium.ModelsTest do
       assert errors == [name: {"can't be blank", [validation: :required]}]
     end
 
-    test "create_attribute/1 returns error on missing kind" do
+    test "create_attribute/1 returns error on missing attribute type id" do
       valid_attrs = %{
         model_id: Ecto.UUID.generate(),
         description: "The title of the book.",
@@ -197,31 +199,14 @@ defmodule Gymnasium.ModelsTest do
       }
 
       assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_attribute(valid_attrs)
-      assert errors == [kind: {"can't be blank", [validation: :required]}]
-    end
-
-    test "create_attribute/1 returns error on invalid kind" do
-      valid_attrs = %{
-        model_id: Ecto.UUID.generate(),
-        description: "The title of the book.",
-        name: "Title",
-        kind: "color"
-      }
-
-      assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_attribute(valid_attrs)
-
-      assert errors == [
-               kind:
-                 {"is invalid",
-                  [{:validation, :inclusion}, {:enum, ["string", "integer", "boolean"]}]}
-             ]
+      assert errors == [attribute_type_id: {"can't be blank", [validation: :required]}]
     end
 
     test "create_model/1 returns error on missing model_id" do
       attrs = %{
         description: "The title of the book.",
         name: "Title",
-        kind: "string"
+        attribute_type_id: Ecto.UUID.generate()
       }
 
       assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_attribute(attrs)
@@ -236,7 +221,7 @@ defmodule Gymnasium.ModelsTest do
         model_id: model_id,
         description: "Books model",
         name: name,
-        kind: "string"
+        attribute_type_id: Ecto.UUID.generate()
       }
 
       assert {:error, %Ecto.Changeset{errors: errors}} = Models.create_attribute(attrs)

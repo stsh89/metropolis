@@ -6,25 +6,23 @@ defmodule Gymnasium.Models.Attribute do
           id: Ecto.UUID.t(),
           model_id: Ecto.UUID.t(),
           description: String.t(),
-          kind: String.t(),
+          attribute_type_id: Ecto.UUID.t(),
           name: String.t(),
           inserted_at: Calendar.datetime(),
           updated_at: Calendar.datetime()
         }
 
-  alias Gymnasium.Models
+  alias Gymnasium.{Models, AttributeTypes}
 
   use Gymnasium.Schema
   import Ecto.Changeset
 
-  @kinds ["string", "integer", "boolean"]
-
   schema "model_attributes" do
     belongs_to :model, Models.Model
 
-    field :description, :string
+    belongs_to :attribute_type, AttributeTypes.AttributeType
 
-    field :kind, :string
+    field :description, :string
 
     field :name, :string
 
@@ -34,9 +32,8 @@ defmodule Gymnasium.Models.Attribute do
   @doc false
   def changeset(model_attribute, attrs) do
     model_attribute
-    |> cast(attrs, [:model_id, :description, :kind, :name])
-    |> validate_required([:model_id, :kind, :name])
-    |> validate_inclusion(:kind, @kinds)
+    |> cast(attrs, [:model_id, :attribute_type_id, :name, :description])
+    |> validate_required([:attribute_type_id, :model_id, :name])
     |> unique_constraint([:model_id, :name])
   end
 end

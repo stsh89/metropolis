@@ -4,6 +4,7 @@ defmodule GymnasiumGrpc.ModelServiceTest do
   alias GymnasiumGrpc.ModelService
   alias Gymnasium.Projects.Project
   alias Gymnasium.Models.{Model, Association, Attribute}
+  alias Gymnasium.AttributeTypes.AttributeType
   alias Gymnasium.Projects
   alias Gymnasium.Models
 
@@ -17,7 +18,7 @@ defmodule GymnasiumGrpc.ModelServiceTest do
     FindProjectModelOverviewAttributes
   }
 
-  import Gymnasium.{ProjectsFixtures, ModelsFixtures}
+  import Gymnasium.{ProjectsFixtures, ModelsFixtures, AttributeTypesFixtures}
 
   describe "create a new Model" do
     test "create_model/1 saves project" do
@@ -127,7 +128,7 @@ defmodule GymnasiumGrpc.ModelServiceTest do
     test "find_project_model_attribute/1 returns found Model" do
       project = project_fixture()
       model = model_fixture(project_id: project.id)
-      attribute = model_attribute_fixture(model_id: model.id)
+      attribute = model_attribute_fixture(model_id: model.id) |> Repo.preload(:attribute_type)
 
       attributes = %FindProjectModelAttributeAttributes{
         project_slug: project.slug,
@@ -197,8 +198,10 @@ defmodule GymnasiumGrpc.ModelServiceTest do
   describe "create a new Model attribute" do
     test "create_attribute/1 saves model attribute" do
       %Model{id: model_id} = model_fixture()
+      %AttributeType{id: attribute_type_id} = attribute_type_fixture()
 
       attributes = %CreateAttributeAttributes{
+        attribute_type_id: attribute_type_id,
         model_id: model_id,
         kind: "string",
         name: "title"

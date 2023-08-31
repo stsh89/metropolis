@@ -106,7 +106,7 @@ defmodule GymnasiumGrpc.ModelService do
   @spec list_project_model_overviews(String.t()) :: [Model.t()]
   def list_project_model_overviews(project_slug) do
     ProjectModels.list_project_models(project_slug,
-      preloads: [:attributes, [associations: :associated_model]]
+      preloads: [attributes: :attribute_type, associations: :associated_model]
     )
   end
 
@@ -370,7 +370,7 @@ defmodule GymnasiumGrpc.ModelService do
 
     case result do
       {:ok, attribute} ->
-        attribute
+        attribute |> Gymnasium.Repo.preload(:attribute_type)
 
       {:error, _changset} ->
         :error

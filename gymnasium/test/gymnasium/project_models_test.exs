@@ -66,7 +66,7 @@ defmodule Gymnasium.ProjectModelsTest do
     test "find_project_model_attribute/3 returns Project's model attribute" do
       %Project{id: project_id, slug: project_slug} = project_fixture()
       model = model_fixture(project_id: project_id)
-      attribute = model_attribute_fixture(model_id: model.id)
+      attribute = model_attribute_fixture(model_id: model.id) |> Repo.preload(:attribute_type)
 
       assert ProjectModels.find_project_model_attribute!(project_slug, model.slug, attribute.name) ==
                attribute
@@ -83,7 +83,7 @@ defmodule Gymnasium.ProjectModelsTest do
     test "list_project_model_attributes/2 returns all model's attributes" do
       %Project{id: project_id, slug: project_slug} = project_fixture()
       %Model{id: model_id, slug: model_slug} = model_fixture(project_id: project_id)
-      attribute = model_attribute_fixture(model_id: model_id)
+      attribute = model_attribute_fixture(model_id: model_id) |> Repo.preload(:attribute_type)
       model_attribute_fixture()
 
       assert ProjectModels.list_project_model_attributes(project_slug, model_slug) == [attribute]

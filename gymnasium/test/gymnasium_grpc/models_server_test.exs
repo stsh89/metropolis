@@ -25,7 +25,7 @@ defmodule GymnasiumGrpc.ModelsServerTest do
     ListProjectModelAttributesResponse
   }
 
-  import Gymnasium.{ModelsFixtures, ProjectsFixtures}
+  import Gymnasium.{ModelsFixtures, ProjectsFixtures, AttributeTypesFixtures}
 
   alias Proto.Gymnasium.V1.Models.Model, as: ProtoModel
   alias Proto.Gymnasium.V1.Models.Association, as: ProtoAssociation
@@ -85,7 +85,10 @@ defmodule GymnasiumGrpc.ModelsServerTest do
       %Project{id: project_id, slug: project_slug} = project_fixture()
       model = model_fixture(project_id: project_id)
       associated_model = model_fixture(project_id: project_id, name: "Author", slug: "author")
-      attribute = model_attribute_fixture(model_id: model.id)
+      attribute_type = attribute_type_fixture()
+
+      attribute =
+        model_attribute_fixture(model_id: model.id, attribute_type_id: attribute_type.id)
 
       association =
         model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
@@ -131,7 +134,11 @@ defmodule GymnasiumGrpc.ModelsServerTest do
       %Project{id: project_id, slug: project_slug} = project_fixture()
       model = model_fixture(project_id: project_id)
       associated_model = model_fixture(project_id: project_id, name: "Author", slug: "author")
-      attribute = model_attribute_fixture(model_id: model.id)
+      attribute_type = attribute_type_fixture()
+
+      attribute =
+        model_attribute_fixture(model_id: model.id, attribute_type_id: attribute_type.id)
+        |> Repo.preload(:attribute_type)
 
       association =
         model_association_fixture(model_id: model.id, associated_model_id: associated_model.id)
@@ -198,7 +205,11 @@ defmodule GymnasiumGrpc.ModelsServerTest do
     test "list_project_model_attributes/2 returns all models for given project slug" do
       %Project{id: project_id, slug: project_slug} = project_fixture()
       model = model_fixture(project_id: project_id)
-      attribute = model_attribute_fixture(model_id: model.id)
+      attribute_type = attribute_type_fixture()
+
+      attribute =
+        model_attribute_fixture(model_id: model.id, attribute_type_id: attribute_type.id)
+        |> Repo.preload(:attribute_type)
 
       %ListProjectModelAttributesResponse{attributes: list} =
         ModelsServer.list_project_model_attributes(
@@ -292,7 +303,10 @@ defmodule GymnasiumGrpc.ModelsServerTest do
     test "find_project_model_attribute/2 returns found Model" do
       %Project{id: project_id, slug: project_slug} = project_fixture()
       model = model_fixture(project_id: project_id)
-      attribute = model_attribute_fixture(model_id: model.id)
+      attribute_type = attribute_type_fixture()
+
+      attribute =
+        model_attribute_fixture(model_id: model.id, attribute_type_id: attribute_type.id)
 
       proto_attribute =
         ModelsServer.find_project_model_attribute(
@@ -411,13 +425,14 @@ defmodule GymnasiumGrpc.ModelsServerTest do
   describe "create the Model attribute" do
     test "create_attribute/2 saves Model attribute" do
       model = model_fixture()
+      attribute_type = attribute_type_fixture()
 
       proto_attribute =
         ModelsServer.create_attribute(
           %CreateAttributeRequest{
             model_id: model.id,
             name: "Title",
-            kind: :ATTRIBUTE_KIND_STRING,
+            attribute_type_id: attribute_type.id,
             description: ""
           },
           nil
