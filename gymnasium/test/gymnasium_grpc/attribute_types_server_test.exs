@@ -23,7 +23,7 @@ defmodule GymnasiumGrpc.AttributeTypesServerTest do
     end
 
     test "create_attribute_type/2 returns error when request contains malformed" do
-      assert_raise Ecto.ChangeError, fn ->
+      assert_raise Ecto.InvalidChangesetError, fn ->
         AttributeTypesServer.create_attribute_type(
           %Rpc.CreateAttributeTypeRequest{
             name: "",
