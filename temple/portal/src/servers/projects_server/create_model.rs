@@ -1,4 +1,4 @@
-use super::{rpc, to_proto_model, Projects};
+use super::{rpc, to_proto_model, ProjectsServer};
 use crate::{
     repo::{ModelsRepo, ProjectsRepo},
     PortalError,
@@ -12,7 +12,7 @@ use foundation::{
 use tonic::{Request, Response, Status};
 
 pub async fn execute(
-    server: &Projects,
+    server: &ProjectsServer,
     request: Request<rpc::CreateModelRequest>,
 ) -> Result<Response<rpc::CreateModelResponse>, Status> {
     let rpc::CreateModelRequest {

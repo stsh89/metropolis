@@ -15,13 +15,13 @@ pub mod rpc {
     tonic::include_proto!("proto.temple.v1"); // The string specified here must match the proto package name
 }
 
-pub struct Projects {
+pub struct ProjectsServer {
     pub projects_repo: ProjectsRepo,
     pub models_repo: ModelsRepo,
 }
 
 #[tonic::async_trait]
-impl rpc::projects_server::Projects for Projects {
+impl rpc::projects_server::Projects for ProjectsServer {
     async fn list_projects(
         &self,
         request: Request<rpc::ListProjectsRequest>, // Accept request of type HelloRequest

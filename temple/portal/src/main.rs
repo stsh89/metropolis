@@ -1,7 +1,7 @@
 mod config;
 mod repo;
 mod result;
-mod server;
+mod servers;
 mod util;
 
 pub use result::{PortalError, PortalErrorCode, PortalResult};
@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let configuration = config::read_from_file(config_file_path)?;
 
     let server_socket_address = configuration.server()?.socket_address()?;
-    let projects = server::Projects {
+    let projects = servers::ProjectsServer {
         projects_repo: repo::ProjectsRepo {
             connection_string: configuration.database()?.connection_string()?,
         },
@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Running server::proto::projects_server::ProjectsServer with tonic::transport::Server using http://{server_socket_address}");
 
     tonic::transport::Server::builder()
-        .add_service(server::rpc::projects_server::ProjectsServer::new(projects))
+        .add_service(servers::RpcProjectsServer::new(projects))
         .serve(server_socket_address)
         .await?;
 
