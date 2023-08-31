@@ -21,7 +21,7 @@ fn compile_proto_gymnasium_v1() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn compile_proto_temple_v1() -> Result<(), Box<dyn std::error::Error>> {
-    let files = vec!["projects.proto"];
+    let files = vec!["projects.proto", "attribute_types/attribute_types.proto"];
 
     let protos: Vec<String> = files
         .iter()
