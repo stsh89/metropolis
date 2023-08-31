@@ -2,11 +2,12 @@ use super::map_status_error;
 use crate::util;
 use foundation::{
     attribute_type::{
-        AttributeType, AttributeTypeRecord, CreateAttributeTypeRecord, GetAttributeTypeRecord,
-        ListAttributeTypeRecords, DeleteAttributeTypeRecord,
+        AttributeType, AttributeTypeRecord, CreateAttributeTypeRecord, DeleteAttributeTypeRecord,
+        GetAttributeTypeRecord, ListAttributeTypeRecords, UpdateAttributeTypeRecord,
     },
     FoundationError, FoundationResult,
 };
+use prost_types::FieldMask;
 
 mod rpc {
     tonic::include_proto!("proto.gymnasium.v1.attribute_types");
@@ -90,6 +91,53 @@ impl CreateAttributeTypeRecord for AttributeTypesRepo {
 }
 
 #[async_trait::async_trait]
+impl UpdateAttributeTypeRecord for AttributeTypesRepo {
+    async fn update_attribute_type_record(
+        &self,
+        attribute_type_record: AttributeTypeRecord,
+    ) -> FoundationResult<AttributeTypeRecord> {
+        let mut client = self.client().await?;
+
+        let AttributeTypeRecord {
+            id,
+            inner:
+                AttributeType {
+                    description,
+                    name,
+                    slug,
+                },
+            ..
+        } = attribute_type_record;
+
+        let proto_attribute_type = client
+            .update_attribute_type(rpc::UpdateAttributeTypeRequest {
+                attribute_type: Some(rpc::AttributeType {
+                    id: id.to_string(),
+                    name,
+                    description: description.unwrap_or_default(),
+                    slug,
+                    create_time: None,
+                    update_time: None,
+                }),
+                update_mask: Some(FieldMask {
+                    paths: vec![
+                        "name".to_string(),
+                        "description".to_string(),
+                        "slug".to_string(),
+                    ],
+                }),
+            })
+            .await
+            .map_err(map_status_error)?
+            .into_inner();
+
+        let attribute_type_record = record_from_proto(proto_attribute_type)?;
+
+        Ok(attribute_type_record)
+    }
+}
+
+#[async_trait::async_trait]
 impl DeleteAttributeTypeRecord for AttributeTypesRepo {
     async fn delete_attribute_type_record(
         &self,
@@ -97,15 +145,10 @@ impl DeleteAttributeTypeRecord for AttributeTypesRepo {
     ) -> FoundationResult<()> {
         let mut client = self.client().await?;
 
-        let AttributeTypeRecord {
-            id,
-            ..
-        } = attribute_type;
+        let AttributeTypeRecord { id, .. } = attribute_type;
 
         client
-            .delete_attribute_type(rpc::DeleteAttributeTypeRequest {
-                id: id.to_string(),
-            })
+            .delete_attribute_type(rpc::DeleteAttributeTypeRequest { id: id.to_string() })
             .await
             .map_err(map_status_error)?;
 

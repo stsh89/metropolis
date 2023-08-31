@@ -6,7 +6,7 @@ class AttributeTypeApiConverter
     # @param attribute_type [AttributeType]
     # @return [Proto::Temple::V1::AttributeType]
     def from_model(attribute_type)
-      Proto::Temple::V1::AttributeType.new(
+      Proto::Temple::V1::AttributeTypes::AttributeType.new(
         description: attribute_type.description,
         name: attribute_type.name,
         slug: attribute_type.slug,

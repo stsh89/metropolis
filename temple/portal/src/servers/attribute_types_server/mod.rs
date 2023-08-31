@@ -21,12 +21,12 @@ impl rpc::attribute_types_server::AttributeTypes for AttributeTypesServer {
 
         let rpc::CreateAttributeTypeRequest { description, name } = request.into_inner();
 
-        let attribute_type = attribute_type::create(&self.attribute_types_repo, attribute_type::CreateRequest {
-            description,
-            name
-        })
-            .await
-            .map_err(Into::<PortalError>::into)?;
+        let attribute_type = attribute_type::create(
+            &self.attribute_types_repo,
+            attribute_type::CreateRequest { description, name },
+        )
+        .await
+        .map_err(Into::<PortalError>::into)?;
 
         Ok(Response::new(to_proto_attribute_type(attribute_type)))
     }
@@ -71,7 +71,21 @@ impl rpc::attribute_types_server::AttributeTypes for AttributeTypesServer {
     ) -> std::result::Result<tonic::Response<rpc::AttributeType>, tonic::Status> {
         println!("Got a request: {:?}", request);
 
-        Err(tonic::Status::unimplemented(""))
+        let rpc::UpdateAttributeTypeRequest {
+            attribute_type,
+            update_mask: _,
+        } = request.into_inner();
+
+        let attribute_type = attribute_type::update(
+            &self.attribute_types_repo,
+            from_proto_attribute_type(
+                attribute_type.ok_or(PortalError::invalid_argument("missing attribute_type"))?,
+            ),
+        )
+        .await
+        .map_err(Into::<PortalError>::into)?;
+
+        Ok(Response::new(to_proto_attribute_type(attribute_type)))
     }
 
     async fn delete_attribute_type(
@@ -90,10 +104,18 @@ impl rpc::attribute_types_server::AttributeTypes for AttributeTypesServer {
     }
 }
 
-fn to_proto_attribute_type(attto_proto_attribute_type: AttributeType) -> rpc::AttributeType {
+fn to_proto_attribute_type(attribute_type: AttributeType) -> rpc::AttributeType {
     rpc::AttributeType {
-        description: attto_proto_attribute_type.description.unwrap_or_default(),
-        name: attto_proto_attribute_type.name,
-        slug: attto_proto_attribute_type.slug,
+        description: attribute_type.description.unwrap_or_default(),
+        name: attribute_type.name,
+        slug: attribute_type.slug,
+    }
+}
+
+fn from_proto_attribute_type(proto_attribute_type: rpc::AttributeType) -> AttributeType {
+    AttributeType {
+        description: Some(proto_attribute_type.description),
+        name: proto_attribute_type.name,
+        slug: proto_attribute_type.slug,
     }
 }

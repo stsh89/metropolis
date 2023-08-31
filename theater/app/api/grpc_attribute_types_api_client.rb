@@ -27,8 +27,8 @@ class GrpcAttributeTypesApiClient
 
   def update_attribute_type(attribute_type)
     @stub.update_attribute_type(Proto::Temple::V1::AttributeTypes::UpdateAttributeTypeRequest.new(
-      attibute_type: from_model(attribute_type),
-      update_mask: %w[name description],
+      attribute_type: from_model(attribute_type),
+      update_mask: Google::Protobuf::FieldMask.new({ paths: %w[description name] }),
     ))
   end
 
