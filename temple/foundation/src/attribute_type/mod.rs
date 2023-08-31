@@ -11,7 +11,7 @@ mod tests;
 
 use crate::{datastore::Record, util, FoundationResult};
 
-pub use create::execute as create;
+pub use create::{execute as create, Request as CreateRequest};
 pub use delete::execute as delete;
 pub use get::execute as get;
 pub use list::execute as list;

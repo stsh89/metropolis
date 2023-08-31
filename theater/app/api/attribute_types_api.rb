@@ -1,7 +1,3 @@
-require Rails.root.join("lib/proto/temple/v1/attribute_types_pb").to_s
-require Rails.root.join("lib/proto/temple/v1/attribute_types_services_pb.rb").to_s
-require "google/protobuf/well_known_types"
-
 # Remote API around attribute types.
 class AttributeTypesApi
   include Singleton

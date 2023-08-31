@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 
-package proto.temple.v1;
+package proto.temple.v1.attribute_types;
 
 // Attribute types API.
 service AttributeTypes {
