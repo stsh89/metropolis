@@ -1,8 +1,10 @@
+mod attribute_types;
 mod models;
 mod projects;
 
 use foundation::FoundationError;
 
+pub use attribute_types::AttributeTypesRepo;
 pub use models::ModelsRepo;
 pub use projects::ProjectsRepo;
 
