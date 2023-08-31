@@ -11,9 +11,10 @@ defmodule Mix.Tasks.Protobuf.Compile do
   end
 
   defp compile_proto_definitions do
-    IO.puts("Compiling proto definitions:")
+    IO.puts("\nCompiling proto definitions:\n")
 
     files = [
+      "attribute_types/attribute_types.proto",
       "projects/projects.proto",
       "models/models.proto",
       "health/health.proto"

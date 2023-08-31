@@ -1,0 +1,20 @@
+#!/bin/sh
+
+grpcurl -d @ \
+    -import-path ./proto \
+    -proto ./proto/gymnasium/v1/attribute_types/attribute_types.proto \
+    -plaintext \
+    localhost:50052 \
+    proto.gymnasium.v1.attribute_types.AttributeTypes/UpdateAttributeType <<EOM
+{
+  "attribute_type": {
+    "id": "1f953a62-a446-45e0-9ce4-eb82b43fbf62",
+    "description": "About",
+    "name": "Integer",
+    "slug": "integer"
+  },
+  "update_mask": {
+    "paths": ["slug"]
+  }
+}
+EOM
