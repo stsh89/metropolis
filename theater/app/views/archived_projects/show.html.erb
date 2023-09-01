@@ -1,24 +1,16 @@
 <p style="color: green"><%= notice %></p>
 
-<nav class="breadcrumb" aria-label="breadcrumbs">
-  <ul>
-    <li><%= link_to "Entrypoint", root_path %></li>
-    <li><%= link_to "Archive", archived_projects_path %></li>
-    <li class="is-active"><a href="#" aria-current="page"><%= @project.name %></a></li>
-  </ul>
-</nav>
+<%= render "ui/components/breadcrumbs",
+    breadcrumbs: archived_projects_breadcrumbs(page_code: :show),
+    current_page_name: @project.name %>
 
-<h1 class="title"><%= @project.name %></h1>
+<%= render "ui/elements/title", title: @project.name %>
+
+<%= render "ui/components/actions", links: [
+    link_to("Restore", project_restore_path(@project), data: { "turbo-method": :put }),
+    link_to("Delete", archived_project_path(@project), data: { "turbo-method": :delete , "turbo-confirm": "Are you sure?"}),
+] %>
 
 <div class="block">
   <%= render @project %>
-</div>
-
-<div class="block">
-  <aside class="menu">
-    <ul class="menu-list">
-      <li><%= link_to "Restore this project", project_restore_path(@project), data: { "turbo-method": :put } %></li>
-      <li><%= link_to "Destroy this project", archived_project_path(@project), data: { "turbo-method": :delete , "turbo-confirm": "Are you sure?"} %></li>
-    </ul>
-  </aside>
 </div>

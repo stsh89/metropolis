@@ -1,36 +1,25 @@
 <p style="color: green"><%= notice %></p>
 
-<nav class="breadcrumb" aria-label="breadcrumbs">
-  <ul>
-    <li><%= link_to "Entrypoint", root_path %></li>
-    <li><%= link_to "Projects", projects_path %></li>
-    <li class="is-active"><a href="#" aria-current="page"><%= @project.name %></a></li>
-  </ul>
-</nav>
+<%= render "ui/components/breadcrumbs",
+    breadcrumbs: projects_breadcrumbs(page_code: :show),
+    current_page_name: @project.name %>
 
-<h1 class="title"><%= @project.name %></h1>
+<%= render "ui/elements/title", title: @project.name %>
+
+<%= render "ui/components/actions", links: [
+    link_to("Class diagram", project_class_diagram_path(@project)),
+    link_to("Rename", edit_project_path(@project)),
+    link_to("Archive", project_archive_path(@project), data: { "turbo-method": :put })
+] %>
 
 <div class="block">
   <%= render @project %>
 </div>
 
-<div class="block">
-  <aside class="menu">
-    <ul class="menu-list">
-      <li><%= link_to "New model", new_project_model_path(@project) %></li>
-      <li><%= link_to "Class Diagram", project_class_diagram_path(@project) %></li>
-      <li><%= link_to "Rename this project", edit_project_path(@project) %></li>
-      <li><%= link_to "Archive this project", project_archive_path(@project), data: { "turbo-method": :put  } %></li>
-    </ul>
-  </aside>
-</div>
+<%= render "ui/elements/subtitle", subtitle: "Models" %>
 
-<div id="models">
-  <% @project.models.each do |model| %>
-    <div class="block">
-      <%= render model %>
+<%= render "ui/components/actions", links: [
+    link_to("New", new_project_model_path(@project)),
+] %>
 
-      <%= link_to "Show this model", project_model_path(@project, model) %>
-    </div>
-  <% end %>
-</div>
+<%= render "ui/components/simple_cards_list", values: models_simple_card_values(@project, @project.models) %>

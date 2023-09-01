@@ -31,6 +31,6 @@ module AttributeTypesHelper
     else
       []
     end
-    # rubocop:enable Metrics/MethodLength
   end
+  # rubocop:enable Metrics/MethodLength
 end

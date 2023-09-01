@@ -1,48 +1,32 @@
 <p style="color: green"><%= notice %></p>
 
-<nav class="breadcrumb" aria-label="breadcrumbs">
-  <ul>
-    <li><%= link_to "Entrypoint", root_path %></li>
-    <li><%= link_to "Projects", projects_path %></li>
-    <li><%= link_to @project.name, @project %></li>
-    <li class="is-active"><a href="#" aria-current="page"><%= @model.name %></a></li>
-  </ul>
-</nav>
+<%= render "ui/components/breadcrumbs",
+    breadcrumbs: models_breadcrumbs(page_code: :show, project: @project),
+    current_page_name: @model.name %>
 
-<h1 class="title"><%= @model.name %></h1>
+<%= render "ui/elements/title", title: @model.name %>
+
+<%= render "ui/components/actions", links: [
+    link_to("Class diagram", project_model_class_diagram_path(@project, @model)),
+    link_to("Delete", project_model_path(@project, @model), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?" })
+] %>
 
 <div class="block">
   <%= render @model %>
 </div>
 
-<div class="block">
-  <aside class="menu">
-    <ul class="menu-list">
-      <li><%= link_to "New attribute", new_project_model_attribute_path(@project, @model) %></li>
-      <li><%= link_to "New association", new_project_model_association_path(@project, @model) %></li>
-      <li><%= link_to "Class Diagram", project_model_class_diagram_path(@project, @model) %></li>
-      <li><%= link_to "Destroy this model", project_model_path(@project, @model), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?" } %></li>
-    </ul>
-  </aside>
-</div>
+<%= render "ui/elements/subtitle", subtitle: "Associations" %>
 
+<%= render "ui/components/actions", links: [
+    link_to("New", new_project_model_association_path(@project, @model)),
+] %>
 
-<div id="model-associations" class="block">
-  <% @model.associations.each do |association| %>
-    <div class="block">
-      <%= render association %>
+<%= render "ui/components/simple_delete_cards_list", values: model_associations_simple_delete_card_values(@project, @model, @model.associations) %>
 
-      <%= link_to "Destroy this association", project_model_association_path(@project, @model, association), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?"} %>
-    </div>
-  <% end %>
-</div>
+<%= render "ui/elements/subtitle", subtitle: "Attributes" %>
 
-<div id="model-attributes">
-  <% @model.attributes.each do |attribute| %>
-    <div class="block">
-      <%= render attribute %>
+<%= render "ui/components/actions", links: [
+    link_to("New", new_project_model_attribute_path(@project, @model)),
+] %>
 
-      <%= link_to "Destroy this attribute", project_model_attribute_path(@project, @model, attribute), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?"} %>
-    </div>
-  <% end %>
-</div>
+<%= render "ui/components/simple_delete_cards_list", values: model_attributes_simple_delete_card_values(@project, @model, @model.attributes) %>

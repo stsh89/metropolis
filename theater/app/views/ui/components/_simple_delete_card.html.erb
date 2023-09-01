@@ -1,0 +1,8 @@
+<div class="card">
+  <div class="card-content">
+    <p><%= name %></p>
+  </div>
+  <footer class="card-footer">
+    <%= link_to "Delete", delete_path, class: "card-footer-item", data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?"} %>
+  </footer>
+</div>

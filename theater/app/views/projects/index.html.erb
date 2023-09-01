@@ -1,27 +1,13 @@
 <p style="color: green"><%= notice %></p>
 
-<nav class="breadcrumb" aria-label="breadcrumbs">
-  <ul>
-    <li><%= link_to "Entrypoint", root_path %></li>
-    <li class="is-active"><a href="#" aria-current="page">Projects</a></li>
-  </ul>
-</nav>
+<%= render "ui/components/breadcrumbs",
+    breadcrumbs: projects_breadcrumbs(page_code: :index),
+    current_page_name: "Projects" %>
 
-<h1 class="title">Projects</h1>
+<%= render "ui/elements/title", title: "Projects" %>
 
-<div class="block">
-  <aside class="menu">
-    <ul class="menu-list">
-      <li><%= link_to "New project", new_project_path %></li>
-    </ul>
-  </aside>
-</div>
+<%= render "ui/components/actions", links: [
+    link_to("New", new_project_path)
+] %>
 
-<div id="projects">
-  <% @projects.each do |project| %>
-    <div class="block">
-      <%= render project %>
-      <%= link_to "Show this project", project %>
-    </div>
-  <% end %>
-</div>
+<%= render "ui/components/simple_cards_list", values: projects_simple_card_values(@projects) %>
