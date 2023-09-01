@@ -42,7 +42,7 @@
     <div class="block">
       <%= render attribute %>
 
-      <%= link_to "Destroy this association", project_model_attribute_path(@project, @model, attribute), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?"} %>
+      <%= link_to "Destroy this attribute", project_model_attribute_path(@project, @model, attribute), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?"} %>
     </div>
   <% end %>
 </div>

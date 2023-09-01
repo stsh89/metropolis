@@ -17,10 +17,10 @@
   </div>
 
   <div class="field">
-    <%= form.label :kind, class: "label" %>
+    <%= form.label :attribute_type_slug, "Type", class: "label" %>
 
     <div class="select">
-      <%= form.select :kind, [["String", "string"], ["Integer", "integer"], ["Boolean", "boolean"]], selected: "string" %>
+      <%= form.select :attribute_type_slug, @attribute_types.map { |at| [at.name, at.slug]} %>
     </div>
   </div>
 
