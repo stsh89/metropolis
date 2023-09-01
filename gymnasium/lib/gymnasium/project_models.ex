@@ -57,7 +57,7 @@ defmodule Gymnasium.ProjectModels do
         on: p.id == m.project_id,
         where: p.slug == ^project_slug and m.slug == ^model_slug,
         order_by: [asc: m.name],
-        preload: [:attributes, [associations: :associated_model]]
+        preload: [attributes: :attribute_type, associations: :associated_model]
 
     Repo.one!(query)
   end
@@ -118,7 +118,8 @@ defmodule Gymnasium.ProjectModels do
         join: p in Project,
         on: p.id == m.project_id,
         where: p.slug == ^project_slug and m.slug == ^model_slug and ma.name == ^attribute_name,
-        order_by: [asc: ma.name]
+        order_by: [asc: ma.name],
+        preload: [:attribute_type]
 
     Repo.one!(query)
   end
@@ -141,7 +142,8 @@ defmodule Gymnasium.ProjectModels do
         join: p in Project,
         on: p.id == m.project_id,
         where: p.slug == ^project_slug and m.slug == ^model_slug,
-        order_by: [asc: ma.name]
+        order_by: [asc: ma.name],
+        preload: :attribute_type
 
     Repo.all(query)
   end

@@ -1,14 +1,3 @@
-defmodule Proto.Gymnasium.V1.Models.AttributeKind do
-  @moduledoc false
-
-  use Protobuf, enum: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
-
-  field :ATTRIBUTE_KIND_UNSPECIFIED, 0
-  field :ATTRIBUTE_KIND_STRING, 1
-  field :ATTRIBUTE_KIND_INTEGER, 2
-  field :ATTRIBUTE_KIND_BOOLEAN, 3
-end
-
 defmodule Proto.Gymnasium.V1.Models.AssociationKind do
   @moduledoc false
 
@@ -57,10 +46,27 @@ defmodule Proto.Gymnasium.V1.Models.Attribute do
   field :id, 1, type: :string
   field :model_id, 2, type: :string, json_name: "modelId"
   field :description, 3, type: :string
-  field :kind, 4, type: Proto.Gymnasium.V1.Models.AttributeKind, enum: true
+
+  field :attribute_type, 4,
+    type: Proto.Gymnasium.V1.Models.AttributeType,
+    json_name: "attributeType"
+
   field :name, 5, type: :string
   field :create_time, 6, type: Google.Protobuf.Timestamp, json_name: "createTime"
   field :update_time, 7, type: Google.Protobuf.Timestamp, json_name: "updateTime"
+end
+
+defmodule Proto.Gymnasium.V1.Models.AttributeType do
+  @moduledoc false
+
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+
+  field :id, 1, type: :string
+  field :description, 2, type: :string
+  field :name, 3, type: :string
+  field :slug, 4, type: :string
+  field :create_time, 5, type: Google.Protobuf.Timestamp, json_name: "createTime"
+  field :update_time, 6, type: Google.Protobuf.Timestamp, json_name: "updateTime"
 end
 
 defmodule Proto.Gymnasium.V1.Models.ModelOverview do
@@ -152,7 +158,7 @@ defmodule Proto.Gymnasium.V1.Models.CreateAttributeRequest do
 
   field :model_id, 1, type: :string, json_name: "modelId"
   field :description, 2, type: :string
-  field :kind, 3, type: Proto.Gymnasium.V1.Models.AttributeKind, enum: true
+  field :attribute_type_id, 3, type: :string, json_name: "attributeTypeId"
   field :name, 4, type: :string
 end
 

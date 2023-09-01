@@ -2,7 +2,8 @@
 
 use super::*;
 use crate::{
-    datastore::model::{AssociationKind, AttributeKind},
+    attribute_type::{AttributeType, AttributeTypeRecord},
+    datastore::model::AssociationKind,
     project::{
         ArchiveProjectRecord, CreateProjectRecord, DeleteProjectRecord, GetProjectRecord,
         ListProjectRecordFilterArchive, ListProjectRecordFilters, ListProjectRecords, Project,
@@ -378,7 +379,7 @@ pub fn model_record_fixture(fixture: ModelRecordFixture) -> datastore::model::Mo
 pub struct ModelAttributeRecordFixture {
     pub model_id: Option<Uuid>,
     pub description: Option<String>,
-    pub kind: Option<AttributeKind>,
+    pub r#type: Option<AttributeTypeRecord>,
     pub name: Option<String>,
 }
 
@@ -388,14 +389,21 @@ pub fn model_attribute_record_fixture(
     let ModelAttributeRecordFixture {
         model_id,
         description,
-        kind,
+        r#type,
         name,
     } = fixture;
 
     datastore::model::Attribute {
         model_id: model_id.unwrap_or(Uuid::new_v4()),
         description: description.unwrap_or_default(),
-        kind: kind.unwrap_or_default(),
+        r#type: r#type.unwrap_or(AttributeTypeRecord {
+            inner: AttributeType {
+                description: None,
+                name: "String".to_string(),
+                slug: "string".to_string(),
+            },
+            ..Default::default()
+        }),
         name: name.unwrap_or("Title".to_string()),
         ..Default::default()
     }

@@ -4,7 +4,7 @@ defmodule Gymnasium.AttributeTypesTest do
   alias Gymnasium.AttributeTypes
   alias Gymnasium.AttributeTypes.AttributeType
 
-  import Gymnasium.AttributeTypesFixtures
+  import Gymnasium.{AttributeTypesFixtures, ModelsFixtures}
 
   describe "create attribute type" do
     test "create_attribute_type/1 saves attribute type" do
@@ -221,6 +221,15 @@ defmodule Gymnasium.AttributeTypesTest do
 
       assert_raise Ecto.NoResultsError, fn ->
         AttributeTypes.get_attribute_type!(attribute_type.id)
+      end
+    end
+
+    test "delete_attribute_type/1 raises constraint error" do
+      attribute_type = attribute_type_fixture()
+      model_attribute_fixture(attribute_type_id: attribute_type.id)
+
+      assert_raise Ecto.ConstraintError, fn ->
+        AttributeTypes.delete_attribute_type(attribute_type)
       end
     end
   end

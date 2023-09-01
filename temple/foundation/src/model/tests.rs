@@ -2,6 +2,7 @@
 
 use super::*;
 use crate::{
+    attribute_type::{tests::AttributeTypeRepo, AttributeTypeRecord, GetAttributeTypeRecord},
     project::GetProjectRecord,
     tests::{
         model_attribute_record_fixture, model_record_fixture, ModelAssociationRepo,
@@ -232,12 +233,13 @@ impl CreateModelAttributeRecord for Repo {
     async fn create_model_attribute_record(
         &self,
         model_record: datastore::model::Model,
+        attribute_type_record: AttributeTypeRecord,
         attribute: Attribute,
     ) -> FoundationResult<datastore::model::Attribute> {
         let Attribute {
             description,
             name,
-            kind,
+            r#type: _,
         } = attribute;
 
         let mut model_attribute_records = self.model_attribute_repo.records.write().await;
@@ -246,7 +248,7 @@ impl CreateModelAttributeRecord for Repo {
             model_id: model_record.id,
             description: description.unwrap_or_default(),
             name,
-            kind: kind.into(),
+            r#type: attribute_type_record,
             ..Default::default()
         };
 
@@ -291,11 +293,24 @@ impl CreateModelAssociationRecord for Repo {
     }
 }
 
+#[async_trait::async_trait]
+impl GetAttributeTypeRecord for Repo {
+    async fn get_attribute_type_record(
+        &self,
+        slug: &str,
+    ) -> FoundationResult<Option<AttributeTypeRecord>> {
+        self.attribute_type_repo
+            .get_attribute_type_record(slug)
+            .await
+    }
+}
+
 pub struct Repo {
     pub project_repo: ProjectRepo,
     pub model_repo: ModelRepo,
     pub model_attribute_repo: ModelAttributeRepo,
     pub model_association_repo: ModelAssociationRepo,
+    pub attribute_type_repo: AttributeTypeRepo,
 }
 
 impl Default for Repo {
@@ -305,6 +320,7 @@ impl Default for Repo {
             model_repo: ModelRepo::seed(vec![]),
             model_attribute_repo: ModelAttributeRepo::seed(vec![]),
             model_association_repo: ModelAssociationRepo::seed(vec![]),
+            attribute_type_repo: AttributeTypeRepo::new(),
         }
     }
 }
@@ -335,7 +351,11 @@ fn it_converts_attribute_from_record() {
         attribute,
         Attribute {
             name: "Title".to_string(),
-            kind: AttributeKind::String,
+            r#type: AttributeType {
+                description: None,
+                name: "String".to_string(),
+                slug: "string".to_string()
+            },
             description: None,
         }
     )

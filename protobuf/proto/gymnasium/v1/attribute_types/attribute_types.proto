@@ -45,7 +45,6 @@ message AttributeType {
     google.protobuf.Timestamp update_time = 6;
 }
 
-
 // Client's request to create attribute type.
 message CreateAttributeTypeRequest {
     // A short hint about how the type is used or what it's intended for.

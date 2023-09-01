@@ -1,9 +1,10 @@
 use super::map_status_error;
 use crate::util;
 use foundation::{
+    attribute_type::{AttributeType, AttributeTypeRecord},
     datastore,
     model::{
-        Association, AssociationKind, Attribute, AttributeKind, CreateModelAssociationRecord,
+        Association, AssociationKind, Attribute, CreateModelAssociationRecord,
         CreateModelAttributeRecord, CreateModelRecord, DeleteModelAssociationRecord,
         DeleteModelAttributeRecord, DeleteModelRecord, GetModelAssociationRecord,
         GetModelAttributeRecord, GetModelOverviewRecord, GetModelRecord, ListModelOverviewRecords,
@@ -255,6 +256,7 @@ impl CreateModelAttributeRecord for ModelsRepo {
     async fn create_model_attribute_record(
         &self,
         model_record: datastore::model::Model,
+        attribute_type_record: AttributeTypeRecord,
         attribute: Attribute,
     ) -> FoundationResult<datastore::model::Attribute> {
         let mut client = self.client().await?;
@@ -264,12 +266,7 @@ impl CreateModelAttributeRecord for ModelsRepo {
                 model_id: model_record.id.to_string(),
                 description: attribute.description.unwrap_or_default(),
                 name: attribute.name,
-                kind: match attribute.kind {
-                    AttributeKind::String => rpc::AttributeKind::String,
-                    AttributeKind::Integer => rpc::AttributeKind::Integer,
-                    AttributeKind::Boolean => rpc::AttributeKind::Boolean,
-                }
-                .into(),
+                attribute_type_id: attribute_type_record.id.to_string(),
             })
             .await
             .map_err(map_status_error)?
@@ -349,11 +346,39 @@ impl ModelsRepo {
     }
 }
 
+fn datastore_model_attribute_type(
+    proto_model_attribute_type: rpc::AttributeType,
+) -> FoundationResult<AttributeTypeRecord> {
+    let create_time = proto_model_attribute_type
+        .create_time
+        .ok_or(FoundationError::internal(
+            "missing #create_time for model attribute type",
+        ))?;
+
+    let update_time = proto_model_attribute_type
+        .update_time
+        .ok_or(FoundationError::internal(
+            "missing #update_time for model attribute type",
+        ))?;
+
+    Ok(AttributeTypeRecord {
+        id: util::proto::uuid_from_proto_string(&proto_model_attribute_type.id, "id")
+            .map_err(map_status_error)?,
+        inner: AttributeType {
+            description: Some(proto_model_attribute_type.description),
+            slug: proto_model_attribute_type.slug,
+            name: proto_model_attribute_type.name,
+        },
+        inserted_at: util::proto::from_proto_timestamp(create_time, "insert_time")
+            .map_err(map_status_error)?,
+        updated_at: util::proto::from_proto_timestamp(update_time, "update_time")
+            .map_err(map_status_error)?,
+    })
+}
+
 fn datastore_model_attribute(
     proto_model_attribute: rpc::Attribute,
 ) -> FoundationResult<datastore::model::Attribute> {
-    use rpc::AttributeKind;
-
     let create_time = proto_model_attribute
         .create_time
         .ok_or(FoundationError::internal("missing #create_time for Model"))?;
@@ -362,25 +387,17 @@ fn datastore_model_attribute(
         .update_time
         .ok_or(FoundationError::internal("missing #update_time for Model"))?;
 
-    let proto_model_attribute_kind = rpc::AttributeKind::from_i32(proto_model_attribute.kind)
-        .ok_or(FoundationError::internal(
-            "missing #kind for ModelAttribute",
-        ))?;
-
     let model_attribute = datastore::model::Attribute {
         id: util::proto::uuid_from_proto_string(&proto_model_attribute.id, "id")
             .map_err(map_status_error)?,
         model_id: util::proto::uuid_from_proto_string(&proto_model_attribute.model_id, "model_id")
             .map_err(map_status_error)?,
         description: proto_model_attribute.description,
-        kind: match proto_model_attribute_kind {
-            AttributeKind::Unspecified => {
-                return Err(FoundationError::internal("UnspecifiedAttributeKind"))
-            }
-            AttributeKind::String => datastore::model::AttributeKind::String,
-            AttributeKind::Integer => datastore::model::AttributeKind::Integer,
-            AttributeKind::Boolean => datastore::model::AttributeKind::Boolean,
-        },
+        r#type: datastore_model_attribute_type(
+            proto_model_attribute
+                .attribute_type
+                .ok_or(FoundationError::internal("missing attribute type"))?,
+        )?,
         name: proto_model_attribute.name,
         inserted_at: util::proto::from_proto_timestamp(create_time, "insert_time")
             .map_err(map_status_error)?,

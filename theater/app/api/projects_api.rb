@@ -31,7 +31,7 @@ class ProjectsApi
       model_slug: model.slug,
       description: attribute.description,
       name: attribute.name,
-      kind: proto_attribute_kind(attribute.kind),
+      attribute_type_slug: attribute.attribute_type_slug,
     ))
   end
   # rubocop:enable Metrics/MethodLength
@@ -138,14 +138,6 @@ class ProjectsApi
   end
 
   private
-
-  def proto_attribute_kind(kind)
-    {
-      "string" => :MODEL_ATTRIBUTE_KIND_STRING,
-      "integer" => :MODEL_ATTRIBUTE_KIND_INTEGER,
-      "boolean" => :MODEL_ATTRIBUTE_KIND_BOOLEAN,
-    }.fetch(kind, :MODEL_ATTRIBUTE_KIND_STRING)
-  end
 
   def proto_association_kind(kind)
     {

@@ -53,11 +53,23 @@ message ModelAttribute {
     // ModelAttribute's description.
     string description = 1;
 
-    // ModelAttribute's slug.
-    ModelAttributeKind kind = 2;
+    // ModelAttribute's type.
+    ModelAttributeType type = 2;
 
     // ModelAttribute's name.
     string name = 3;
+}
+
+// Representation of attribute type.
+message ModelAttributeType {
+    // A short hint about how the type is used or what it's intended for.
+    string description = 1;
+
+    // Mandatory field. A short, meaningful title of the attribute type.
+    string name = 2;
+
+    // Mandatory field. Unique web identifier of the attribute type.
+    string slug = 3;
 }
 
 enum ModelAttributeKind {
@@ -184,11 +196,11 @@ message DeleteModelRequest {
 message DeleteModelResponse {}
 
 message CreateModelAttributeRequest {
-    string project_slug = 1;
-    string model_slug = 2;
-    string description = 3;
-    ModelAttributeKind kind = 4;
-    string name = 5;
+    string attribute_type_slug = 1;
+    string description = 2;
+    string model_slug = 3;
+    string name = 4;
+    string project_slug = 5;
 }
 
 message CreateModelAttributeResponse {

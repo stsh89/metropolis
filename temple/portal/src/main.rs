@@ -20,6 +20,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         models_repo: repo::ModelsRepo {
             connection_string: configuration.database()?.connection_string()?,
         },
+        attribute_types_repo: repo::AttributeTypesRepo {
+            connection_string: configuration.database()?.connection_string()?,
+        },
     };
     let attribute_types_server = servers::attribute_types_server::AttributeTypesServer {
         attribute_types_repo: repo::AttributeTypesRepo {

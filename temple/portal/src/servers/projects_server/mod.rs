@@ -1,15 +1,17 @@
 // use crate::{datastore::Repo, model::Project, service, util};
 use crate::{
-    repo::{ModelsRepo, ProjectsRepo},
+    repo::{AttributeTypesRepo, ModelsRepo, ProjectsRepo},
     PortalError,
 };
 use foundation::{
+    attribute_type,
     model::{self, Model},
     project::{self, Project},
 };
 use tonic::{Request, Response, Status};
 
 mod create_model;
+mod create_model_attribute;
 
 pub mod rpc {
     tonic::include_proto!("proto.temple.v1"); // The string specified here must match the proto package name
@@ -18,6 +20,7 @@ pub mod rpc {
 pub struct ProjectsServer {
     pub projects_repo: ProjectsRepo,
     pub models_repo: ModelsRepo,
+    pub attribute_types_repo: AttributeTypesRepo,
 }
 
 #[tonic::async_trait]
@@ -255,45 +258,9 @@ impl rpc::projects_server::Projects for ProjectsServer {
         &self,
         request: Request<rpc::CreateModelAttributeRequest>, // Accept request of type HelloRequest
     ) -> Result<Response<rpc::CreateModelAttributeResponse>, Status> {
-        use rpc::ModelAttributeKind;
-
         println!("Got a request: {:?}", request);
 
-        let rpc::CreateModelAttributeRequest {
-            project_slug,
-            model_slug,
-            kind,
-            description,
-            name,
-        } = request.into_inner();
-
-        let Some(attribute_kind) = rpc::ModelAttributeKind::from_i32(kind) else {
-            return Err(PortalError::invalid_argument("kind").into());
-        };
-
-        let model_attribute = model::create_attribute::execute(
-            &self.models_repo,
-            model::create_attribute::Request {
-                project_slug,
-                model_slug,
-                description,
-                kind: match attribute_kind {
-                    ModelAttributeKind::Unspecified => "unspecified",
-                    ModelAttributeKind::String => "string",
-                    ModelAttributeKind::Integer => "integer",
-                    ModelAttributeKind::Boolean => "boolean",
-                }
-                .to_string(),
-                name,
-            },
-        )
-        .await
-        .map_err(Into::<PortalError>::into)?
-        .model_attribute;
-
-        Ok(Response::new(rpc::CreateModelAttributeResponse {
-            model_attribute: Some(to_proto_model_attribute(model_attribute)),
-        }))
+        create_model_attribute::execute(self, request).await
     }
 
     async fn delete_model_attribute(
@@ -474,17 +441,20 @@ fn to_proto_model_association(model_association: model::Association) -> rpc::Mod
     }
 }
 
-fn to_proto_model_attribute(model_attribute: model::Attribute) -> rpc::ModelAttribute {
-    use rpc::ModelAttributeKind;
-
+pub fn to_proto_model_attribute(model_attribute: model::Attribute) -> rpc::ModelAttribute {
     rpc::ModelAttribute {
         description: model_attribute.description.unwrap_or_default(),
         name: model_attribute.name,
-        kind: match model_attribute.kind {
-            model::AttributeKind::String => ModelAttributeKind::String,
-            model::AttributeKind::Integer => ModelAttributeKind::Integer,
-            model::AttributeKind::Boolean => ModelAttributeKind::Boolean,
-        }
-        .into(),
+        r#type: Some(to_proto_model_attribute_type(model_attribute.r#type)),
+    }
+}
+
+fn to_proto_model_attribute_type(
+    model_attribute_type: attribute_type::AttributeType,
+) -> rpc::ModelAttributeType {
+    rpc::ModelAttributeType {
+        name: model_attribute_type.name,
+        slug: model_attribute_type.slug,
+        description: model_attribute_type.description.unwrap_or_default(),
     }
 }

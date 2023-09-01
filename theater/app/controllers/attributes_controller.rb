@@ -3,6 +3,8 @@ class AttributesController < ApplicationController
 
   before_action :set_model, only: %i[new create destroy]
 
+  before_action :list_attribute_types, only: :new
+
   before_action :initialize_model_attribute, only: :create
 
   # GET /projects/book-store/models/book/attributes/new
@@ -42,8 +44,12 @@ class AttributesController < ApplicationController
     @attribute = ModelAttribute.new(attribute_params)
   end
 
+  def list_attribute_types
+    @attribute_types = AttributeType.all
+  end
+
   # Only allow a list of trusted parameters through.
   def attribute_params
-    params.require(:model_attribute).permit(:name, :description, :kind)
+    params.require(:model_attribute).permit(:name, :description, :attribute_type_slug)
   end
 end

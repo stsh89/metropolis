@@ -2,9 +2,9 @@ class ModelAttribute
   include ActiveModel::API
   include ActiveModel::Validations
 
-  attr_accessor :description, :name, :kind
+  attr_accessor :description, :name, :attribute_type_slug, :attribute_type
 
-  validates :name, :kind, presence: true
+  validates :name, :attribute_type_slug, presence: true
 
   def id
     @name
@@ -32,18 +32,8 @@ class ModelAttribute
       ModelAttribute.new(
         description: proto_attribute.description,
         name: proto_attribute.name,
-        kind: kind_from_proto(proto_attribute.kind),
+        attribute_type: AttributeTypeApiConverter.to_model(proto_attribute.type),
       )
-    end
-
-    private
-
-    def kind_from_proto(proto_kind)
-      {
-        MODEL_ATTRIBUTE_KIND_STRING: "string",
-        MODEL_ATTRIBUTE_KIND_INTEGER: "integer",
-        MODEL_ATTRIBUTE_KIND_BOOLEAN: "boolean",
-      }.fetch(proto_kind, "string")
     end
   end
 end

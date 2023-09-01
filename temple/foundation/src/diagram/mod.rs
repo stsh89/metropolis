@@ -88,15 +88,7 @@ fn to_diagram_class_attribute(
     attribute: &model::Attribute,
 ) -> mermaid::class_diagram::Attribute<'_> {
     mermaid::class_diagram::Attribute {
-        kind: to_diagram_attribute_kind(&attribute.kind),
+        kind: &attribute.r#type.name,
         name: &attribute.name,
-    }
-}
-
-fn to_diagram_attribute_kind(kind: &model::AttributeKind) -> mermaid::class_diagram::AttributeKind {
-    match kind {
-        model::AttributeKind::String => mermaid::class_diagram::AttributeKind::String,
-        model::AttributeKind::Integer => mermaid::class_diagram::AttributeKind::Integer,
-        model::AttributeKind::Boolean => mermaid::class_diagram::AttributeKind::Boolean,
     }
 }

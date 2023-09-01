@@ -32,7 +32,7 @@ defmodule Gymnasium.ModelsFixtures do
       |> Enum.into(%{
         model_id: Ecto.UUID.generate(),
         description: "The title of the Book",
-        kind: "string",
+        attribute_type_id: Ecto.UUID.generate(),
         name: "title"
       })
       |> Models.create_attribute()

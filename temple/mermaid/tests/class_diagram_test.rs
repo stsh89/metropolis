@@ -1,4 +1,4 @@
-use mermaid::class_diagram::{Association, Attribute, AttributeKind, Class, ClassDiagram};
+use mermaid::class_diagram::{Association, Attribute, Class, ClassDiagram};
 
 fn manifest_dir() -> String {
     std::env::var("CARGO_MANIFEST_DIR").unwrap()
@@ -27,15 +27,15 @@ fn it_generates_class_diagram_with_classes_and_associations() {
                 name: "Book",
                 attributes: &[
                     Attribute {
-                        kind: AttributeKind::String,
+                        kind: "String",
                         name: "title",
                     },
                     Attribute {
-                        kind: AttributeKind::Integer,
+                        kind: "Integer",
                         name: "year",
                     },
                     Attribute {
-                        kind: AttributeKind::Boolean,
+                        kind: "Boolean",
                         name: "is_new",
                     },
                 ],
@@ -44,19 +44,19 @@ fn it_generates_class_diagram_with_classes_and_associations() {
                 name: "Author",
                 attributes: &[
                     Attribute {
-                        kind: AttributeKind::String,
+                        kind: "String",
                         name: "first_name",
                     },
                     Attribute {
-                        kind: AttributeKind::String,
+                        kind: "String",
                         name: "last_name",
                     },
                     Attribute {
-                        kind: AttributeKind::Integer,
+                        kind: "Integer",
                         name: "number_of_books",
                     },
                     Attribute {
-                        kind: AttributeKind::Boolean,
+                        kind: "Boolean",
                         name: "is_bestseller",
                     },
                 ],
@@ -76,15 +76,15 @@ fn it_generates_class_diagram_with_classes_only() {
                 name: "Book",
                 attributes: &[
                     Attribute {
-                        kind: AttributeKind::String,
+                        kind: "String",
                         name: "title",
                     },
                     Attribute {
-                        kind: AttributeKind::Integer,
+                        kind: "Integer",
                         name: "year",
                     },
                     Attribute {
-                        kind: AttributeKind::Boolean,
+                        kind: "Boolean",
                         name: "is_new",
                     },
                 ],
@@ -93,19 +93,19 @@ fn it_generates_class_diagram_with_classes_only() {
                 name: "Author",
                 attributes: &[
                     Attribute {
-                        kind: AttributeKind::String,
+                        kind: "String",
                         name: "first_name",
                     },
                     Attribute {
-                        kind: AttributeKind::String,
+                        kind: "String",
                         name: "last_name",
                     },
                     Attribute {
-                        kind: AttributeKind::Integer,
+                        kind: "Integer",
                         name: "number_of_books",
                     },
                     Attribute {
-                        kind: AttributeKind::Boolean,
+                        kind: "Boolean",
                         name: "is_bestseller",
                     },
                 ],

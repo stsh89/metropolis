@@ -4,7 +4,7 @@ defmodule GymnasiumGrpc.AttributeTypesServerTest do
   alias GymnasiumGrpc.AttributeTypesServer
   alias Proto.Gymnasium.V1.AttributeTypes, as: Rpc
 
-  import Gymnasium.AttributeTypesFixtures
+  import Gymnasium.{AttributeTypesFixtures, ModelsFixtures}
 
   describe "create attribute type" do
     test "create_attribute_type/2 saves attribute type" do
@@ -132,6 +132,20 @@ defmodule GymnasiumGrpc.AttributeTypesServerTest do
         )
 
       assert %Google.Protobuf.Empty{} == response
+    end
+
+    test "delete_attribute_type/2 raises constraint error" do
+      attribute_type = attribute_type_fixture()
+      model_attribute_fixture(attribute_type_id: attribute_type.id)
+
+      assert_raise Ecto.ConstraintError, fn ->
+        AttributeTypesServer.delete_attribute_type(
+          %Rpc.DeleteAttributeTypeRequest{
+            id: attribute_type.id
+          },
+          nil
+        )
+      end
     end
 
     test "delete_attribute_type/2 raises internal error" do

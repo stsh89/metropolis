@@ -4,6 +4,7 @@ defmodule GymnasiumGrpc.ModelsServer do
   use GRPC.Server, service: Proto.Gymnasium.V1.Models.Models.Service
 
   alias Gymnasium.Models.{Model, Association, Attribute}
+  alias Gymnasium.AttributeTypes.{AttributeType}
   alias GymnasiumGrpc.Util
   alias Proto.Gymnasium.V1.Models, as: Rpc
   alias GymnasiumGrpc.ModelService
@@ -209,16 +210,16 @@ defmodule GymnasiumGrpc.ModelsServer do
   def create_attribute(%Rpc.CreateAttributeRequest{} = request, _stream) do
     %Rpc.CreateAttributeRequest{
       model_id: model_id,
+      attribute_type_id: attribute_type_id,
       description: description,
-      name: name,
-      kind: kind
+      name: name
     } = request
 
     attributes = %ModelService.CreateAttributeAttributes{
+      attribute_type_id: attribute_type_id,
       model_id: model_id,
       description: description,
-      name: name,
-      kind: from_proto_attribute_kind(kind)
+      name: name
     }
 
     case ModelService.create_attribute(attributes) do
@@ -301,6 +302,17 @@ defmodule GymnasiumGrpc.ModelsServer do
     }
   end
 
+  defp to_proto_model_attribute_type(%AttributeType{} = attribute_type) do
+    %Rpc.AttributeType{
+      id: attribute_type.id,
+      description: attribute_type.description,
+      name: attribute_type.name,
+      slug: attribute_type.slug,
+      create_time: Util.to_proto_timestamp(attribute_type.inserted_at),
+      update_time: Util.to_proto_timestamp(attribute_type.updated_at)
+    }
+  end
+
   defp to_proto_model_overview(%Model{} = model) do
     %Rpc.ModelOverview{
       model: to_proto_model(model),
@@ -326,8 +338,8 @@ defmodule GymnasiumGrpc.ModelsServer do
     %Rpc.Attribute{
       id: attribute.id,
       model_id: attribute.model_id,
+      attribute_type: to_proto_model_attribute_type(attribute.attribute_type),
       description: attribute.description,
-      kind: to_proto_attribute_kind(attribute.kind),
       name: attribute.name,
       create_time: Util.to_proto_timestamp(attribute.inserted_at),
       update_time: Util.to_proto_timestamp(attribute.updated_at)
@@ -343,14 +355,4 @@ defmodule GymnasiumGrpc.ModelsServer do
   defp to_proto_association_kind("has_one"), do: :ASSOCIATION_KIND_HAS_ONE
   defp to_proto_association_kind("has_many"), do: :ASSOCIATION_KIND_HAS_MANY
   defp to_proto_association_kind(_), do: :ASSOCIATION_KIND_UNSPECIFIED
-
-  defp from_proto_attribute_kind(:ATTRIBUTE_KIND_STRING), do: "string"
-  defp from_proto_attribute_kind(:ATTRIBUTE_KIND_INTEGER), do: "integer"
-  defp from_proto_attribute_kind(:ATTRIBUTE_KIND_BOOLEAN), do: "boolean"
-  defp from_proto_attribute_kind(_), do: "unspecified"
-
-  defp to_proto_attribute_kind("string"), do: :ATTRIBUTE_KIND_STRING
-  defp to_proto_attribute_kind("integer"), do: :ATTRIBUTE_KIND_INTEGER
-  defp to_proto_attribute_kind("boolean"), do: :ATTRIBUTE_KIND_BOOLEAN
-  defp to_proto_attribute_kind(_), do: :ATTRIBUTE_KIND_UNSPECIFIED
 end

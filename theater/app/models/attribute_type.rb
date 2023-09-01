@@ -148,17 +148,5 @@ class AttributeType
 
       attribute_type
     end
-
-    private
-
-    # Convert attribute type that was returned via API into model.
-    # @return [AttributeType]
-    def from_proto(proto_attribute_type)
-      AttributeType.new(
-        description: proto_attribute_type.description,
-        name: proto_attribute_type.name,
-        slug: proto_attribute_type.slug,
-      )
-    end
   end
 end

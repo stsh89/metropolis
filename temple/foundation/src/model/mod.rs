@@ -13,7 +13,10 @@ mod tests;
 
 use std::str::FromStr;
 
-use crate::{datastore, util, FoundationError, FoundationResult};
+use crate::{
+    attribute_type::{AttributeType, AttributeTypeRecord},
+    datastore, util, FoundationError, FoundationResult,
+};
 
 #[async_trait::async_trait]
 pub trait CreateModelRecord {
@@ -107,6 +110,7 @@ pub trait CreateModelAttributeRecord {
     async fn create_model_attribute_record(
         &self,
         model: datastore::model::Model,
+        attribute_type_record: AttributeTypeRecord,
         attribute: Attribute,
     ) -> FoundationResult<datastore::model::Attribute>;
 }
@@ -134,7 +138,7 @@ pub struct Model {
 pub struct Attribute {
     pub description: Option<String>,
 
-    pub kind: AttributeKind,
+    pub r#type: AttributeType,
 
     pub name: String,
 }
@@ -148,15 +152,6 @@ pub struct Association {
     pub model: Model,
 
     pub name: String,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub enum AttributeKind {
-    String,
-
-    Integer,
-
-    Boolean,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -220,7 +215,7 @@ impl From<datastore::model::Attribute> for Attribute {
             model_id: _,
             description,
             name,
-            kind,
+            r#type,
             inserted_at: _,
             updated_at: _,
         } = value;
@@ -228,27 +223,7 @@ impl From<datastore::model::Attribute> for Attribute {
         Self {
             description: util::string::optional(&description),
             name,
-            kind: kind.into(),
-        }
-    }
-}
-
-impl From<datastore::model::AttributeKind> for AttributeKind {
-    fn from(value: datastore::model::AttributeKind) -> Self {
-        match value {
-            datastore::model::AttributeKind::String => AttributeKind::String,
-            datastore::model::AttributeKind::Integer => AttributeKind::Integer,
-            datastore::model::AttributeKind::Boolean => AttributeKind::Boolean,
-        }
-    }
-}
-
-impl From<AttributeKind> for datastore::model::AttributeKind {
-    fn from(value: AttributeKind) -> Self {
-        match value {
-            AttributeKind::String => datastore::model::AttributeKind::String,
-            AttributeKind::Integer => datastore::model::AttributeKind::Integer,
-            AttributeKind::Boolean => datastore::model::AttributeKind::Boolean,
+            r#type: r#type.into(),
         }
     }
 }
@@ -315,11 +290,11 @@ impl PartialEq for Attribute {
     fn eq(&self, other: &Self) -> bool {
         let Attribute {
             description,
-            kind,
+            r#type,
             name,
         } = other;
 
-        &self.description == description && &self.name == name && &self.kind == kind
+        &self.description == description && &self.name == name && &self.r#type == r#type
     }
 }
 
@@ -336,21 +311,6 @@ impl PartialEq for Association {
             && &self.kind == kind
             && &self.model == model
             && &self.name == name
-    }
-}
-
-impl FromStr for AttributeKind {
-    type Err = FoundationError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "string" => Ok(AttributeKind::String),
-            "integer" => Ok(AttributeKind::Integer),
-            "boolean" => Ok(AttributeKind::Boolean),
-            other => Err(FoundationError::invalid_argument(format! {
-                "`#{other}` is not a valid AttributeKind for the Model"
-            })),
-        }
     }
 }
 

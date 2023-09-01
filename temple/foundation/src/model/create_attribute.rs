@@ -1,6 +1,7 @@
 use crate::{
+    attribute_type::GetAttributeTypeRecord,
     model::{Attribute, CreateModelAttributeRecord, GetModelRecord},
-    util, FoundationResult,
+    util, FoundationError, FoundationResult,
 };
 
 pub struct Request {
@@ -8,7 +9,7 @@ pub struct Request {
     pub model_slug: String,
     pub description: String,
     pub name: String,
-    pub kind: String,
+    pub attribute_type_slug: String,
 }
 
 pub struct Response {
@@ -16,25 +17,31 @@ pub struct Response {
 }
 
 pub async fn execute(
-    repo: &(impl GetModelRecord + CreateModelAttributeRecord),
+    repo: &(impl GetModelRecord + CreateModelAttributeRecord + GetAttributeTypeRecord),
     request: Request,
 ) -> FoundationResult<Response> {
     let Request {
         project_slug,
         model_slug,
         description,
-        kind,
+        attribute_type_slug,
         name,
     } = request;
 
     let model_record = repo.get_model_record(&project_slug, &model_slug).await?;
 
+    let attribute_type_record = repo
+        .get_attribute_type_record(&attribute_type_slug)
+        .await?
+        .ok_or(FoundationError::not_found("attribute type not found"))?;
+
     let model_attribute_record = repo
         .create_model_attribute_record(
             model_record,
+            attribute_type_record.clone(),
             Attribute {
                 description: util::string::optional(&description),
-                kind: kind.parse()?,
+                r#type: attribute_type_record.into(),
                 name,
             },
         )
@@ -51,7 +58,8 @@ pub async fn execute(
 mod tests {
     use super::*;
     use crate::{
-        model::{tests::Repo, AttributeKind},
+        attribute_type::tests::{attribute_type_record_fixture, AttributeTypeRepo},
+        model::tests::Repo,
         tests::{
             model_record_fixture, project_record_fixture, ModelRecordFixture, ModelRepo,
             ProjectRepo,
@@ -68,10 +76,13 @@ mod tests {
 
         let project_repo = ProjectRepo::seed(vec![project_record.clone()]);
         let model_repo = ModelRepo::seed(vec![model_record.clone()]);
+        let attribute_type_repo = AttributeTypeRepo::new();
+        let attribute_type_record = attribute_type_record_fixture(&attribute_type_repo).await;
 
         let repo = Repo {
             project_repo,
             model_repo,
+            attribute_type_repo,
             ..Default::default()
         };
 
@@ -82,7 +93,7 @@ mod tests {
                 model_slug: model_record.slug,
                 description: "The Title of the Book".to_string(),
                 name: "Title".to_string(),
-                kind: "string".to_string(),
+                attribute_type_slug: attribute_type_record.inner.slug.to_owned(),
             },
         )
         .await?;
@@ -101,7 +112,7 @@ mod tests {
             response.model_attribute,
             Attribute {
                 description: Some("The Title of the Book".to_string()),
-                kind: AttributeKind::String,
+                r#type: attribute_type_record.into(),
                 name: "Title".to_string(),
             }
         );

@@ -112,8 +112,8 @@ message Attribute {
     // The description of the attribute.
     string description = 3;
 
-    // The kind of the Attribute.
-    AttributeKind kind = 4;
+    // Unique identifier of the attribute type.
+    AttributeType attribute_type = 4;
 
     // The name of the attribute.
     string name = 5;
@@ -123,6 +123,27 @@ message Attribute {
 
     // The timestamp of the last attribute's update.
     google.protobuf.Timestamp update_time = 7;
+}
+
+// Representation of attribute type.
+message AttributeType {
+    // Mandatory field. Unique identifier of the attribute type. UUID in the string form.
+    string id = 1;
+
+    // A short hint about how the type is used or what it's intended for.
+    string description = 2;
+
+    // Mandatory field. A short, meaningful title of the attribute type.
+    string name = 3;
+
+    // Mandatory field. Unique web identifier of the attribute type.
+    string slug = 4;
+
+    // Mandatory field. The time the attribute type was created.
+    google.protobuf.Timestamp create_time = 5;
+
+    // Mandatory field. The last time that the attribute type was changed.
+    google.protobuf.Timestamp update_time = 6;
 }
 
 // Model with attributes and associations.
@@ -208,8 +229,8 @@ message CreateAttributeRequest {
     // The description of the Model's attribute.
     string description = 2;
 
-    // Kind of the Model's attribute;
-    AttributeKind kind = 3;
+    // Type of the Model's attribute;
+    string attribute_type_id = 3;
 
     // The name of the Model's attribute.
     string name = 4;
@@ -299,21 +320,6 @@ message DeleteAttributeRequest {
 message DeleteAssociationRequest {
     // Unique association identifier. UUID in a string form.
     string id = 1;
-}
-
-// All possible kinds of Model attributes.
-enum AttributeKind {
-    // Unspecified
-    ATTRIBUTE_KIND_UNSPECIFIED = 0;
-
-    // String
-    ATTRIBUTE_KIND_STRING = 1;
-
-    // Integer
-    ATTRIBUTE_KIND_INTEGER = 2;
-
-    // Bool
-    ATTRIBUTE_KIND_BOOLEAN = 3;
 }
 
 // All possible kinds of Model associations.

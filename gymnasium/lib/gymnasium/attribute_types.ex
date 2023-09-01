@@ -7,6 +7,7 @@ defmodule Gymnasium.AttributeTypes do
   alias Gymnasium.Repo
 
   alias Gymnasium.AttributeTypes.AttributeType
+  alias Gymnasium.Models
 
   @doc """
   Returns the list of attribute_types.
@@ -109,6 +110,17 @@ defmodule Gymnasium.AttributeTypes do
   """
   @spec delete_attribute_type(AttributeType.t()) :: {:ok, AttributeType.t()}
   def delete_attribute_type(%AttributeType{} = attribute_type) do
+    query = from ma in Models.Attribute, where: ma.attribute_type_id == ^attribute_type.id
+
+    if Repo.exists?(query) do
+      raise Ecto.ConstraintError,
+        type: "delete",
+        constraint: "model attributes",
+        message: "can't delete attribute type",
+        changeset: %Ecto.Changeset{},
+        action: :delete
+    end
+
     Repo.delete(attribute_type)
   end
 
